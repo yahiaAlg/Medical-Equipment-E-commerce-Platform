@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <link href="https://fonts.googleapis.com" rel="preconnect" />
+    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&amp;display=swap"
+      rel="stylesheet"
+    />
+    <link href="images/logo.png" rel="icon" />
+    <title>Fennec Med-Home</title>
+    <link rel="stylesheet" href="css/style.css" />
+  </head>
+  <body>
+    <!-- Header Section -->
+    <header class="header">
+      <nav class="navbar">
+        <div class="logo">
+          <div class="logo-img">
+            <img alt="Fennec Med Logo" src="images/logo.png" />
+          </div>
+        </div>
+        <ul class="nav-links">
+          <li>
+            <a href="#"> Home </a>
+          </li>
+          <li>
+            <a href="#"> About Us </a>
+          </li>
+          <li>
+            <a href="#"> Health Practitioners </a>
+          </li>
+          <li>
+            <a href="#"> Services </a>
+          </li>
+          <li>
+            <a href="#"> Information </a>
+          </li>
+          <li>
+            <a href="#"> Contact Us </a>
+          </li>
+        </ul>
+        <div class="nav-buttons">
+          <a class="btn btn-call" href="#"> Call Us </a>
+          <a class="btn btn-book" href="#"> Book Now </a>
+        </div>
+        <button
+          class="menu-toggle"
+          onclick="toggleMenu()"
+          aria-label="Toggle menu"
+        >
+          <ion-icon name="menu-outline"></ion-icon>
+        </button>
+      </nav>
+    </header>
+
+    <!-- Mobile Menu Overlay -->
+    <div
+      class="mobile-menu-overlay"
+      id="mobileMenuOverlay"
+      onclick="closeMenu()"
+    ></div>
+
+    <!-- Mobile Menu -->
+    <div class="mobile-menu" id="mobileMenu">
+      <div class="mobile-menu-header">
+        <div class="logo">
+          <div class="logo-img">
+            <img alt="Fennec Med Logo" src="images/logo.png" />
+          </div>
+          Fennec Med
+        </div>
+        <button
+          class="mobile-menu-close"
+          onclick="toggleMenu()"
+          aria-label="Close menu"
+        >
+          <ion-icon name="close-outline"></ion-icon>
+        </button>
+      </div>
+      <ul class="mobile-nav-links">
+        <li>
+          <a href="#" onclick="closeMenu()"> Home </a>
+        </li>
+        <li>
+          <a href="#" onclick="closeMenu()"> About Us </a>
+        </li>
+        <li>
+          <a href="#" onclick="closeMenu()"> Health Practitioners </a>
+        </li>
+        <li>
+          <a href="#" onclick="closeMenu()"> Services </a>
+        </li>
+        <li>
+          <a href="#" onclick="closeMenu()"> Information </a>
+        </li>
+        <li>
+          <a href="#" onclick="closeMenu()"> Contact Us </a>
+        </li>
+      </ul>
+      <div class="mobile-nav-buttons">
+        <a class="btn btn-call" href="#" onclick="closeMenu()"> Call Us </a>
+        <a class="btn btn-book" href="#" onclick="closeMenu()"> Book Now </a>
+      </div>
+    </div>
+
+    <!-- Hero Section -->
+    <section class="hero">
+      <h1>Welcome to Fennec Med</h1>
+      <p>
+        Providing quality medical materials to families across the region since
+        2022.
+      </p>
+      <div class="hero-buttons">
+        <a class="btn btn-call" href="#"> Call Us </a>
+        <a class="btn btn-book" href="#"> Book Now </a>
+      </div>
+    </section>
+    <!-- About Us Section -->
+    <section class="about-us-section">
+      <div class="about-us-container">
+        <div class="about-us-image">
+          <img alt="Fennec Med" src="images/aboutUs-section.png" />
+        </div>
+        <div class="about-us-content">
+          <h2>About Our Brighton-Based Practice</h2>
+          <p>
+            We know visiting the doctor can feel a bit daunting. At Newbay
+            Medical Clinic, we've shaped our practice to make every visit feel
+            safe, calm, and comfortable. We keep our space clean and welcoming,
+            and we're mindful of your time—so you can focus on feeling cared
+            for, not stressed.
+          </p>
+          <a class="btn btn-learn-more" href="#"> Learn More About Us </a>
+        </div>
+      </div>
+    </section>
+    <!-- Products Section -->
+    <section class="products-section">
+      <h2 class="h2-p">Our Products</h2>
+      <div class="products-container">
+        <div class="product-card">
+          <div class="product-image">
+            <img
+              alt="3M Littmann Classic III Stethoscope"
+              src="images/prdct1.png"
+            />
+          </div>
+          <h3>Used to listen to heart sounds and detect abnormalities</h3>
+          <p class="product-price">18,900.00</p>
+        </div>
+        <div class="product-card">
+          <div class="product-image">
+            <img
+              alt="Accu-Chek Performa Blood Glucose Meter"
+              src="images/prdct2.png"
+            />
+          </div>
+          <h3>Measures blood sugar levels for diabetes management</h3>
+          <p class="product-price">37.00</p>
+        </div>
+        <div class="product-card">
+          <div class="product-image">
+            <img
+              alt="Non-contact infrared thermometer"
+              src="images/prdct3.png"
+            />
+          </div>
+          <h3>Measures body temperature to detect fever or infection</h3>
+          <p class="product-price">41,500.00</p>
+        </div>
+        <div class="product-card">
+          <div class="product-image">
+            <img alt="Kidney anatomical model" src="images/prdct4.png" />
+          </div>
+          <h3>Kidney anatomical model.</h3>
+          <p class="product-price">68,000.00</p>
+        </div>
+        <div class="product-card">
+          <div class="product-image">
+            <img
+              alt="Omron HEM-7130 Upper Arm Blood Pressure Monitor"
+              src="images/prdct5.png"
+            />
+          </div>
+          <h3>
+            Measures blood pressure for diagnosing and managing hypertension.
+          </h3>
+          <p class="product-price">6,700.00</p>
+        </div>
+        <div class="product-card">
+          <div class="product-image">
+            <img
+              alt="Examines ears to diagnose infections and other conditions"
+              src="images/prdct6.png"
+            />
+          </div>
+          <h3>Examines ears to diagnose infections and other conditions</h3>
+          <p class="product-price">690.00 - 740.00</p>
+        </div>
+        <div class="product-card">
+          <div class="product-image">
+            <img
+              alt="Automated external defibrillator (AED)"
+              src="images/prdct7.png"
+            />
+          </div>
+          <h3>
+            Delivers electric shocks to treat life-threatening heart rhythms
+          </h3>
+          <p class="product-price">6,900.00</p>
+        </div>
+        <div class="product-card">
+          <div class="product-image">
+            <img alt="Portable pulse oximeter" src="images/prdct8.png" />
+          </div>
+          <h3>
+            Measures blood oxygen levels and pulse rate for respiratory
+            monitoring
+          </h3>
+          <p class="product-price">20,600.00</p>
+        </div>
+      </div>
+    </section>
+    <!-- Specialities Section -->
+    <section class="specialty-section">
+      <h2 class="h2-specialty">Our Specialties</h2>
+      <div class="specialties-container">
+        <div class="specialty-card">
+          <div class="specialty-icon">
+            <img alt="General Medicine" src="images/General Medicine.png" />
+          </div>
+          <h3>General Medicine</h3>
+        </div>
+        <div class="specialty-card">
+          <div class="specialty-icon">
+            <img alt="Pediatrics" src="images/Pediatrics.png" />
+          </div>
+          <h3>Pediatrics</h3>
+        </div>
+        <div class="specialty-card">
+          <div class="specialty-icon">
+            <img alt="Gynecology" src="images/Gynecology.png" />
+          </div>
+          <h3>Gynecology</h3>
+        </div>
+        <div class="specialty-card">
+          <div class="specialty-icon">
+            <img alt="Orthopedics" src="images/Orthopedics.png" />
+          </div>
+          <h3>Orthopedics</h3>
+        </div>
+        <div class="specialty-card">
+          <div class="specialty-icon">
+            <img alt="Dentistry" src="images/dentistry.png" />
+          </div>
+          <h3>Dentistry</h3>
+        </div>
+        <div class="specialty-card">
+          <div class="specialty-icon">
+            <img alt="Dermatology" src="images/Dermatology.png" />
+          </div>
+          <h3>Dermatology</h3>
+        </div>
+        <div class="specialty-card">
+          <div class="specialty-icon">
+            <img alt="Pneumology" src="images/Pneumology.png" />
+          </div>
+          <h3>Pneumology</h3>
+        </div>
+        <div class="specialty-card">
+          <div class="specialty-icon">
+            <img alt="Ophthalmology" src="images/Ophthalmology.png" />
+          </div>
+          <h3>Ophthalmology</h3>
+        </div>
+        <div class="specialty-card">
+          <div class="specialty-icon">
+            <img alt="Gastroenterology" src="images/Gastroenterology.png" />
+          </div>
+          <h3>Gastroenterology</h3>
+        </div>
+        <div class="specialty-card">
+          <div class="specialty-icon">
+            <ion-icon class="icons" name="fitness-sharp"> </ion-icon>
+          </div>
+          <h3>Cardiology</h3>
+        </div>
+        <div class="specialty-card">
+          <div class="specialty-icon">
+            <img alt="Surgery" src="images/surgery.png" />
+          </div>
+          <h3>Surgery</h3>
+        </div>
+        <div class="specialty-card">
+          <div class="specialty-icon">
+            <img alt="Laboratory" src="images/Laboratory.png" />
+          </div>
+          <h3>Laboratory</h3>
+        </div>
+      </div>
+    </section>
+    <!-- Testimonial Section -->
+    <section class="testimonial-section">
+      <h2>What Our Customers Say</h2>
+      <div class="testimonial-container">
+        <div class="testimonial-card">
+          <p class="testimonial-text">
+            "The products are of high quality and the service is excellent.
+            Highly recommend!"
+          </p>
+          <p class="testimonial-author">- John Doe</p>
+          <div class="rating">★★★★★</div>
+        </div>
+        <div class="testimonial-card">
+          <p class="testimonial-text">
+            "Great experience with Fennec Med. The staff is very knowledgeable
+            and helpful."
+          </p>
+          <p class="testimonial-author">- Jane Smith</p>
+          <div class="rating">★★★★★</div>
+        </div>
+        <div class="testimonial-card">
+          <p class="testimonial-text">
+            "I've been using their medical supplies for years and have always
+            been satisfied."
+          </p>
+          <p class="testimonial-author">- Robert Johnson</p>
+          <div class="rating">★★★★★</div>
+        </div>
+      </div>
+    </section>
+    <!-- Find Us Section -->
+    <section class="find-us-section">
+      <h2>Where To Find Us</h2>
+      <p>
+        Looking for your new go-to Fennec Med in Brighton and Bayside? Newbay
+        Medical is based in the Brighton area, offering care to anyone in and
+        around Brighton; including
+        <a href="#"> Caulfield South </a>
+        ,
+        <a href="#"> Elwood </a>
+        ,
+        <a href="#"> Bentleigh </a>
+        ,
+        <a href="#"> Gardenvale </a>
+        ,
+        <a href="#"> Hampton </a>
+        ,
+        <a href="#"> Sandringham </a>
+        . If you're from the Brighton area and want a local medical practice you
+        know you can trust when things get tough, we're ready to take your call.
+      </p>
+    </section>
+    <section class="map-section">
+      <div class="map-container">
+        <iframe
+          allowfullscreen=""
+          loading="lazy"
+          src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3151.83512499764!2d145.000000!3d-37.900000!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMzfCsDU2JzI4LjQiTiAxNjXCsDMwJzQ5LjYiUyA!5e0!3m2!1sen!2sau!4v1234567890123"
+          style="border: 0"
+        >
+        </iframe>
+      </div>
+    </section>
+    <!-- CTA Section -->
+    <section class="cta-section">
+      <h2>Ready to Take the Next Step?</h2>
+      <p>
+        Contact us today to learn more about our medical materials and services.
+      </p>
+      <a class="btn btn-cta" href="#"> Get Started </a>
+    </section>
+    <!-- Footer -->
+    <footer class="footer">
+      <div class="footer-container">
+        <div class="footer-section">
+          <h3>Contact Us</h3>
+          <p>Phone: (123) 456-7890</p>
+          <p>Email: info@fennecmed.com</p>
+          <p>Address: 123 Medical St, Brighton, VIC 3186</p>
+        </div>
+        <div class="footer-section">
+          <h3>Quick Links</h3>
+          <ul>
+            <li>
+              <a href="#"> Home </a>
+            </li>
+            <li>
+              <a href="#"> About Us </a>
+            </li>
+            <li>
+              <a href="#"> Services </a>
+            </li>
+            <li>
+              <a href="#"> Contact Us </a>
+            </li>
+          </ul>
+        </div>
+        <div class="footer-section">
+          <h3>Follow Us</h3>
+          <div class="social-icons">
+            <a href="#">
+              <ion-icon name="logo-facebook"> </ion-icon>
+            </a>
+            <a href="#">
+              <ion-icon name="logo-instagram"> </ion-icon>
+            </a>
+            <a href="#">
+              <ion-icon name="logo-whatsapp"> </ion-icon>
+            </a>
+            <a href="#">
+              <ion-icon name="logo-youtube"> </ion-icon>
+            </a>
+          </div>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>© 2025 Fennec Med. All rights reserved.</p>
+      </div>
+    </footer>
+    <script
+      src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"
+      type="module"
+    ></script>
+    <script
+      nomodule=""
+      src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"
+    ></script>
+    
+    <script src="js/index.js"></script>
+  </body>
+</html>

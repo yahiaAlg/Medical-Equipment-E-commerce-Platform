@@ -1,0 +1,308 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}FAQ - MedEquip Pro{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="bg-primary text-white py-5">
+    <div class="container">
+        <div class="row">
+            <div class="col-12 text-center">
+                <h1 class="display-4 fw-bold mb-3">Frequently Asked Questions</h1>
+                <p class="lead">Find answers to common questions about our medical equipment and services</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Search FAQ -->
+<section class="py-4 bg-light">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-6 mx-auto">
+                <div class="input-group input-group-lg">
+                    <input type="text" class="form-control" placeholder="Search FAQ..." id="faqSearch">
+                    <button class="btn btn-primary" type="button">
+                        <i class="fas fa-search"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- FAQ Categories -->
+<section class="py-5">
+    <div class="container">
+        <div class="row">
+            <!-- FAQ Navigation -->
+            <div class="col-lg-3 mb-4">
+                <div class="card shadow-sm">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0"><i class="fas fa-list me-2"></i>Categories</h5>
+                    </div>
+                    <div class="list-group list-group-flush">
+                        {% for category, faqs in faqs_by_category.items %}
+                        <a href="#{{ category|slugify }}" class="list-group-item list-group-item-action">
+                            <i class="fas fa-chevron-right me-2"></i>{{ category }}
+                            <span class="badge bg-primary rounded-pill float-end">{{ faqs|length }}</span>
+                        </a>
+                        {% endfor %}
+                    </div>
+                </div>
+                
+                <!-- Contact Support -->
+                <div class="card shadow-sm mt-4">
+                    <div class="card-body text-center">
+                        <i class="fas fa-headset fa-3x text-primary mb-3"></i>
+                        <h5 class="fw-bold">Still Need Help?</h5>
+                        <p class="text-muted small">Can't find what you're looking for? Our support team is here to help.</p>
+                        <a href="{% url 'pages:contact' %}" class="btn btn-primary">Contact Support</a>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- FAQ Content -->
+            <div class="col-lg-9">
+                {% for category, faqs in faqs_by_category.items %}
+                <div class="faq-category mb-5" id="{{ category|slugify }}">
+                    <div class="d-flex align-items-center mb-4">
+                        <div class="category-icon me-3">
+                            {% if 'Ordering' in category %}
+                                <i class="fas fa-shopping-cart fa-2x text-primary"></i>
+                            {% elif 'Shipping' in category %}
+                                <i class="fas fa-truck fa-2x text-success"></i>
+                            {% elif 'Technical' in category %}
+                                <i class="fas fa-tools fa-2x text-warning"></i>
+                            {% elif 'Warranties' in category %}
+                                <i class="fas fa-shield-alt fa-2x text-info"></i>
+                            {% elif 'Returns' in category %}
+                                <i class="fas fa-undo fa-2x text-danger"></i>
+                            {% else %}
+                                <i class="fas fa-question-circle fa-2x text-secondary"></i>
+                            {% endif %}
+                        </div>
+                        <h2 class="fw-bold mb-0">{{ category }}</h2>
+                    </div>
+                    
+                    <div class="accordion" id="accordion{{ forloop.counter }}">
+                        {% for faq in faqs %}
+                        <div class="accordion-item">
+                            <h3 class="accordion-header" id="heading{{ forloop.parentloop.counter }}{{ forloop.counter }}">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse{{ forloop.parentloop.counter }}{{ forloop.counter }}" aria-expanded="false">
+                                    {{ faq.question }}
+                                </button>
+                            </h3>
+                            <div id="collapse{{ forloop.parentloop.counter }}{{ forloop.counter }}" class="accordion-collapse collapse" data-bs-parent="#accordion{{ forloop.parentloop.counter }}">
+                                <div class="accordion-body">
+                                    {{ faq.answer|linebreaks }}
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% empty %}
+                <div class="text-center py-5">
+                    <i class="fas fa-question-circle fa-4x text-muted mb-3"></i>
+                    <h3 class="text-muted">No FAQs Available</h3>
+                    <p class="text-muted">We're working on adding frequently asked questions. Please check back soon!</p>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Popular Topics -->
+<section class="py-5 bg-light">
+    <div class="container">
+        <div class="text-center mb-5">
+            <h2 class="display-5 fw-bold mb-3">Popular Topics</h2>
+            <p class="lead text-muted">Quick access to our most searched topics</p>
+        </div>
+        
+        <div class="row g-4">
+            <div class="col-lg-4 col-md-6">
+                <div class="card topic-card border-0 shadow-sm h-100">
+                    <div class="card-body text-center p-4">
+                        <i class="fas fa-shipping-fast fa-3x text-primary mb-3"></i>
+                        <h5 class="fw-bold">Shipping & Delivery</h5>
+                        <p class="text-muted">Learn about our shipping options, delivery times, and tracking.</p>
+                        <a href="#shipping" class="btn btn-outline-primary">View Details</a>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-lg-4 col-md-6">
+                <div class="card topic-card border-0 shadow-sm h-100">
+                    <div class="card-body text-center p-4">
+                        <i class="fas fa-credit-card fa-3x text-success mb-3"></i>
+                        <h5 class="fw-bold">Payment Methods</h5>
+                        <p class="text-muted">Information about accepted payment methods and billing.</p>
+                        <a href="#ordering" class="btn btn-outline-success">View Details</a>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-lg-4 col-md-6">
+                <div class="card topic-card border-0 shadow-sm h-100">
+                    <div class="card-body text-center p-4">
+                        <i class="fas fa-tools fa-3x text-warning mb-3"></i>
+                        <h5 class="fw-bold">Technical Support</h5>
+                        <p class="text-muted">Get help with equipment setup, troubleshooting, and maintenance.</p>
+                        <a href="#technical-support" class="btn btn-outline-warning">View Details</a>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-lg-4 col-md-6">
+                <div class="card topic-card border-0 shadow-sm h-100">
+                    <div class="card-body text-center p-4">
+                        <i class="fas fa-shield-alt fa-3x text-info mb-3"></i>
+                        <h5 class="fw-bold">Warranties</h5>
+                        <p class="text-muted">Understanding warranty coverage and claim procedures.</p>
+                        <a href="#warranties" class="btn btn-outline-info">View Details</a>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-lg-4 col-md-6">
+                <div class="card topic-card border-0 shadow-sm h-100">
+                    <div class="card-body text-center p-4">
+                        <i class="fas fa-undo fa-3x text-danger mb-3"></i>
+                        <h5 class="fw-bold">Returns & Exchanges</h5>
+                        <p class="text-muted">Learn about our return policy and exchange procedures.</p>
+                        <a href="#returns-exchanges" class="btn btn-outline-danger">View Details</a>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-lg-4 col-md-6">
+                <div class="card topic-card border-0 shadow-sm h-100">
+                    <div class="card-body text-center p-4">
+                        <i class="fas fa-user-md fa-3x text-secondary mb-3"></i>
+                        <h5 class="fw-bold">Account Management</h5>
+                        <p class="text-muted">Managing your account, orders, and personal information.</p>
+                        <a href="#ordering" class="btn btn-outline-secondary">View Details</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Contact CTA -->
+<section class="py-5 bg-primary text-white">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-8">
+                <h3 class="fw-bold mb-2">Didn't Find Your Answer?</h3>
+                <p class="mb-0">Our expert support team is ready to help you with any questions about medical equipment.</p>
+            </div>
+            <div class="col-lg-4 text-lg-end">
+                <div class="d-flex flex-column flex-lg-row gap-2">
+                    <a href="{% url 'pages:contact' %}" class="btn btn-light">
+                        <i class="fas fa-envelope me-2"></i>Contact Us
+                    </a>
+                    <a href="tel:+15551234567" class="btn btn-outline-light">
+                        <i class="fas fa-phone me-2"></i>Call Now
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+.topic-card:hover {
+    transform: translateY(-5px);
+    transition: transform 0.3s ease;
+}
+
+.faq-category {
+    scroll-margin-top: 100px;
+}
+
+.accordion-button:not(.collapsed) {
+    background-color: var(--bs-primary);
+    color: white;
+}
+
+.accordion-button:focus {
+    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+}
+
+.list-group-item-action:hover {
+    background-color: rgba(13, 110, 253, 0.1);
+}
+
+.category-icon {
+    min-width: 60px;
+}
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // FAQ Search functionality
+    const searchInput = document.getElementById('faqSearch');
+    const accordionItems = document.querySelectorAll('.accordion-item');
+    
+    searchInput.addEventListener('input', function() {
+        const searchTerm = this.value.toLowerCase();
+        
+        accordionItems.forEach(item => {
+            const question = item.querySelector('.accordion-button').textContent.toLowerCase();
+            const answer = item.querySelector('.accordion-body').textContent.toLowerCase();
+            
+            if (question.includes(searchTerm) || answer.includes(searchTerm)) {
+                item.style.display = 'block';
+                if (searchTerm.length > 0) {
+                    // Highlight search terms
+                    highlightSearchTerm(item, searchTerm);
+                }
+            } else {
+                item.style.display = 'none';
+            }
+        });
+        
+        // Show/hide category headers
+        document.querySelectorAll('.faq-category').forEach(category => {
+            const visibleItems = category.querySelectorAll('.accordion-item[style="display: block;"], .accordion-item:not([style])');
+            if (visibleItems.length === 0) {
+                category.style.display = 'none';
+            } else {
+                category.style.display = 'block';
+            }
+        });
+    });
+    
+    function highlightSearchTerm(item, term) {
+        // Simple highlighting - in production, you might want a more sophisticated approach
+        const button = item.querySelector('.accordion-button');
+        const originalText = button.textContent;
+        const highlightedText = originalText.replace(new RegExp(term, 'gi'), `<mark>$&</mark>`);
+        button.innerHTML = highlightedText;
+    }
+    
+    // Smooth scrolling for category links
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function (e) {
+            e.preventDefault();
+            const target = document.querySelector(this.getAttribute('href'));
+            if (target) {
+                target.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'start'
+                });
+            }
+        });
+    });
+});
+</script>
+{% endblock %}

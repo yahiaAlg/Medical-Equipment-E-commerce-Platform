@@ -1,0 +1,175 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load crispy_forms_tags %}
+
+{% block title %}Register - MedEquip Pro{% endblock %}
+
+{% block content %}
+<section class="py-5">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8 col-xl-6">
+                <div class="card shadow-lg border-0">
+                    <div class="card-header bg-primary text-white text-center py-4">
+                        <h2 class="mb-0">
+                            <i class="fas fa-user-plus me-2"></i>Create Your Account
+                        </h2>
+                        <p class="mb-0 mt-2">Join the MedEquip Pro community</p>
+                    </div>
+                    
+                    <div class="card-body p-5">
+                        <!-- User Type Selection Info -->
+                        <div class="alert alert-info mb-4">
+                            <h6 class="alert-heading">
+                                <i class="fas fa-info-circle me-2"></i>Choose Your Account Type
+                            </h6>
+                            <div class="row g-2 mt-2">
+                                <div class="col-6">
+                                    <small><strong>General User:</strong> Individual purchases</small>
+                                </div>
+                                <div class="col-6">
+                                    <small><strong>Pharmacy:</strong> Bulk orders & special pricing</small>
+                                </div>
+                                <div class="col-6">
+                                    <small><strong>Clinic Staff:</strong> Department-based ordering</small>
+                                </div>
+                                <div class="col-6">
+                                    <small><strong>Doctor:</strong> Specialty recommendations</small>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        {% crispy form %}
+                        
+                        <div class="text-center mt-4">
+                            <p class="text-muted">
+                                Already have an account? 
+                                <a href="{% url 'accounts:login' %}" class="text-decoration-none">Sign in here</a>
+                            </p>
+                        </div>
+                    </div>
+                    
+                    <div class="card-footer bg-light text-center py-3">
+                        <small class="text-muted">
+                            By creating an account, you agree to our 
+                            <a href="#" class="text-decoration-none">Terms of Service</a> and 
+                            <a href="#" class="text-decoration-none">Privacy Policy</a>
+                        </small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Benefits Section -->
+<section class="py-5 bg-light">
+    <div class="container">
+        <div class="text-center mb-5">
+            <h3 class="fw-bold">Why Join MedEquip Pro?</h3>
+            <p class="text-muted">Discover the benefits of being part of our medical equipment community</p>
+        </div>
+        
+        <div class="row g-4">
+            <div class="col-lg-3 col-md-6">
+                <div class="text-center">
+                    <div class="benefit-icon bg-primary text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 60px; height: 60px;">
+                        <i class="fas fa-tags"></i>
+                    </div>
+                    <h5 class="fw-bold">Exclusive Pricing</h5>
+                    <p class="text-muted small">Access special member pricing and bulk discounts</p>
+                </div>
+            </div>
+            
+            <div class="col-lg-3 col-md-6">
+                <div class="text-center">
+                    <div class="benefit-icon bg-success text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 60px; height: 60px;">
+                        <i class="fas fa-shipping-fast"></i>
+                    </div>
+                    <h5 class="fw-bold">Fast Shipping</h5>
+                    <p class="text-muted small">Priority shipping and expedited delivery options</p>
+                </div>
+            </div>
+            
+            <div class="col-lg-3 col-md-6">
+                <div class="text-center">
+                    <div class="benefit-icon bg-info text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 60px; height: 60px;">
+                        <i class="fas fa-headset"></i>
+                    </div>
+                    <h5 class="fw-bold">Expert Support</h5>
+                    <p class="text-muted small">Dedicated support from medical equipment specialists</p>
+                </div>
+            </div>
+            
+            <div class="col-lg-3 col-md-6">
+                <div class="text-center">
+                    <div class="benefit-icon bg-warning text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 60px; height: 60px;">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <h5 class="fw-bold">Order Tracking</h5>
+                    <p class="text-muted small">Real-time order tracking and purchase history</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Show/hide additional info based on user type selection
+    const userTypeField = document.getElementById('id_user_type');
+    const infoAlert = document.querySelector('.alert-info');
+    
+    if (userTypeField) {
+        userTypeField.addEventListener('change', function() {
+            const selectedType = this.value;
+            
+            // You can add specific messaging or requirements based on user type
+            if (selectedType === 'pharmacy' || selectedType === 'clinic' || selectedType === 'doctor') {
+                // Show additional verification info
+                if (!document.querySelector('.verification-info')) {
+                    const verificationInfo = document.createElement('div');
+                    verificationInfo.className = 'alert alert-warning verification-info mt-3';
+                    verificationInfo.innerHTML = `
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        <strong>Verification Required:</strong> Professional accounts require verification. 
+                        You'll be able to complete your professional profile after registration.
+                    `;
+                    infoAlert.parentNode.insertBefore(verificationInfo, infoAlert.nextSibling);
+                }
+            } else {
+                // Remove verification info for general users
+                const verificationInfo = document.querySelector('.verification-info');
+                if (verificationInfo) {
+                    verificationInfo.remove();
+                }
+            }
+        });
+    }
+    
+    // Form validation enhancements
+    const form = document.querySelector('form');
+    if (form) {
+        form.addEventListener('submit', function(e) {
+            const password1 = document.getElementById('id_password1').value;
+            const password2 = document.getElementById('id_password2').value;
+            
+            if (password1 !== password2) {
+                e.preventDefault();
+                showToast('Passwords do not match!', 'danger');
+                return false;
+            }
+            
+            // Show loading state
+            const submitBtn = form.querySelector('button[type="submit"]');
+            if (submitBtn) {
+                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Creating Account...';
+                submitBtn.disabled = true;
+            }
+        });
+    }
+});
+</script>
+{% endblock %}

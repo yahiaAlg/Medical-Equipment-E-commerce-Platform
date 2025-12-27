@@ -1,0 +1,289 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Products Report - Admin - MedEquip Pro{% endblock %}
+
+{% block extra_css %}
+<style>
+    .chart-container {
+        position: relative;
+        height: 350px;
+    }
+    .stat-box {
+        border-left: 4px solid;
+        padding-left: 15px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-5 pt-5">
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <h2><i class="fas fa-chart-bar me-2"></i>Products Report & Analytics</h2>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{% url 'accounts:admin_dashboard' %}">Admin Dashboard</a></li>
+                    <li class="breadcrumb-item active">Products Report</li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+
+    <!-- Category Performance -->
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0"><i class="fas fa-layer-group me-2"></i>Category Performance</h5>
+                </div>
+                <div class="card-body">
+                    <div class="chart-container">
+                        <canvas id="categoryChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0"><i class="fas fa-hospital me-2"></i>Specialty Distribution</h5>
+                </div>
+                <div class="card-body">
+                    <div class="chart-container">
+                        <canvas id="specialtyChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Category Stats -->
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0">Category Statistics</h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Category</th>
+                                    <th>Products</th>
+                                    <th>Total Revenue</th>
+                                    <th>Avg Price</th>
+                                    <th>Performance</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for stat in category_stats %}
+                                <tr>
+                                    <td><strong>{{ stat.category__name }}</strong></td>
+                                    <td>{{ stat.product_count }} items</td>
+                                    <td>${{ stat.total_revenue|default:0|floatformat:2 }}</td>
+                                    <td>${{ stat.avg_price|floatformat:2 }}</td>
+                                    <td>
+                                        <div class="progress" style="height: 20px;">
+                                            <div class="progress-bar bg-success" role="progressbar" 
+                                                 style="width: {{ stat.total_revenue|default:0|floatformat:0 }}%">
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Top Products -->
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header bg-warning text-white">
+                    <h5 class="mb-0"><i class="fas fa-trophy me-2"></i>Top 20 Products by Sales</h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Product</th>
+                                    <th>Category</th>
+                                    <th>Brand</th>
+                                    <th>Price</th>
+                                    <th>Stock</th>
+                                    <th>Units Sold</th>
+                                    <th>Revenue</th>
+                                    <th>Rating</th>
+                                    <th>Reviews</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for product in products %}
+                                <tr>
+                                    <td><strong>{{ forloop.counter }}</strong></td>
+                                    <td>
+                                        <a href="{% url 'products:detail' product.slug %}" target="_blank">
+                                            {{ product.name|truncatewords:5 }}
+                                        </a>
+                                    </td>
+                                    <td><span class="badge bg-secondary">{{ product.category.name }}</span></td>
+                                    <td>{{ product.brand.name }}</td>
+                                    <td>${{ product.price }}</td>
+                                    <td>
+                                        {% if product.stock_quantity == 0 %}
+                                            <span class="badge bg-danger">Out of Stock</span>
+                                        {% elif product.stock_quantity <= 10 %}
+                                            <span class="badge bg-warning">{{ product.stock_quantity }} units</span>
+                                        {% else %}
+                                            <span class="badge bg-success">{{ product.stock_quantity }} units</span>
+                                        {% endif %}
+                                    </td>
+                                    <td><strong>{{ product.total_sold|default:0 }}</strong> units</td>
+                                    <td><strong>${{ product.total_revenue|default:0|floatformat:2 }}</strong></td>
+                                    <td>
+                                        {% if product.avg_rating %}
+                                            <div class="text-warning">
+                                                {% for i in "12345" %}
+                                                    {% if forloop.counter <= product.avg_rating %}
+                                                        <i class="fas fa-star"></i>
+                                                    {% else %}
+                                                        <i class="far fa-star"></i>
+                                                    {% endif %}
+                                                {% endfor %}
+                                            </div>
+                                            <small>{{ product.avg_rating|floatformat:1 }}</small>
+                                        {% else %}
+                                            <span class="text-muted">No rating</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ product.review_count }} reviews</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Specialty Stats -->
+    <div class="row mt-4">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header bg-dark text-white">
+                    <h5 class="mb-0">Specialty Performance</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        {% for stat in specialty_stats %}
+                        <div class="col-md-3 mb-3">
+                            <div class="stat-box" style="border-color: #{{ forloop.counter|stringformat:"02d" }}{{ forloop.counter|add:"20"|stringformat:"02d" }}{{ forloop.counter|add:"40"|stringformat:"02d" }};">
+                                <h6 class="text-muted">{{ stat.specialty|title }}</h6>
+                                <h4>{{ stat.product_count }} products</h4>
+                                <p class="mb-0"><strong>{{ stat.total_sold|default:0 }}</strong> units sold</p>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Category Performance Chart
+    const categoryCtx = document.getElementById('categoryChart').getContext('2d');
+    const categoryStats = {{ category_stats|safe }};
+    
+    new Chart(categoryCtx, {
+        type: 'bar',
+        data: {
+            labels: [
+                {% for stat in category_stats %}
+                '{{ stat.category__name }}'{% if not forloop.last %},{% endif %}
+                {% endfor %}
+            ],
+            datasets: [{
+                label: 'Revenue ($)',
+                data: [
+                    {% for stat in category_stats %}
+                    {{ stat.total_revenue|default:0 }}{% if not forloop.last %},{% endif %}
+                    {% endfor %}
+                ],
+                backgroundColor: 'rgba(13, 110, 253, 0.7)',
+                borderColor: 'rgba(13, 110, 253, 1)',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    title: {
+                        display: true,
+                        text: 'Revenue ($)'
+                    }
+                }
+            },
+            plugins: {
+                legend: {
+                    display: false
+                }
+            }
+        }
+    });
+
+    // Specialty Chart
+    const specialtyCtx = document.getElementById('specialtyChart').getContext('2d');
+    const specialtyStats = {{ specialty_stats|safe }};
+    
+    new Chart(specialtyCtx, {
+        type: 'pie',
+        data: {
+            labels: [
+                {% for stat in specialty_stats %}
+                '{{ stat.specialty|title }}'{% if not forloop.last %},{% endif %}
+                {% endfor %}
+            ],
+            datasets: [{
+                data: [
+                    {% for stat in specialty_stats %}
+                    {{ stat.product_count }}{% if not forloop.last %},{% endif %}
+                    {% endfor %}
+                ],
+                backgroundColor: [
+                    '#0d6efd', '#198754', '#ffc107', '#dc3545', 
+                    '#6f42c1', '#20c997', '#fd7e14', '#6c757d'
+                ]
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'right'
+                }
+            }
+        }
+    });
+});
+</script>
+{% endblock %}

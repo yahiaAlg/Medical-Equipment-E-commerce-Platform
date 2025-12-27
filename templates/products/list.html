@@ -1,0 +1,372 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Medical Equipment - MedEquip Pro{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="bg-primary text-white py-4">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-8">
+                <h1 class="display-5 fw-bold mb-2">Medical Equipment Catalog</h1>
+                <p class="lead mb-0">Discover our comprehensive range of professional medical equipment</p>
+            </div>
+            <div class="col-lg-4 text-lg-end">
+                <div class="d-flex align-items-center justify-content-lg-end">
+                    <span class="me-2">{{ page_obj.paginator.count }} Products</span>
+                    <i class="fas fa-boxes fa-2x"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="py-4">
+    <div class="container">
+        <div class="row">
+            <!-- Filters Sidebar -->
+            <div class="col-lg-3 mb-4">
+                <div class="filter-sidebar">
+                    <h5 class="fw-bold mb-4"><i class="fas fa-filter me-2"></i>Filters</h5>
+                    
+                    <!-- Categories -->
+                    <div class="filter-group">
+                        <h6>Categories</h6>
+                        {% for category in categories %}
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" name="category" value="{{ category.slug }}" id="cat{{ category.id }}"
+                                   {% if current_filters.category == category.slug %}checked{% endif %}>
+                            <label class="form-check-label" for="cat{{ category.id }}">
+                                {{ category.name }}
+                            </label>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    
+                    <!-- Specialties -->
+                    <div class="filter-group">
+                        <h6>Medical Specialties</h6>
+                        {% for specialty_code, specialty_name in specialties %}
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" name="specialty" value="{{ specialty_code }}" id="spec{{ forloop.counter }}"
+                                   {% if current_filters.specialty == specialty_code %}checked{% endif %}>
+                            <label class="form-check-label" for="spec{{ forloop.counter }}">
+                                {{ specialty_name }}
+                            </label>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    
+                    <!-- Brands -->
+                    <div class="filter-group">
+                        <h6>Brands</h6>
+                        {% for brand in brands %}
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" name="brand" value="{{ brand.id }}" id="brand{{ brand.id }}"
+                                   {% if current_filters.brand == brand.id|stringformat:"s" %}checked{% endif %}>
+                            <label class="form-check-label" for="brand{{ brand.id }}">
+                                {{ brand.name }}
+                            </label>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    
+                    <!-- Price Range -->
+                    <div class="filter-group">
+                        <h6>Price Range</h6>
+                        <div class="row g-2">
+                            <div class="col-6">
+                                <input type="number" class="form-control form-control-sm" placeholder="Min" name="price_min" value="{{ current_filters.price_min }}">
+                            </div>
+                            <div class="col-6">
+                                <input type="number" class="form-control form-control-sm" placeholder="Max" name="price_max" value="{{ current_filters.price_max }}">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Availability -->
+                    <div class="filter-group">
+                        <h6>Availability</h6>
+                        {% for status_code, status_name in availability_choices %}
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="availability" value="{{ status_code }}" id="avail{{ forloop.counter }}"
+                                   {% if current_filters.availability == status_code %}checked{% endif %}>
+                            <label class="form-check-label" for="avail{{ forloop.counter }}">
+                                {{ status_name }}
+                            </label>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    
+                    <div class="d-grid gap-2">
+                        <button type="button" class="btn btn-primary" id="applyFilters">Apply Filters</button>
+                        <button type="button" class="btn btn-outline-secondary" id="clearFilters">Clear All</button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Products Grid -->
+            <div class="col-lg-9">
+                <!-- Sort and View Options -->
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <div class="d-flex align-items-center">
+                        <span class="text-muted me-3">{{ page_obj.start_index }}-{{ page_obj.end_index }} of {{ page_obj.paginator.count }} products</span>
+                    </div>
+                    
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="d-flex align-items-center">
+                            <label for="sortSelect" class="form-label me-2 mb-0">Sort by:</label>
+                            <select class="form-select form-select-sm" id="sortSelect" name="sort" style="width: auto;">
+                                <option value="name" {% if current_filters.sort == 'name' %}selected{% endif %}>Name A-Z</option>
+                                <option value="price_low" {% if current_filters.sort == 'price_low' %}selected{% endif %}>Price: Low to High</option>
+                                <option value="price_high" {% if current_filters.sort == 'price_high' %}selected{% endif %}>Price: High to Low</option>
+                                <option value="newest" {% if current_filters.sort == 'newest' %}selected{% endif %}>Newest First</option>
+                                <option value="rating" {% if current_filters.sort == 'rating' %}selected{% endif %}>Highest Rated</option>
+                            </select>
+                        </div>
+                        
+                        <div class="btn-group" role="group">
+                            <button type="button" class="btn btn-outline-secondary btn-sm active" id="gridView">
+                                <i class="fas fa-th"></i>
+                            </button>
+                            <button type="button" class="btn btn-outline-secondary btn-sm" id="listView">
+                                <i class="fas fa-list"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Products -->
+                <div class="row g-4" id="productsGrid">
+                    {% for product in page_obj %}
+                    <div class="col-lg-4 col-md-6 product-item">
+                        <div class="card product-card h-100">
+                            <div class="position-relative">
+                                {% if product.images.first %}
+                                    <img src="{{ product.images.first.image.url }}" class="card-img-top product-image" alt="{{ product.name }}">
+                                {% else %}
+                                    <img src="https://images.pexels.com/photos/40568/medical-appointment-doctor-healthcare-40568.jpeg?auto=compress&cs=tinysrgb&w=400" class="card-img-top product-image" alt="{{ product.name }}">
+                                {% endif %}
+                                
+                                <!-- Product Badges -->
+                                <div class="position-absolute top-0 start-0 m-2">
+                                    {% if product.featured %}
+                                        <span class="badge bg-warning">Featured</span>
+                                    {% endif %}
+                                    {% if product.trending %}
+                                        <span class="badge bg-danger">Trending</span>
+                                    {% endif %}
+                                </div>
+                                
+                                <!-- Availability Badge -->
+                                <div class="position-absolute top-0 end-0 m-2">
+                                    {% if product.availability_status == 'in_stock' %}
+                                        <span class="badge bg-success">In Stock</span>
+                                    {% elif product.availability_status == 'out_of_stock' %}
+                                        <span class="badge bg-danger">Out of Stock</span>
+                                    {% elif product.availability_status == 'pre_order' %}
+                                        <span class="badge bg-info">Pre-Order</span>
+                                    {% else %}
+                                        <span class="badge bg-secondary">{{ product.get_availability_status_display }}</span>
+                                    {% endif %}
+                                </div>
+                                
+                                <!-- Wishlist Button -->
+                                {% if user.is_authenticated %}
+                                <button class="btn btn-outline-light btn-sm position-absolute bottom-0 end-0 m-2 add-to-wishlist" data-product-id="{{ product.id }}">
+                                    <i class="far fa-heart"></i>
+                                </button>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-start mb-2">
+                                    <h6 class="card-title mb-0">{{ product.name|truncatechars:50 }}</h6>
+                                    {% if product.specialty %}
+                                        <span class="badge bg-light text-dark">{{ product.get_specialty_display }}</span>
+                                    {% endif %}
+                                </div>
+                                
+                                <p class="text-muted small mb-2">{{ product.brand.name }}</p>
+                                <p class="card-text text-muted small">{{ product.short_description|truncatechars:80 }}</p>
+                                
+                                <!-- Rating -->
+                                <div class="d-flex align-items-center mb-2">
+                                    <div class="product-rating me-2">
+                                        {% for i in "12345"|make_list %}
+                                            {% if forloop.counter <= product.get_average_rating %}
+                                                <i class="fas fa-star"></i>
+                                            {% else %}
+                                                <i class="far fa-star"></i>
+                                            {% endif %}
+                                        {% endfor %}
+                                    </div>
+                                    <small class="text-muted">({{ product.get_review_count }} reviews)</small>
+                                </div>
+                                
+                                <!-- Price -->
+                                <div class="d-flex justify-content-between align-items-center mb-3">
+                                    <div>
+                                        <span class="price-tag">${{ product.price }}</span>
+                                        {% if product.bulk_price and product.bulk_quantity %}
+                                            <br><small class="text-muted">Bulk ({{ product.bulk_quantity }}+): ${{ product.bulk_price }}</small>
+                                        {% endif %}
+                                    </div>
+                                    <small class="text-muted">SKU: {{ product.sku }}</small>
+                                </div>
+                                
+                                <!-- Actions -->
+                                <div class="d-flex gap-2">
+                                    <a href="{{ product.get_absolute_url }}" class="btn btn-outline-primary btn-sm flex-fill">
+                                        <i class="fas fa-eye me-1"></i>View Details
+                                    </a>
+                                    {% if user.is_authenticated and product.availability_status == 'in_stock' %}
+                                    <button class="btn btn-primary btn-sm add-to-cart" data-product-id="{{ product.id }}">
+                                        <i class="fas fa-cart-plus"></i>
+                                    </button>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% empty %}
+                    <div class="col-12">
+                        <div class="text-center py-5">
+                            <i class="fas fa-search fa-4x text-muted mb-3"></i>
+                            <h3 class="text-muted">No Products Found</h3>
+                            <p class="text-muted">Try adjusting your filters or search criteria.</p>
+                            <button class="btn btn-primary" id="clearFilters">Clear Filters</button>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                
+                <!-- Pagination -->
+                {% if page_obj.has_other_pages %}
+                <nav aria-label="Products pagination" class="mt-5">
+                    <ul class="pagination justify-content-center">
+                        {% if page_obj.has_previous %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page=1{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">First</a>
+                            </li>
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">Previous</a>
+                            </li>
+                        {% endif %}
+                        
+                        {% for num in page_obj.paginator.page_range %}
+                            {% if page_obj.number == num %}
+                                <li class="page-item active">
+                                    <span class="page-link">{{ num }}</span>
+                                </li>
+                            {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ num }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">{{ num }}</a>
+                                </li>
+                            {% endif %}
+                        {% endfor %}
+                        
+                        {% if page_obj.has_next %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ page_obj.next_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">Next</a>
+                            </li>
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">Last</a>
+                            </li>
+                        {% endif %}
+                    </ul>
+                </nav>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Filter functionality
+    const applyFiltersBtn = document.getElementById('applyFilters');
+    const clearFiltersBtn = document.getElementById('clearFilters');
+    const sortSelect = document.getElementById('sortSelect');
+    
+    function buildFilterUrl() {
+        const params = new URLSearchParams();
+        
+        // Categories
+        document.querySelectorAll('input[name="category"]:checked').forEach(input => {
+            params.append('category', input.value);
+        });
+        
+        // Specialties
+        document.querySelectorAll('input[name="specialty"]:checked').forEach(input => {
+            params.append('specialty', input.value);
+        });
+        
+        // Brands
+        document.querySelectorAll('input[name="brand"]:checked').forEach(input => {
+            params.append('brand', input.value);
+        });
+        
+        // Price range
+        const priceMin = document.querySelector('input[name="price_min"]').value;
+        const priceMax = document.querySelector('input[name="price_max"]').value;
+        if (priceMin) params.append('price_min', priceMin);
+        if (priceMax) params.append('price_max', priceMax);
+        
+        // Availability
+        const availability = document.querySelector('input[name="availability"]:checked');
+        if (availability) params.append('availability', availability.value);
+        
+        // Sort
+        const sort = sortSelect.value;
+        if (sort) params.append('sort', sort);
+        
+        return params.toString();
+    }
+    
+    applyFiltersBtn.addEventListener('click', function() {
+        const filterUrl = buildFilterUrl();
+        window.location.href = window.location.pathname + '?' + filterUrl;
+    });
+    
+    clearFiltersBtn.addEventListener('click', function() {
+        window.location.href = window.location.pathname;
+    });
+    
+    sortSelect.addEventListener('change', function() {
+        const filterUrl = buildFilterUrl();
+        window.location.href = window.location.pathname + '?' + filterUrl;
+    });
+    
+    // View toggle
+    const gridViewBtn = document.getElementById('gridView');
+    const listViewBtn = document.getElementById('listView');
+    const productsGrid = document.getElementById('productsGrid');
+    
+    listViewBtn.addEventListener('click', function() {
+        gridViewBtn.classList.remove('active');
+        listViewBtn.classList.add('active');
+        productsGrid.classList.remove('row');
+        productsGrid.classList.add('list-view');
+        
+        document.querySelectorAll('.product-item').forEach(item => {
+            item.className = 'col-12 product-item mb-3';
+        });
+    });
+    
+    gridViewBtn.addEventListener('click', function() {
+        listViewBtn.classList.remove('active');
+        gridViewBtn.classList.add('active');
+        productsGrid.classList.add('row');
+        productsGrid.classList.remove('list-view');
+        
+        document.querySelectorAll('.product-item').forEach(item => {
+            item.className = 'col-lg-4 col-md-6 product-item';
+        });
+    });
+});
+</script>
+{% endblock %}
