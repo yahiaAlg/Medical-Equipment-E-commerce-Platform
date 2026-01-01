@@ -1,0 +1,194 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Submit Complaint - Fennec Med{% endblock %}
+
+{% block extra_css %}
+<style>
+.complaint-section {
+  background-color: #f0f4f8;
+  padding: 3.125rem 1.25rem;
+  min-height: 70vh;
+}
+
+.complaint-container {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.complaint-card {
+  background-color: white;
+  border-radius: 0.625rem;
+  padding: 2.5rem;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.complaint-header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.complaint-header h1 {
+  font-size: clamp(1.5rem, 4vw, 2rem);
+  color: #1a3e75;
+  margin-bottom: 0.5rem;
+}
+
+.complaint-header p {
+  color: #666;
+  font-size: 1rem;
+}
+
+.order-info-box {
+  background-color: #fff3cd;
+  border-left: 4px solid #ffc107;
+  padding: 1.25rem;
+  margin-bottom: 2rem;
+  border-radius: 0.625rem;
+}
+
+.order-info-box p {
+  margin: 0.375rem 0;
+  color: #856404;
+}
+
+.form-group {
+  margin-bottom: 1.5rem;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+  color: #333;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid #ddd;
+  border-radius: 0.375rem;
+  font-size: 1rem;
+  transition: border-color 0.3s;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+  outline: none;
+  border-color: #34588f;
+}
+
+.form-group textarea {
+  min-height: 150px;
+  resize: vertical;
+}
+
+.file-upload-group {
+  border: 2px dashed #ddd;
+  border-radius: 0.625rem;
+  padding: 1.5rem;
+  text-align: center;
+}
+
+.file-upload-group i {
+  font-size: 2.5rem;
+  color: #34588f;
+  margin-bottom: 1rem;
+}
+
+.submit-button {
+  background-color: #34588f;
+  color: white;
+  padding: 0.938rem 2.5rem;
+  border-radius: 1.563rem;
+  border: none;
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+  width: 100%;
+  transition: background-color 0.3s;
+}
+
+.submit-button:hover {
+  background-color: #1a3e75;
+}
+
+.help-text {
+  font-size: 0.875rem;
+  color: #666;
+  margin-top: 0.375rem;
+}
+
+.error-message {
+  color: #d32f2f;
+  font-size: 0.875rem;
+  margin-top: 0.375rem;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="complaint-section">
+  <div class="complaint-container">
+    <div class="complaint-card">
+      <div class="complaint-header">
+        <h1>Submit a Complaint</h1>
+        <p>We're here to help resolve any issues you may have</p>
+      </div>
+
+      <div class="order-info-box">
+        <p><strong>Order:</strong> {{ order.order_id }}</p>
+        <p><strong>Order Date:</strong> {{ order.created_at|date:"M d, Y" }}</p>
+        <p><strong>Total:</strong> {{ order.total_amount|floatformat:2 }} DZD</p>
+      </div>
+
+      <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+
+        <div class="form-group">
+          <label for="{{ form.reason.id_for_label }}">{{ form.reason.label }} *</label>
+          {{ form.reason }}
+          {% if form.reason.errors %}
+            <div class="error-message">{{ form.reason.errors }}</div>
+          {% endif %}
+        </div>
+
+        <div class="form-group">
+          <label for="{{ form.custom_reason.id_for_label }}">{{ form.custom_reason.label }}</label>
+          {{ form.custom_reason }}
+          {% if form.custom_reason.errors %}
+            <div class="error-message">{{ form.custom_reason.errors }}</div>
+          {% endif %}
+          <p class="help-text">Only fill this if you selected "Other" as the reason</p>
+        </div>
+
+        <div class="form-group">
+          <label for="{{ form.description.id_for_label }}">{{ form.description.label }} *</label>
+          {{ form.description }}
+          {% if form.description.errors %}
+            <div class="error-message">{{ form.description.errors }}</div>
+          {% endif %}
+          <p class="help-text">Please provide as much detail as possible</p>
+        </div>
+
+        <div class="form-group">
+          <label>Attachments (Optional)</label>
+          <div class="file-upload-group">
+            <i class="fas fa-paperclip"></i>
+            <p><strong>Upload supporting files</strong></p>
+            <p class="help-text">Images, videos, or PDFs (max 10MB each)</p>
+            <input type="file" name="attachments" multiple accept="image/*,video/*,application/pdf" class="form-control mt-2">
+          </div>
+        </div>
+
+        <button type="submit" class="submit-button">
+          <i class="fas fa-paper-plane"></i> Submit Complaint
+        </button>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

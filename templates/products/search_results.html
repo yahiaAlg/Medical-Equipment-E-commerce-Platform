@@ -1,343 +1,165 @@
-{% extends 'base.html' %}
+{% extends "base.html" %}
 {% load static %}
 
-{% block title %}Search Results for "{{ query }}" - MedEquip Pro{% endblock %}
+{% block title %}Search Results - Fennec Med{% endblock %}
 
-{% block content %}
-<!-- Search Results Header -->
-<section class="bg-light py-4">
-    <div class="container">
-        <div class="row align-items-center">
-            <div class="col-lg-8">
-                <h1 class="h3 fw-bold mb-2">Search Results</h1>
-                {% if query %}
-                    <p class="mb-0">
-                        Showing {{ total_results }} result{{ total_results|pluralize }} for 
-                        <strong>"{{ query }}"</strong>
-                    </p>
-                {% else %}
-                    <p class="mb-0">Please enter a search term to find products.</p>
-                {% endif %}
-            </div>
-            <div class="col-lg-4 text-lg-end">
-                <form method="GET" action="{% url 'products:search' %}" class="d-flex">
-                    <input type="search" name="q" class="form-control me-2" placeholder="Search products..." value="{{ query }}">
-                    <button type="submit" class="btn btn-primary">
-                        <i class="fas fa-search"></i>
-                    </button>
-                </form>
-            </div>
-        </div>
-    </div>
-</section>
-
-{% if query %}
-<section class="py-4">
-    <div class="container">
-        {% if page_obj %}
-            <!-- Sort Options -->
-            <div class="d-flex justify-content-between align-items-center mb-4">
-                <div>
-                    <span class="text-muted">
-                        {{ page_obj.start_index }}-{{ page_obj.end_index }} of {{ page_obj.paginator.count }} results
-                    </span>
-                </div>
-                
-                <div class="d-flex align-items-center">
-                    <label for="sortSelect" class="form-label me-2 mb-0">Sort by:</label>
-                    <select class="form-select form-select-sm" id="sortSelect" style="width: auto;">
-                        <option value="relevance">Relevance</option>
-                        <option value="name">Name A-Z</option>
-                        <option value="price_low">Price: Low to High</option>
-                        <option value="price_high">Price: High to Low</option>
-                        <option value="newest">Newest First</option>
-                        <option value="rating">Highest Rated</option>
-                    </select>
-                </div>
-            </div>
-            
-            <!-- Search Results -->
-            <div class="row g-4">
-                {% for product in page_obj %}
-                <div class="col-lg-4 col-md-6">
-                    <div class="card product-card h-100">
-                        <div class="position-relative">
-                            {% if product.images.first %}
-                                <img src="{{ product.images.first.image.url }}" class="card-img-top product-image" alt="{{ product.name }}">
-                            {% else %}
-                                <img src="https://images.pexels.com/photos/40568/medical-appointment-doctor-healthcare-40568.jpeg?auto=compress&cs=tinysrgb&w=400" class="card-img-top product-image" alt="{{ product.name }}">
-                            {% endif %}
-                            
-                            <!-- Product Badges -->
-                            <div class="position-absolute top-0 start-0 m-2">
-                                {% if product.featured %}
-                                    <span class="badge bg-warning">Featured</span>
-                                {% endif %}
-                                {% if product.trending %}
-                                    <span class="badge bg-danger">Trending</span>
-                                {% endif %}
-                            </div>
-                            
-                            <!-- Availability Badge -->
-                            <div class="position-absolute top-0 end-0 m-2">
-                                {% if product.availability_status == 'in_stock' %}
-                                    <span class="badge bg-success">In Stock</span>
-                                {% elif product.availability_status == 'out_of_stock' %}
-                                    <span class="badge bg-danger">Out of Stock</span>
-                                {% elif product.availability_status == 'pre_order' %}
-                                    <span class="badge bg-info">Pre-Order</span>
-                                {% else %}
-                                    <span class="badge bg-secondary">{{ product.get_availability_status_display }}</span>
-                                {% endif %}
-                            </div>
-                            
-                            <!-- Wishlist Button -->
-                            {% if user.is_authenticated %}
-                            <button class="btn btn-outline-light btn-sm position-absolute bottom-0 end-0 m-2 add-to-wishlist" data-product-id="{{ product.id }}">
-                                <i class="far fa-heart"></i>
-                            </button>
-                            {% endif %}
-                        </div>
-                        
-                        <div class="card-body">
-                            <div class="d-flex justify-content-between align-items-start mb-2">
-                                <h6 class="card-title mb-0">
-                                    <!-- Highlight search terms in product name -->
-                                    {% if query in product.name %}
-                                        {{ product.name|replace:query|safe }}
-                                    {% else %}
-                                        {{ product.name|truncatechars:50 }}
-                                    {% endif %}
-                                </h6>
-                                {% if product.specialty %}
-                                    <span class="badge bg-light text-dark">{{ product.get_specialty_display }}</span>
-                                {% endif %}
-                            </div>
-                            
-                            <p class="text-muted small mb-2">{{ product.brand.name }}</p>
-                            <p class="card-text text-muted small">{{ product.short_description|truncatechars:80 }}</p>
-                            
-                            <!-- Rating -->
-                            <div class="d-flex align-items-center mb-2">
-                                <div class="product-rating me-2">
-                                    {% for i in "12345"|make_list %}
-                                        {% if forloop.counter <= product.get_average_rating %}
-                                            <i class="fas fa-star"></i>
-                                        {% else %}
-                                            <i class="far fa-star"></i>
-                                        {% endif %}
-                                    {% endfor %}
-                                </div>
-                                <small class="text-muted">({{ product.get_review_count }} reviews)</small>
-                            </div>
-                            
-                            <!-- Price -->
-                            <div class="d-flex justify-content-between align-items-center mb-3">
-                                <div>
-                                    <span class="price-tag">${{ product.price }}</span>
-                                    {% if product.bulk_price and product.bulk_quantity %}
-                                        <br><small class="text-muted">Bulk ({{ product.bulk_quantity }}+): ${{ product.bulk_price }}</small>
-                                    {% endif %}
-                                </div>
-                                <small class="text-muted">SKU: {{ product.sku }}</small>
-                            </div>
-                            
-                            <!-- Actions -->
-                            <div class="d-flex gap-2">
-                                <a href="{{ product.get_absolute_url }}" class="btn btn-outline-primary btn-sm flex-fill">
-                                    <i class="fas fa-eye me-1"></i>View Details
-                                </a>
-                                {% if user.is_authenticated and product.availability_status == 'in_stock' %}
-                                <button class="btn btn-primary btn-sm add-to-cart" data-product-id="{{ product.id }}">
-                                    <i class="fas fa-cart-plus"></i>
-                                </button>
-                                {% endif %}
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                {% endfor %}
-            </div>
-            
-            <!-- Pagination -->
-            {% if page_obj.has_other_pages %}
-            <nav aria-label="Search results pagination" class="mt-5">
-                <ul class="pagination justify-content-center">
-                    {% if page_obj.has_previous %}
-                        <li class="page-item">
-                            <a class="page-link" href="?q={{ query }}&page=1">First</a>
-                        </li>
-                        <li class="page-item">
-                            <a class="page-link" href="?q={{ query }}&page={{ page_obj.previous_page_number }}">Previous</a>
-                        </li>
-                    {% endif %}
-                    
-                    {% for num in page_obj.paginator.page_range %}
-                        {% if page_obj.number == num %}
-                            <li class="page-item active">
-                                <span class="page-link">{{ num }}</span>
-                            </li>
-                        {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
-                            <li class="page-item">
-                                <a class="page-link" href="?q={{ query }}&page={{ num }}">{{ num }}</a>
-                            </li>
-                        {% endif %}
-                    {% endfor %}
-                    
-                    {% if page_obj.has_next %}
-                        <li class="page-item">
-                            <a class="page-link" href="?q={{ query }}&page={{ page_obj.next_page_number }}">Next</a>
-                        </li>
-                        <li class="page-item">
-                            <a class="page-link" href="?q={{ query }}&page={{ page_obj.paginator.num_pages }}">Last</a>
-                        </li>
-                    {% endif %}
-                </ul>
-            </nav>
-            {% endif %}
-            
-        {% else %}
-            <!-- No Results -->
-            <div class="text-center py-5">
-                <i class="fas fa-search fa-4x text-muted mb-4"></i>
-                <h3 class="text-muted mb-3">No products found</h3>
-                <p class="text-muted mb-4">
-                    We couldn't find any products matching "<strong>{{ query }}</strong>". 
-                    Try adjusting your search terms or browse our categories.
-                </p>
-                
-                <!-- Search Suggestions -->
-                <div class="row justify-content-center">
-                    <div class="col-lg-8">
-                        <div class="card">
-                            <div class="card-body">
-                                <h5 class="card-title">Search Suggestions</h5>
-                                <ul class="list-unstyled mb-0">
-                                    <li class="mb-2"><i class="fas fa-lightbulb text-warning me-2"></i>Check your spelling</li>
-                                    <li class="mb-2"><i class="fas fa-lightbulb text-warning me-2"></i>Try more general keywords</li>
-                                    <li class="mb-2"><i class="fas fa-lightbulb text-warning me-2"></i>Use fewer keywords</li>
-                                    <li><i class="fas fa-lightbulb text-warning me-2"></i>Browse our product categories</li>
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Popular Categories -->
-                <div class="mt-5">
-                    <h4 class="mb-4">Popular Categories</h4>
-                    <div class="row g-3">
-                        <div class="col-lg-3 col-md-6">
-                            <a href="{% url 'products:list' %}?specialty=cardiology" class="btn btn-outline-primary w-100">
-                                <i class="fas fa-heartbeat me-2"></i>Cardiology
-                            </a>
-                        </div>
-                        <div class="col-lg-3 col-md-6">
-                            <a href="{% url 'products:list' %}?specialty=dermatology" class="btn btn-outline-success w-100">
-                                <i class="fas fa-hand-paper me-2"></i>Dermatology
-                            </a>
-                        </div>
-                        <div class="col-lg-3 col-md-6">
-                            <a href="{% url 'products:list' %}?specialty=ophthalmology" class="btn btn-outline-info w-100">
-                                <i class="fas fa-eye me-2"></i>Ophthalmology
-                            </a>
-                        </div>
-                        <div class="col-lg-3 col-md-6">
-                            <a href="{% url 'products:list' %}?specialty=orthopedics" class="btn btn-outline-warning w-100">
-                                <i class="fas fa-bone me-2"></i>Orthopedics
-                            </a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        {% endif %}
-    </div>
-</section>
-{% endif %}
-
-<!-- Search Tips -->
-<section class="py-5 bg-light">
-    <div class="container">
-        <div class="row">
-            <div class="col-lg-8 mx-auto text-center">
-                <h3 class="fw-bold mb-4">Need Help Finding Products?</h3>
-                <p class="text-muted mb-4">Our medical equipment experts are here to help you find exactly what you need.</p>
-                
-                <div class="row g-4">
-                    <div class="col-md-4">
-                        <div class="card border-0 shadow-sm">
-                            <div class="card-body text-center p-4">
-                                <i class="fas fa-phone fa-2x text-primary mb-3"></i>
-                                <h5 class="fw-bold">Call Us</h5>
-                                <p class="text-muted small">Speak with our product specialists</p>
-                                <a href="tel:+15551234567" class="btn btn-outline-primary btn-sm">+1 (555) 123-4567</a>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="col-md-4">
-                        <div class="card border-0 shadow-sm">
-                            <div class="card-body text-center p-4">
-                                <i class="fas fa-comments fa-2x text-success mb-3"></i>
-                                <h5 class="fw-bold">Live Chat</h5>
-                                <p class="text-muted small">Get instant help from our team</p>
-                                <button class="btn btn-outline-success btn-sm">Start Chat</button>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="col-md-4">
-                        <div class="card border-0 shadow-sm">
-                            <div class="card-body text-center p-4">
-                                <i class="fas fa-envelope fa-2x text-info mb-3"></i>
-                                <h5 class="fw-bold">Email Us</h5>
-                                <p class="text-muted small">Send us your requirements</p>
-                                <a href="{% url 'pages:contact' %}" class="btn btn-outline-info btn-sm">Contact Form</a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</section>
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/searchResults.css' %}">
 {% endblock %}
 
-{% block extra_js %}
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    // Sort functionality
-    const sortSelect = document.getElementById('sortSelect');
-    if (sortSelect) {
-        sortSelect.addEventListener('change', function() {
-            const currentUrl = new URL(window.location);
-            currentUrl.searchParams.set('sort', this.value);
-            window.location.href = currentUrl.toString();
-        });
-    }
-    
-    // Highlight search terms
-    function highlightSearchTerms(query) {
-        if (!query) return;
-        
-        const elements = document.querySelectorAll('.card-title, .card-text');
-        elements.forEach(element => {
-            const text = element.textContent;
-            const highlightedText = text.replace(
-                new RegExp(query, 'gi'), 
-                '<mark class="search-highlight">$&</mark>'
-            );
-            if (highlightedText !== text) {
-                element.innerHTML = highlightedText;
-            }
-        });
-    }
-    
-    // Apply highlighting
-    const query = '{{ query|escapejs }}';
-    if (query) {
-        highlightSearchTerms(query);
-    }
-});
-</script>
+{% block content %}
+<!-- Search Header -->
+<div class="search-header">
+  <div class="search-header-content">
+    <h1>Search Results</h1>
+    <div class="search-container">
+      <form method="get" action="{% url 'products:search' %}">
+        <input
+          type="text"
+          name="q"
+          placeholder="Search medical supplies..."
+          class="search-input"
+          value="{{ query }}"
+        />
+        <button type="submit" class="search-btn">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+            <circle cx="11" cy="11" r="8" stroke="currentColor" stroke-width="2"/>
+            <path d="m21 21-4.35-4.35" stroke="currentColor" stroke-width="2"/>
+          </svg>
+        </button>
+      </form>
+    </div>
+    <p class="search-info">Showing {{ total_results }} result{{ total_results|pluralize }} for "{{ query }}"</p>
+  </div>
+</div>
+
+<!-- Search Results Section -->
+<div class="results-section">
+  <div class="results-container">
+    <aside class="filters-sidebar">
+      <h3>Filter Results</h3>
+
+      <div class="filter-group">
+        <h4>Category</h4>
+        <div class="filter-options">
+          {% for category in categories %}
+          <label>
+            <input type="checkbox" name="category" value="{{ category.slug }}" />
+            {{ category.name }} ({{ category.products.count }})
+          </label>
+          {% endfor %}
+        </div>
+      </div>
+
+      <div class="filter-group">
+        <h4>Price Range</h4>
+        <div class="filter-options">
+          <label><input type="checkbox" name="price" value="0-50" /> Under $50</label>
+          <label><input type="checkbox" name="price" value="50-200" /> $50 - $200</label>
+          <label><input type="checkbox" name="price" value="200+" /> Over $200</label>
+        </div>
+      </div>
+
+      <div class="filter-group">
+        <h4>Brand</h4>
+        <div class="filter-options">
+          {% for brand in brands %}
+          <label>
+            <input type="checkbox" name="brand" value="{{ brand.id }}" />
+            {{ brand.name }}
+          </label>
+          {% endfor %}
+        </div>
+      </div>
+
+      <div class="filter-group">
+        <h4>Availability</h4>
+        <div class="filter-options">
+          <label><input type="checkbox" name="availability" value="in_stock" /> In Stock</label>
+          <label><input type="checkbox" name="availability" value="pre_order" /> Pre-order</label>
+        </div>
+      </div>
+
+      <button class="clear-filters-btn" onclick="window.location.href='{% url 'products:search' %}?q={{ query }}'">Clear All Filters</button>
+    </aside>
+
+    <div class="results-content">
+      <div class="results-header">
+        <div class="results-count">
+          <span>{{ page_obj.paginator.count }} Products Found</span>
+        </div>
+        <div class="sort-options">
+          <label for="sort">Sort by:</label>
+          <select id="sort" class="sort-select" onchange="window.location.href='?q={{ query }}&sort=' + this.value">
+            <option value="name" {% if current_filters.sort == 'name' %}selected{% endif %}>Relevance</option>
+            <option value="price_low" {% if current_filters.sort == 'price_low' %}selected{% endif %}>Price: Low to High</option>
+            <option value="price_high" {% if current_filters.sort == 'price_high' %}selected{% endif %}>Price: High to Low</option>
+            <option value="rating" {% if current_filters.sort == 'rating' %}selected{% endif %}>Customer Rating</option>
+            <option value="newest" {% if current_filters.sort == 'newest' %}selected{% endif %}>Newest First</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="products-grid">
+        {% for product in page_obj %}
+        <div class="product-card">
+          <div class="product-image">
+            {% if product.images.first %}
+            <img src="{{ product.images.first.image.url }}" alt="{{ product.name }}" />
+            {% else %}
+            <img src="{% static 'images/placeholder.png' %}" alt="{{ product.name }}" />
+            {% endif %}
+            {% if product.featured %}
+            <div class="product-badge">Best Seller</div>
+            {% elif product.trending %}
+            <div class="product-badge">Trending</div>
+            {% endif %}
+          </div>
+          <div class="product-info">
+            <h3><a href="{% url 'products:detail' product.slug %}">{{ product.name }}</a></h3>
+            <p class="product-category">{{ product.category.name }}</p>
+            <div class="product-rating">
+              <span class="stars">★★★★★</span>
+              <span class="rating-text">({{ product.get_average_rating|floatformat:1 }}) {{ product.get_review_count }} reviews</span>
+            </div>
+            <p class="product-description">{{ product.short_description|truncatewords:15 }}</p>
+            <div class="product-price">
+              <span class="current-price">${{ product.price }}</span>
+              {% if product.bulk_price %}
+              <span class="original-price">${{ product.bulk_price }}</span>
+              {% endif %}
+            </div>
+            <div class="product-actions">
+              <button class="add-to-cart-btn">Add to Cart</button>
+              <button class="save-btn" onclick="toggleWishlist({{ product.id }})">♡</button>
+            </div>
+          </div>
+        </div>
+        {% empty %}
+        <p>No products found matching your search.</p>
+        {% endfor %}
+      </div>
+
+      {% if page_obj.has_other_pages %}
+      <div class="pagination">
+        {% if page_obj.has_previous %}
+        <a href="?q={{ query }}&page={{ page_obj.previous_page_number }}" class="page-btn prev">Previous</a>
+        {% else %}
+        <button class="page-btn prev" disabled>Previous</button>
+        {% endif %}
+
+        {% for num in page_obj.paginator.page_range %}
+        <a href="?q={{ query }}&page={{ num }}" class="page-btn {% if page_obj.number == num %}active{% endif %}">{{ num }}</a>
+        {% endfor %}
+
+        {% if page_obj.has_next %}
+        <a href="?q={{ query }}&page={{ page_obj.next_page_number }}" class="page-btn next">Next</a>
+        {% else %}
+        <button class="page-btn next" disabled>Next</button>
+        {% endif %}
+      </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
 {% endblock %}

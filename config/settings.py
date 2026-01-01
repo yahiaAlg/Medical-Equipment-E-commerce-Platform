@@ -35,6 +35,8 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = "config.urls"
 
+# Add to TEMPLATES context_processors in settings.py
+
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
@@ -46,7 +48,9 @@ TEMPLATES = [
                 "django.template.context_processors.request",
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
-                "payments.context_processors.cart_items_count",
+                # Add this line:
+                "pages.context_processors.site_info",
+                "accounts.context_processors.wishlist_items",
             ],
         },
     },

@@ -1,0 +1,196 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Refunds Management - Admin{% endblock %}
+
+{% block extra_css %}
+<style>
+.admin-header {
+  background: linear-gradient(135deg, #34588f 0%, #1a3e75 100%);
+  color: white;
+  padding: 2rem 0;
+  margin-bottom: 2rem;
+}
+
+.stat-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.mini-stat {
+  background: white;
+  padding: 1rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  text-align: center;
+}
+
+.mini-stat .number {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #34588f;
+}
+
+.mini-stat .label {
+  font-size: 0.85rem;
+  color: #666;
+}
+
+.filter-bar {
+  background: white;
+  padding: 1.5rem;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  margin-bottom: 1.5rem;
+}
+
+.table-container {
+  background: white;
+  border-radius: 10px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.status-badge {
+  padding: 0.4rem 0.8rem;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.status-refund_pending { background: #fff3cd; color: #856404; }
+.status-refund_approved { background: #d1ecf1; color: #0c5460; }
+.status-refund_processing { background: #cfe2ff; color: #084298; }
+.status-refund_completed { background: #d4edda; color: #155724; }
+.status-refund_rejected { background: #f8d7da; color: #721c24; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="admin-header">
+  <div class="container">
+    <h1><i class="fas fa-undo me-2"></i>Refunds Management</h1>
+    <p class="mb-0">Process and track customer refunds</p>
+  </div>
+</div>
+
+<div class="container mb-5">
+  <div class="mb-3">
+    <a href="{% url 'accounts:admin_dashboard' %}" class="btn btn-outline-secondary">
+      <i class="fas fa-arrow-left me-2"></i>Back to Dashboard
+    </a>
+  </div>
+
+  <!-- Refund Statistics -->
+  <div class="stat-row">
+    <div class="mini-stat">
+      <div class="number">{{ refund_stats.total }}</div>
+      <div class="label">Total Refunds</div>
+    </div>
+    <div class="mini-stat">
+      <div class="number">{{ refund_stats.pending }}</div>
+      <div class="label">Pending</div>
+    </div>
+    <div class="mini-stat">
+      <div class="number">{{ refund_stats.approved }}</div>
+      <div class="label">Approved</div>
+    </div>
+    <div class="mini-stat">
+      <div class="number">{{ refund_stats.completed }}</div>
+      <div class="label">Completed</div>
+    </div>
+    <div class="mini-stat">
+      <div class="number">{{ refund_stats.total_amount|floatformat:2 }} DZD</div>
+      <div class="label">Total Refunded</div>
+    </div>
+  </div>
+
+  <!-- Filters -->
+  <div class="filter-bar">
+    <form method="get" class="row g-3">
+      <div class="col-md-10">
+        <label class="form-label">Status</label>
+        <select name="status" class="form-select">
+          <option value="all" {% if status_filter == 'all' %}selected{% endif %}>All Refunds</option>
+          <option value="refund_pending" {% if status_filter == 'refund_pending' %}selected{% endif %}>Pending</option>
+          <option value="refund_approved" {% if status_filter == 'refund_approved' %}selected{% endif %}>Approved</option>
+          <option value="refund_processing" {% if status_filter == 'refund_processing' %}selected{% endif %}>Processing</option>
+          <option value="refund_completed" {% if status_filter == 'refund_completed' %}selected{% endif %}>Completed</option>
+          <option value="refund_rejected" {% if status_filter == 'refund_rejected' %}selected{% endif %}>Rejected</option>
+        </select>
+      </div>
+      <div class="col-md-2 d-flex align-items-end">
+        <button type="submit" class="btn btn-primary w-100">
+          <i class="fas fa-search me-2"></i>Filter
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <!-- Refunds Table -->
+  <div class="table-container">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <h5 class="mb-0">Refunds List ({{ refunds.count }})</h5>
+    </div>
+
+    <div class="table-responsive">
+      <table class="table table-hover">
+        <thead>
+          <tr>
+            <th>Refund #</th>
+            <th>Order #</th>
+            <th>Customer</th>
+            <th>Amount</th>
+            <th>Reason</th>
+            <th>Date</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for refund in refunds %}
+          <tr>
+            <td><strong>{{ refund.refund_number }}</strong></td>
+            <td>{{ refund.order.order_id }}</td>
+            <td>
+              {{ refund.order.user.username }}
+              <br><small class="text-muted">{{ refund.order.user.email }}</small>
+            </td>
+            <td><strong>{{ refund.amount }} DZD</strong></td>
+            <td>
+              <small>{{ refund.reason|truncatewords:10 }}</small>
+            </td>
+            <td>{{ refund.created_at|date:"M d, Y" }}</td>
+            <td>
+              <span class="status-badge status-{{ refund.status }}">
+                {{ refund.get_status_display }}
+              </span>
+            </td>
+            <td>
+              {% if refund.status in 'refund_approved,refund_processing' %}
+              <a href="{% url 'accounts:admin_upload_refund_proof' refund.id %}" 
+                 class="btn btn-sm btn-primary">
+                <i class="fas fa-upload"></i> Upload Proof
+              </a>
+              {% elif refund.status == 'refund_completed' %}
+              <span class="badge bg-success">
+                <i class="fas fa-check"></i> Completed
+              </span>
+              {% else %}
+              <span class="badge bg-secondary">{{ refund.get_status_display }}</span>
+              {% endif %}
+            </td>
+          </tr>
+          {% empty %}
+          <tr>
+            <td colspan="8" class="text-center text-muted py-4">No refunds found</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,232 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Upload Refund Proof - Fennec Med{% endblock %}
+
+{% block extra_css %}
+<style>
+.admin-header {
+  background: linear-gradient(135deg, #34588f 0%, #1a3e75 100%);
+  color: white;
+  padding: 2rem 0;
+  margin-bottom: 2rem;
+}
+
+.card-custom {
+  background: white;
+  border-radius: 10px;
+  padding: 2rem;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  margin-bottom: 1.5rem;
+}
+
+.info-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.75rem 0;
+  border-bottom: 1px solid #e9ecef;
+}
+
+.info-row:last-child {
+  border-bottom: none;
+}
+
+.info-label {
+  font-weight: 600;
+  color: #666;
+}
+
+.info-value {
+  color: #333;
+  font-weight: 500;
+}
+
+.upload-area {
+  background: #f8f9fa;
+  border: 2px dashed #dee2e6;
+  border-radius: 8px;
+  padding: 2rem;
+  text-align: center;
+  transition: all 0.3s;
+}
+
+.upload-area:hover {
+  border-color: #34588f;
+  background: #f0f4f8;
+}
+
+.upload-icon {
+  font-size: 3rem;
+  color: #34588f;
+  margin-bottom: 1rem;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="admin-header">
+  <div class="container">
+    <div class="d-flex justify-content-between align-items-center">
+      <div>
+        <h1><i class="fas fa-upload me-2"></i>Upload Refund Proof</h1>
+        <p class="mb-0">Complete refund process for {{ refund.refund_number }}</p>
+      </div>
+      <a href="{% url 'accounts:admin_refunds_management' %}" class="btn btn-light">
+        <i class="fas fa-arrow-left me-2"></i>Back to Refunds
+      </a>
+    </div>
+  </div>
+</div>
+
+<div class="container mb-5">
+  <div class="row">
+    <!-- Refund Details -->
+    <div class="col-lg-5 mb-4">
+      <div class="card-custom">
+        <h5 class="mb-4"><i class="fas fa-info-circle me-2"></i>Refund Information</h5>
+        
+        <div class="info-row">
+          <span class="info-label">Refund Number:</span>
+          <span class="info-value">{{ refund.refund_number }}</span>
+        </div>
+        
+        <div class="info-row">
+          <span class="info-label">Order ID:</span>
+          <span class="info-value">
+            <a href="{% url 'accounts:admin_orders_management' %}?search={{ refund.order.order_id }}">
+              {{ refund.order.order_id }}
+            </a>
+          </span>
+        </div>
+        
+        <div class="info-row">
+          <span class="info-label">Customer:</span>
+          <span class="info-value">
+            <a href="{% url 'accounts:admin_user_detail' refund.order.user.id %}">
+              {{ refund.order.user.get_full_name|default:refund.order.user.username }}
+            </a>
+          </span>
+        </div>
+        
+        <div class="info-row">
+          <span class="info-label">Email:</span>
+          <span class="info-value">{{ refund.order.user.email }}</span>
+        </div>
+        
+        <div class="info-row">
+          <span class="info-label">Refund Amount:</span>
+          <span class="info-value"><strong>{{ refund.amount }} DZD</strong></span>
+        </div>
+        
+        <div class="info-row">
+          <span class="info-label">Status:</span>
+          <span class="info-value">
+            <span class="badge bg-warning">{{ refund.get_status_display }}</span>
+          </span>
+        </div>
+        
+        <div class="info-row">
+          <span class="info-label">Created:</span>
+          <span class="info-value">{{ refund.created_at|date:"M d, Y H:i" }}</span>
+        </div>
+        
+        <div class="info-row">
+          <span class="info-label">Approved By:</span>
+          <span class="info-value">{{ refund.approved_by.username }}</span>
+        </div>
+      </div>
+      
+      <div class="alert alert-info">
+        <h6><i class="fas fa-info-circle me-2"></i>Refund Reason</h6>
+        <p class="mb-0">{{ refund.reason }}</p>
+      </div>
+    </div>
+    
+    <!-- Upload Form -->
+    <div class="col-lg-7 mb-4">
+      <div class="card-custom">
+        <h5 class="mb-4"><i class="fas fa-file-upload me-2"></i>Upload Refund Proof</h5>
+        
+        <form method="post" enctype="multipart/form-data">
+          {% csrf_token %}
+          
+          <div class="mb-4">
+            <label class="form-label"><strong>Refund Method *</strong></label>
+            {{ form.refund_method }}
+            <small class="form-text text-muted">Select the method used for refunding</small>
+          </div>
+          
+          <div class="mb-4">
+            <label class="form-label"><strong>Proof Document *</strong></label>
+            <div class="upload-area">
+              <div class="upload-icon">
+                <i class="fas fa-cloud-upload-alt"></i>
+              </div>
+              {{ form.proof_file }}
+              <p class="text-muted mb-0 mt-2">
+                <small>Upload image (JPG, PNG) or PDF. Max size: 5MB</small>
+              </p>
+            </div>
+          </div>
+          
+          <div class="mb-4">
+            <label class="form-label"><strong>Transaction Reference</strong></label>
+            {{ form.transaction_reference }}
+            <small class="form-text text-muted">Transaction ID or reference number from payment system</small>
+          </div>
+          
+          <div class="mb-4">
+            <label class="form-label"><strong>Notes</strong></label>
+            {{ form.notes }}
+            <small class="form-text text-muted">Any additional information about the refund</small>
+          </div>
+          
+          <div class="alert alert-success">
+            <h6><i class="fas fa-check-circle me-2"></i>What Happens Next?</h6>
+            <p class="mb-0 small">
+              After uploading refund proof:
+              <ul class="mb-0">
+                <li>Refund status will change to "Completed"</li>
+                <li>Customer will receive notification with receipt</li>
+                <li>Order status will update to "Refunded"</li>
+                <li>Invoice will be marked as "Refunded"</li>
+              </ul>
+            </p>
+          </div>
+          
+          <div class="d-grid gap-2">
+            <button type="submit" class="btn btn-success btn-lg">
+              <i class="fas fa-check me-2"></i>Upload & Complete Refund
+            </button>
+            <a href="{% url 'accounts:admin_refunds_management' %}" class="btn btn-outline-secondary">
+              Cancel
+            </a>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// File upload preview
+document.querySelector('input[type="file"]').addEventListener('change', function(e) {
+  const fileName = e.target.files[0]?.name;
+  if (fileName) {
+    const uploadArea = document.querySelector('.upload-area');
+    uploadArea.style.borderColor = '#34588f';
+    uploadArea.style.background = '#f0f4f8';
+    
+    const fileInfo = document.createElement('p');
+    fileInfo.className = 'text-success mb-0 mt-2';
+    fileInfo.innerHTML = '<i class="fas fa-check-circle me-2"></i>Selected: ' + fileName;
+    
+    // Remove previous file info
+    const existingInfo = uploadArea.querySelector('.text-success');
+    if (existingInfo) existingInfo.remove();
+    
+    uploadArea.appendChild(fileInfo);
+  }
+});
+</script>
+{% endblock %}

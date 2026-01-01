@@ -1,0 +1,280 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Complaint {{ complaint.complaint_number }} - Fennec Med{% endblock %}
+
+{% block extra_css %}
+<style>
+.complaint-detail-section {
+  background-color: #f0f4f8;
+  padding: 3.125rem 1.25rem;
+  min-height: 70vh;
+}
+
+.complaint-container {
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.complaint-paper {
+  background-color: white;
+  border-radius: 0.625rem;
+  padding: 2.5rem;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.detail-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.detail-header h1 {
+  font-size: clamp(1.5rem, 4vw, 2rem);
+  color: #1a3e75;
+}
+
+.complaint-status {
+  padding: 0.5rem 1.25rem;
+  border-radius: 1.563rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+.status-open {
+  background-color: #fff3cd;
+  color: #856404;
+}
+
+.status-in_review {
+  background-color: #cfe2ff;
+  color: #084298;
+}
+
+.status-awaiting_user {
+  background-color: #ffc107;
+  color: #000;
+}
+
+.status-resolved {
+  background-color: #d1e7dd;
+  color: #0f5132;
+}
+
+.status-rejected {
+  background-color: #f8d7da;
+  color: #842029;
+}
+
+.info-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1.5rem;
+  padding: 1.5rem;
+  background-color: #f8f9fa;
+  border-radius: 0.625rem;
+  margin-bottom: 2rem;
+}
+
+.info-item h3 {
+  font-size: 0.875rem;
+  color: #666;
+  margin-bottom: 0.375rem;
+}
+
+.info-item p {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #333;
+  margin: 0;
+}
+
+.complaint-content {
+  margin-bottom: 2rem;
+}
+
+.complaint-content h2 {
+  font-size: 1.25rem;
+  color: #1a3e75;
+  margin-bottom: 1rem;
+}
+
+.complaint-content p {
+  color: #666;
+  line-height: 1.8;
+}
+
+.attachments-section {
+  margin: 2rem 0;
+}
+
+.attachments-section h2 {
+  font-size: 1.25rem;
+  color: #1a3e75;
+  margin-bottom: 1rem;
+}
+
+.attachments-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 1rem;
+}
+
+.attachment-item {
+  border: 1px solid #ddd;
+  border-radius: 0.375rem;
+  padding: 0.75rem;
+  text-align: center;
+  transition: transform 0.3s;
+}
+
+.attachment-item:hover {
+  transform: translateY(-0.188rem);
+}
+
+.attachment-item i {
+  font-size: 2rem;
+  color: #34588f;
+  margin-bottom: 0.5rem;
+}
+
+.attachment-item a {
+  color: #34588f;
+  text-decoration: none;
+  font-size: 0.875rem;
+}
+
+.admin-response {
+  background-color: #e3f2fd;
+  border-left: 4px solid #2196f3;
+  padding: 1.5rem;
+  border-radius: 0.625rem;
+  margin: 2rem 0;
+}
+
+.admin-response h2 {
+  font-size: 1.125rem;
+  color: #1565c0;
+  margin-bottom: 1rem;
+}
+
+.admin-response h3 {
+  font-size: 1rem;
+  color: #1565c0;
+  margin: 1rem 0 0.5rem;
+}
+
+.admin-response p {
+  color: #333;
+  line-height: 1.6;
+  margin: 0.5rem 0;
+}
+
+.back-button {
+  background-color: #6c757d;
+  color: white;
+  padding: 0.938rem 1.875rem;
+  border-radius: 1.563rem;
+  text-decoration: none;
+  font-weight: 600;
+  display: inline-block;
+  margin-top: 2rem;
+  transition: background-color 0.3s;
+}
+
+.back-button:hover {
+  background-color: #5a6268;
+  color: white;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="complaint-detail-section">
+  <div class="complaint-container">
+    <div class="complaint-paper">
+      <div class="detail-header">
+        <h1>{{ complaint.complaint_number }}</h1>
+        <span class="complaint-status status-{{ complaint.status }}">
+          {{ complaint.get_status_display }}
+        </span>
+      </div>
+
+      <div class="info-grid">
+        <div class="info-item">
+          <h3>Order Number</h3>
+          <p>{{ complaint.order.order_id }}</p>
+        </div>
+        <div class="info-item">
+          <h3>Submitted On</h3>
+          <p>{{ complaint.created_at|date:"M d, Y" }}</p>
+        </div>
+        <div class="info-item">
+          <h3>Complaint Reason</h3>
+          <p>
+            {% if complaint.reason %}
+              {{ complaint.reason.name }}
+            {% elif complaint.custom_reason %}
+              {{ complaint.custom_reason }}
+            {% endif %}
+          </p>
+        </div>
+        {% if complaint.resolved_at %}
+        <div class="info-item">
+          <h3>Resolved On</h3>
+          <p>{{ complaint.resolved_at|date:"M d, Y" }}</p>
+        </div>
+        {% endif %}
+      </div>
+
+      <div class="complaint-content">
+        <h2>Description</h2>
+        <p>{{ complaint.description }}</p>
+      </div>
+
+      {% if complaint.attachments.exists %}
+      <div class="attachments-section">
+        <h2>Attachments</h2>
+        <div class="attachments-grid">
+          {% for attachment in complaint.attachments.all %}
+          <div class="attachment-item">
+            <i class="fas fa-file"></i>
+            <a href="{{ attachment.file.url }}" target="_blank">View File</a>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+      {% endif %}
+
+      {% if complaint.admin_notes or complaint.resolution_notes %}
+      <div class="admin-response">
+        <h2><i class="fas fa-reply"></i> Admin Response</h2>
+        
+        {% if complaint.admin_notes %}
+        <h3>Admin Notes:</h3>
+        <p>{{ complaint.admin_notes }}</p>
+        {% endif %}
+        
+        {% if complaint.resolution_notes %}
+        <h3>Resolution:</h3>
+        <p>{{ complaint.resolution_notes }}</p>
+        {% endif %}
+        
+        {% if complaint.handled_by %}
+        <p style="margin-top: 1rem; font-size: 0.875rem; color: #666;">
+          Handled by: {{ complaint.handled_by.get_full_name|default:complaint.handled_by.username }}
+        </p>
+        {% endif %}
+      </div>
+      {% endif %}
+
+      <a href="{% url 'payments:complaint_list' %}" class="back-button">
+        <i class="fas fa-arrow-left"></i> Back to Complaints
+      </a>
+    </div>
+  </div>
+</div>
+{% endblock %}

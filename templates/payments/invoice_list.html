@@ -1,0 +1,227 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}My Invoices - Fennec Med{% endblock %}
+
+{% block extra_css %}
+<style>
+.invoices-section {
+  background-color: #f0f4f8;
+  padding: 3.125rem 1.25rem;
+  min-height: 70vh;
+}
+
+.invoices-container {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.section-header {
+  text-align: center;
+  margin-bottom: 2.5rem;
+}
+
+.section-header h1 {
+  font-size: clamp(1.75rem, 4vw, 2.25rem);
+  color: #1a3e75;
+  margin-bottom: 0.625rem;
+}
+
+.section-header p {
+  color: #666;
+  font-size: clamp(0.938rem, 2vw, 1rem);
+}
+
+.invoice-card {
+  background-color: white;
+  border-radius: 0.625rem;
+  padding: 1.5rem;
+  margin-bottom: 1.25rem;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s;
+}
+
+.invoice-card:hover {
+  transform: translateY(-0.313rem);
+}
+
+.invoice-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+  flex-wrap: wrap;
+  gap: 0.625rem;
+}
+
+.invoice-number {
+  font-size: 1.125rem;
+  font-weight: bold;
+  color: #1a3e75;
+}
+
+.invoice-status {
+  padding: 0.375rem 0.938rem;
+  border-radius: 1.563rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+.status-unpaid {
+  background-color: #ffeaa7;
+  color: #d63031;
+}
+
+.status-payment_submitted {
+  background-color: #74b9ff;
+  color: #0984e3;
+}
+
+.status-payment_rejected {
+  background-color: #ff7675;
+  color: #d63031;
+}
+
+.status-paid {
+  background-color: #55efc4;
+  color: #00b894;
+}
+
+.status-refunded {
+  background-color: #dfe6e9;
+  color: #636e72;
+}
+
+.invoice-details {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.detail-item {
+  display: flex;
+  flex-direction: column;
+}
+
+.detail-label {
+  font-size: 0.813rem;
+  color: #666;
+  margin-bottom: 0.25rem;
+}
+
+.detail-value {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #333;
+}
+
+.invoice-actions {
+  display: flex;
+  gap: 0.625rem;
+  flex-wrap: wrap;
+}
+
+.btn-view {
+  background-color: #34588f;
+  color: white;
+  padding: 0.563rem 1.25rem;
+  border-radius: 1.563rem;
+  text-decoration: none;
+  font-size: 0.875rem;
+  font-weight: 600;
+  transition: background-color 0.3s;
+}
+
+.btn-view:hover {
+  background-color: #1a3e75;
+  color: white;
+}
+
+.btn-upload {
+  background-color: #00b894;
+  color: white;
+  padding: 0.563rem 1.25rem;
+  border-radius: 1.563rem;
+  text-decoration: none;
+  font-size: 0.875rem;
+  font-weight: 600;
+  transition: background-color 0.3s;
+}
+
+.btn-upload:hover {
+  background-color: #00a388;
+  color: white;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 3rem 1rem;
+}
+
+.empty-state i {
+  font-size: 4rem;
+  color: #dfe6e9;
+  margin-bottom: 1rem;
+}
+
+.empty-state p {
+  color: #666;
+  font-size: 1.125rem;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="invoices-section">
+  <div class="invoices-container">
+    <div class="section-header">
+      <h1>My Invoices</h1>
+      <p>View and manage all your invoices</p>
+    </div>
+
+    {% if invoices %}
+      {% for invoice in invoices %}
+      <div class="invoice-card">
+        <div class="invoice-header">
+          <span class="invoice-number">{{ invoice.invoice_number }}</span>
+          <span class="invoice-status status-{{ invoice.status }}">
+            {{ invoice.get_status_display }}
+          </span>
+        </div>
+
+        <div class="invoice-details">
+          <div class="detail-item">
+            <span class="detail-label">Order</span>
+            <span class="detail-value">{{ invoice.order.order_id }}</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">Amount</span>
+            <span class="detail-value">{{ invoice.total_amount|floatformat:2 }} DZD</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">Date</span>
+            <span class="detail-value">{{ invoice.created_at|date:"M d, Y" }}</span>
+          </div>
+        </div>
+
+        <div class="invoice-actions">
+          <a href="{% url 'payments:invoice_detail' invoice.id %}" class="btn-view">View Details</a>
+          {% if invoice.status == 'unpaid' or invoice.status == 'payment_rejected' %}
+            <a href="{% url 'payments:upload_payment_proof' invoice.id %}" class="btn-upload">Upload Payment Proof</a>
+          {% endif %}
+          {% if invoice.status == 'paid' %}
+            <a href="{% url 'payments:payment_receipt' invoice.id %}" class="btn-view">View Receipt</a>
+          {% endif %}
+        </div>
+      </div>
+      {% endfor %}
+    {% else %}
+      <div class="empty-state">
+        <i class="fas fa-file-invoice"></i>
+        <p>No invoices found</p>
+      </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

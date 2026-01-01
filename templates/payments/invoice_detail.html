@@ -1,0 +1,327 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Invoice {{ invoice.invoice_number }} - Fennec Med{% endblock %}
+
+{% block extra_css %}
+<style>
+.invoice-detail-section {
+  background-color: #f0f4f8;
+  padding: 3.125rem 1.25rem;
+  min-height: 70vh;
+}
+
+.invoice-container {
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.invoice-paper {
+  background-color: white;
+  border-radius: 0.625rem;
+  padding: 2.5rem;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.invoice-header-section {
+  display: flex;
+  justify-content: space-between;
+  align-items: start;
+  margin-bottom: 2rem;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+}
+
+.company-info h1 {
+  color: #34588f;
+  font-size: 1.75rem;
+  margin-bottom: 0.5rem;
+}
+
+.company-info p {
+  color: #666;
+  margin: 0.25rem 0;
+  font-size: 0.938rem;
+}
+
+.invoice-meta {
+  text-align: right;
+}
+
+.invoice-meta h2 {
+  font-size: 2rem;
+  color: #1a3e75;
+  margin-bottom: 0.5rem;
+}
+
+.invoice-meta p {
+  margin: 0.25rem 0;
+  color: #666;
+}
+
+.status-badge {
+  display: inline-block;
+  padding: 0.5rem 1.25rem;
+  border-radius: 1.563rem;
+  font-weight: 600;
+  margin-top: 0.5rem;
+}
+
+.status-unpaid {
+  background-color: #ffeaa7;
+  color: #d63031;
+}
+
+.status-payment_submitted {
+  background-color: #74b9ff;
+  color: #0984e3;
+}
+
+.status-payment_rejected {
+  background-color: #ff7675;
+  color: #d63031;
+}
+
+.status-paid {
+  background-color: #55efc4;
+  color: #00b894;
+}
+
+.status-refunded {
+  background-color: #dfe6e9;
+  color: #636e72;
+}
+
+.billing-section {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 2rem;
+  margin-bottom: 2rem;
+  padding: 1.5rem;
+  background-color: #f8f9fa;
+  border-radius: 0.625rem;
+}
+
+.billing-info h3 {
+  color: #34588f;
+  font-size: 1rem;
+  margin-bottom: 0.75rem;
+}
+
+.billing-info p {
+  color: #666;
+  margin: 0.25rem 0;
+  font-size: 0.938rem;
+}
+
+.items-table {
+  width: 100%;
+  margin-bottom: 2rem;
+  border-collapse: collapse;
+}
+
+.items-table th {
+  background-color: #4a6a9b;
+  color: white;
+  padding: 0.938rem;
+  text-align: left;
+  font-weight: 600;
+}
+
+.items-table td {
+  padding: 0.938rem;
+  border-bottom: 1px solid #ddd;
+}
+
+.items-table tr:last-child td {
+  border-bottom: none;
+}
+
+.totals-section {
+  margin-left: auto;
+  width: 300px;
+  max-width: 100%;
+}
+
+.total-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.625rem 0;
+  font-size: 1rem;
+}
+
+.total-row.final {
+  border-top: 2px solid #34588f;
+  padding-top: 1rem;
+  margin-top: 0.5rem;
+  font-size: 1.25rem;
+  font-weight: bold;
+  color: #1a3e75;
+}
+
+.payment-instructions {
+  background-color: #fff3cd;
+  border-left: 4px solid #ffc107;
+  padding: 1.5rem;
+  margin: 2rem 0;
+  border-radius: 0.625rem;
+}
+
+.payment-instructions h3 {
+  color: #856404;
+  margin-bottom: 1rem;
+  font-size: 1.125rem;
+}
+
+.payment-instructions pre {
+  background-color: white;
+  padding: 1rem;
+  border-radius: 0.375rem;
+  overflow-x: auto;
+  font-size: 0.875rem;
+  white-space: pre-wrap;
+}
+
+.action-buttons {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-top: 2rem;
+}
+
+.btn-primary-action {
+  background-color: #34588f;
+  color: white;
+  padding: 0.938rem 1.875rem;
+  border-radius: 1.563rem;
+  text-decoration: none;
+  font-weight: 600;
+  transition: background-color 0.3s;
+}
+
+.btn-primary-action:hover {
+  background-color: #1a3e75;
+  color: white;
+}
+
+.btn-secondary-action {
+  background-color: #6c757d;
+  color: white;
+  padding: 0.938rem 1.875rem;
+  border-radius: 1.563rem;
+  text-decoration: none;
+  font-weight: 600;
+  transition: background-color 0.3s;
+}
+
+.btn-secondary-action:hover {
+  background-color: #5a6268;
+  color: white;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="invoice-detail-section">
+  <div class="invoice-container">
+    <div class="invoice-paper">
+      <div class="invoice-header-section">
+        <div class="company-info">
+          <h1>Fennec Med</h1>
+          <p>Medical Equipment & Supplies</p>
+          <p>Algeria</p>
+        </div>
+        <div class="invoice-meta">
+          <h2>INVOICE</h2>
+          <p><strong>{{ invoice.invoice_number }}</strong></p>
+          <p>Date: {{ invoice.created_at|date:"M d, Y" }}</p>
+          <span class="status-badge status-{{ invoice.status }}">
+            {{ invoice.get_status_display }}
+          </span>
+        </div>
+      </div>
+
+      <div class="billing-section">
+        <div class="billing-info">
+          <h3>Bill To:</h3>
+          <p><strong>{{ invoice.order.user.get_full_name|default:invoice.order.user.username }}</strong></p>
+          <p>{{ invoice.order.shipping_address }}</p>
+          <p>{{ invoice.order.shipping_city }}, {{ invoice.order.shipping_state }}</p>
+          <p>{{ invoice.order.shipping_zip }}</p>
+        </div>
+        <div class="billing-info">
+          <h3>Order Details:</h3>
+          <p>Order ID: <strong>{{ invoice.order.order_id }}</strong></p>
+          <p>Order Date: {{ invoice.order.created_at|date:"M d, Y" }}</p>
+          {% if invoice.paid_at %}
+            <p>Paid: {{ invoice.paid_at|date:"M d, Y" }}</p>
+          {% endif %}
+        </div>
+      </div>
+
+      <table class="items-table">
+        <thead>
+          <tr>
+            <th>Item</th>
+            <th>Quantity</th>
+            <th>Unit Price</th>
+            <th>Total</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for item in invoice.order.items.all %}
+          <tr>
+            <td>{{ item.product.name }}</td>
+            <td>{{ item.quantity }}</td>
+            <td>{{ item.price|floatformat:2 }} DZD</td>
+            <td>{{ item.get_total_price|floatformat:2 }} DZD</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+
+      <div class="totals-section">
+        <div class="total-row">
+          <span>Subtotal:</span>
+          <span>{{ invoice.subtotal|floatformat:2 }} DZD</span>
+        </div>
+        <div class="total-row">
+          <span>Tax (19%):</span>
+          <span>{{ invoice.tax_amount|floatformat:2 }} DZD</span>
+        </div>
+        <div class="total-row">
+          <span>Shipping:</span>
+          <span>{{ invoice.order.shipping_cost|floatformat:2 }} DZD</span>
+        </div>
+        <div class="total-row final">
+          <span>Total:</span>
+          <span>{{ invoice.total_amount|floatformat:2 }} DZD</span>
+        </div>
+      </div>
+
+      {% if invoice.status == 'unpaid' or invoice.status == 'payment_rejected' %}
+      <div class="payment-instructions">
+        <h3><i class="fas fa-info-circle"></i> Payment Instructions</h3>
+        <pre>{{ invoice.payment_instructions }}</pre>
+      </div>
+      {% endif %}
+
+      <div class="action-buttons">
+        {% if invoice.status == 'unpaid' or invoice.status == 'payment_rejected' %}
+          <a href="{% url 'payments:upload_payment_proof' invoice.id %}" class="btn-primary-action">
+            <i class="fas fa-upload"></i> Upload Payment Proof
+          </a>
+        {% endif %}
+        {% if invoice.status == 'paid' %}
+          <a href="{% url 'payments:payment_receipt' invoice.id %}" class="btn-primary-action">
+            <i class="fas fa-receipt"></i> View Receipt
+          </a>
+        {% endif %}
+        <a href="{% url 'payments:invoice_list' %}" class="btn-secondary-action">
+          <i class="fas fa-arrow-left"></i> Back to Invoices
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

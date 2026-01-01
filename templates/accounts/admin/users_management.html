@@ -1,0 +1,228 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Users Management - Admin{% endblock %}
+
+{% block extra_css %}
+<style>
+.admin-header {
+  background: linear-gradient(135deg, #34588f 0%, #1a3e75 100%);
+  color: white;
+  padding: 2rem 0;
+  margin-bottom: 2rem;
+}
+
+.filter-bar {
+  background: white;
+  padding: 1.5rem;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  margin-bottom: 1.5rem;
+}
+
+.table-container {
+  background: white;
+  border-radius: 10px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.status-badge {
+  padding: 0.4rem 0.8rem;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.status-active { background: #d4edda; color: #155724; }
+.status-inactive { background: #f8d7da; color: #721c24; }
+.status-pending { background: #fff3cd; color: #856404; }
+
+.user-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.avatar-placeholder {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #34588f, #607d8b);
+  color: white;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="admin-header">
+  <div class="container">
+    <h1><i class="fas fa-users me-2"></i>Users Management</h1>
+    <p class="mb-0">Manage user accounts and permissions</p>
+  </div>
+</div>
+
+<div class="container mb-5">
+  <div class="mb-3">
+    <a href="{% url 'accounts:admin_dashboard' %}" class="btn btn-outline-secondary">
+      <i class="fas fa-arrow-left me-2"></i>Back to Dashboard
+    </a>
+  </div>
+
+  <!-- Filters -->
+  <div class="filter-bar">
+    <form method="get" class="row g-3">
+      <div class="col-md-3">
+        <label class="form-label">Status</label>
+        <select name="status" class="form-select">
+          <option value="all" {% if status_filter == 'all' %}selected{% endif %}>All Users</option>
+          <option value="active" {% if status_filter == 'active' %}selected{% endif %}>Active</option>
+          <option value="inactive" {% if status_filter == 'inactive' %}selected{% endif %}>Inactive</option>
+          <option value="pending" {% if status_filter == 'pending' %}selected{% endif %}>Pending Approval</option>
+        </select>
+      </div>
+      <div class="col-md-3">
+        <label class="form-label">User Type</label>
+        <select name="user_type" class="form-select">
+          <option value="all" {% if user_type_filter == 'all' %}selected{% endif %}>All Types</option>
+          <option value="general" {% if user_type_filter == 'general' %}selected{% endif %}>General</option>
+          <option value="pharmacy" {% if user_type_filter == 'pharmacy' %}selected{% endif %}>Pharmacy</option>
+          <option value="clinic" {% if user_type_filter == 'clinic' %}selected{% endif %}>Clinic</option>
+          <option value="doctor" {% if user_type_filter == 'doctor' %}selected{% endif %}>Doctor</option>
+        </select>
+      </div>
+      <div class="col-md-4">
+        <label class="form-label">Search</label>
+        <input type="text" name="search" class="form-control" 
+               placeholder="Username, email, name..." value="{{ search }}">
+      </div>
+      <div class="col-md-2 d-flex align-items-end">
+        <button type="submit" class="btn btn-primary w-100">
+          <i class="fas fa-search me-2"></i>Filter
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <!-- Users Table -->
+  <div class="table-container">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <h5 class="mb-0">Users List ({{ users.count }})</h5>
+    </div>
+
+    <div class="table-responsive">
+      <table class="table table-hover">
+        <thead>
+          <tr>
+            <th>User</th>
+            <th>Email</th>
+            <th>Type</th>
+            <th>Joined</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for user in users %}
+          <tr>
+            <td>
+              <div class="d-flex align-items-center">
+                {% if user.profile.avatar %}
+                  <img src="{{ user.profile.avatar.url }}" class="user-avatar me-2" alt="{{ user.username }}">
+                {% else %}
+                  <div class="avatar-placeholder me-2">
+                    {{ user.first_name|first|upper }}{{ user.last_name|first|upper }}
+                  </div>
+                {% endif %}
+                <div>
+                  <strong>{{ user.username }}</strong>
+                  {% if user.get_full_name %}
+                    <br><small class="text-muted">{{ user.get_full_name }}</small>
+                  {% endif %}
+                </div>
+              </div>
+            </td>
+            <td>{{ user.email }}</td>
+            <td>
+              <span class="badge bg-secondary">
+                {{ user.profile.get_user_type_display }}
+              </span>
+            </td>
+            <td>{{ user.date_joined|date:"M d, Y" }}</td>
+            <td>
+              <span class="status-badge {% if user.is_active %}status-active{% else %}status-inactive{% endif %}">
+                {% if user.is_active %}Active{% else %}Inactive{% endif %}
+              </span>
+            </td>
+            <td>
+              <div class="btn-group" role="group">
+                <a href="{% url 'accounts:admin_user_detail' user.id %}" 
+                   class="btn btn-sm btn-outline-primary" title="View Details">
+                  <i class="fas fa-eye"></i>
+                </a>
+                {% if not user.is_superuser %}
+                <button type="button" class="btn btn-sm btn-outline-warning" 
+                        onclick="toggleUserStatus({{ user.id }})" title="Toggle Status">
+                  <i class="fas fa-toggle-on"></i>
+                </button>
+                <button type="button" class="btn btn-sm btn-outline-danger" 
+                        onclick="deleteUser({{ user.id }}, '{{ user.username }}')" title="Delete">
+                  <i class="fas fa-trash"></i>
+                </button>
+                {% endif %}
+              </div>
+            </td>
+          </tr>
+          {% empty %}
+          <tr>
+            <td colspan="6" class="text-center text-muted py-4">No users found</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<script>
+function toggleUserStatus(userId) {
+  if (confirm('Are you sure you want to toggle this user\'s status?')) {
+    fetch(`/accounts/admin/user/${userId}/toggle/`, {
+      method: 'POST',
+      headers: {
+        'X-CSRFToken': '{{ csrf_token }}',
+        'Content-Type': 'application/json'
+      }
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data.success) {
+        location.reload();
+      }
+    });
+  }
+}
+
+function deleteUser(userId, username) {
+  if (confirm(`Are you sure you want to delete user "${username}"? This action cannot be undone.`)) {
+    const form = document.createElement('form');
+    form.method = 'POST';
+    form.action = `/accounts/admin/user/${userId}/delete/`;
+    
+    const csrfToken = document.createElement('input');
+    csrfToken.type = 'hidden';
+    csrfToken.name = 'csrfmiddlewaretoken';
+    csrfToken.value = '{{ csrf_token }}';
+    form.appendChild(csrfToken);
+    
+    document.body.appendChild(form);
+    form.submit();
+  }
+}
+</script>
+{% endblock %}

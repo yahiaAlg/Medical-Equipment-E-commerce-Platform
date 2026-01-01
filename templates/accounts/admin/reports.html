@@ -1,0 +1,793 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Reports & Analytics - Admin{% endblock %}
+
+{% block extra_css %}
+<style>
+.admin-header {
+  background: linear-gradient(135deg, #34588f 0%, #1a3e75 100%);
+  color: white;
+  padding: 2rem 0;
+  margin-bottom: 2rem;
+}
+
+.report-card {
+  background: white;
+  border-radius: 10px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  margin-bottom: 1.5rem;
+  height: 100%;
+}
+
+.report-card h5 {
+  color: #34588f;
+  border-bottom: 2px solid #34588f;
+  padding-bottom: 0.5rem;
+  margin-bottom: 1rem;
+  font-weight: 600;
+}
+
+.metric-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.metric-box {
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  padding: 1.5rem;
+  border-radius: 8px;
+  border-left: 4px solid #34588f;
+  transition: transform 0.2s;
+}
+
+.metric-box:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+.metric-box .label {
+  font-size: 0.85rem;
+  color: #666;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+}
+
+.metric-box .value {
+  font-size: 2rem;
+  font-weight: bold;
+  color: #34588f;
+  margin-bottom: 0.25rem;
+}
+
+.metric-box .subvalue {
+  font-size: 0.9rem;
+  color: #666;
+}
+
+.metric-box .change {
+  font-size: 0.9rem;
+  margin-top: 0.5rem;
+}
+
+.metric-box.success { border-left-color: #28a745; }
+.metric-box.warning { border-left-color: #ffc107; }
+.metric-box.danger { border-left-color: #dc3545; }
+.metric-box.info { border-left-color: #17a2b8; }
+
+.positive { color: #28a745; }
+.negative { color: #dc3545; }
+
+.filter-bar {
+  background: white;
+  padding: 1.5rem;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  margin-bottom: 1.5rem;
+}
+
+.chart-container {
+  position: relative;
+  min-height: 300px;
+  max-height: 400px;
+  margin-top: 1rem;
+}
+
+.chart-container.small {
+  min-height: 250px;
+  max-height: 300px;
+}
+
+.data-table {
+  width: 100%;
+  margin-top: 1rem;
+}
+
+.data-table thead th {
+  background-color: #f8f9fa;
+  font-weight: 600;
+  color: #34588f;
+  border-bottom: 2px solid #dee2e6;
+  padding: 0.75rem;
+}
+
+.data-table tbody td {
+  padding: 0.75rem;
+  border-bottom: 1px solid #e9ecef;
+}
+
+.data-table tbody tr:hover {
+  background-color: #f8f9fa;
+}
+
+.badge-custom {
+  padding: 0.35rem 0.75rem;
+  border-radius: 4px;
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+
+.progress-custom {
+  height: 8px;
+  border-radius: 4px;
+  background-color: #e9ecef;
+}
+
+.progress-bar-custom {
+  background-color: #34588f;
+  height: 100%;
+  border-radius: 4px;
+  transition: width 0.3s;
+}
+
+.section-tabs {
+  border-bottom: 2px solid #dee2e6;
+  margin-bottom: 1.5rem;
+}
+
+.section-tabs .nav-link {
+  color: #666;
+  border: none;
+  border-bottom: 3px solid transparent;
+  font-weight: 500;
+  padding: 0.75rem 1.5rem;
+}
+
+.section-tabs .nav-link.active {
+  color: #34588f;
+  border-bottom-color: #34588f;
+  background: none;
+}
+
+.stat-icon {
+  width: 50px;
+  height: 50px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+.stat-icon.blue { background: rgba(52, 88, 143, 0.1); color: #34588f; }
+.stat-icon.green { background: rgba(40, 167, 69, 0.1); color: #28a745; }
+.stat-icon.orange { background: rgba(255, 193, 7, 0.1); color: #ffc107; }
+.stat-icon.red { background: rgba(220, 53, 69, 0.1); color: #dc3545; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="admin-header">
+  <div class="container">
+    <h1><i class="fas fa-chart-bar me-2"></i>Reports & Analytics</h1>
+    <p class="mb-0">Comprehensive business insights and performance metrics</p>
+  </div>
+</div>
+
+<div class="container mb-5">
+  <div class="mb-3">
+    <a href="{% url 'accounts:admin_dashboard' %}" class="btn btn-outline-secondary">
+      <i class="fas fa-arrow-left me-2"></i>Back to Dashboard
+    </a>
+  </div>
+
+  <!-- Period Filter -->
+  <div class="filter-bar">
+    <form method="get" class="row g-3 align-items-end">
+      <div class="col-md-3">
+        <label class="form-label fw-semibold">Time Period</label>
+        <select name="period" class="form-select" onchange="this.form.submit()">
+          <option value="7" {% if period == '7' %}selected{% endif %}>Last 7 Days</option>
+          <option value="30" {% if period == '30' %}selected{% endif %}>Last 30 Days</option>
+          <option value="90" {% if period == '90' %}selected{% endif %}>Last 90 Days</option>
+          <option value="180" {% if period == '180' %}selected{% endif %}>Last 6 Months</option>
+          <option value="365" {% if period == '365' %}selected{% endif %}>Last Year</option>
+        </select>
+      </div>
+      <div class="col-md-9 text-end">
+        <small class="text-muted">
+          <i class="fas fa-calendar-alt me-1"></i>
+          {{ start_date|date:"M d, Y" }} - {{ end_date|date:"M d, Y" }}
+        </small>
+      </div>
+    </form>
+  </div>
+
+  <!-- Section Tabs -->
+  <ul class="nav section-tabs" id="reportTabs" role="tablist">
+    <li class="nav-item">
+      <a class="nav-link active" data-bs-toggle="tab" href="#financial">
+        <i class="fas fa-dollar-sign me-2"></i>Financial
+      </a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" data-bs-toggle="tab" href="#products">
+        <i class="fas fa-box me-2"></i>Products
+      </a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" data-bs-toggle="tab" href="#customers">
+        <i class="fas fa-users me-2"></i>Customers
+      </a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" data-bs-toggle="tab" href="#reviews">
+        <i class="fas fa-star me-2"></i>Reviews
+      </a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" data-bs-toggle="tab" href="#support">
+        <i class="fas fa-headset me-2"></i>Support
+      </a>
+    </li>
+  </ul>
+
+  <div class="tab-content">
+    <!-- FINANCIAL TAB -->
+    <div class="tab-pane fade show active" id="financial">
+      <!-- Key Financial Metrics -->
+      <div class="metric-grid">
+        <div class="metric-box success">
+          <div class="stat-icon green">
+            <i class="fas fa-dollar-sign"></i>
+          </div>
+          <div class="label">Total Revenue</div>
+          <div class="value">{{ total_revenue|floatformat:2 }} DZD</div>
+        </div>
+        <div class="metric-box info">
+          <div class="stat-icon blue">
+            <i class="fas fa-chart-line"></i>
+          </div>
+          <div class="label">Net Revenue</div>
+          <div class="value">{{ net_revenue|floatformat:2 }} DZD</div>
+          <div class="subvalue">After refunds</div>
+        </div>
+        <div class="metric-box">
+          <div class="stat-icon orange">
+            <i class="fas fa-shopping-cart"></i>
+          </div>
+          <div class="label">Total Orders</div>
+          <div class="value">{{ order_stats.total_orders }}</div>
+        </div>
+        <div class="metric-box">
+          <div class="stat-icon blue">
+            <i class="fas fa-receipt"></i>
+          </div>
+          <div class="label">Avg Order Value</div>
+          <div class="value">{{ avg_order_value|floatformat:2 }} DZD</div>
+          <div class="subvalue">{{ avg_items_per_order|floatformat:1 }} items/order</div>
+        </div>
+        <div class="metric-box danger">
+          <div class="stat-icon red">
+            <i class="fas fa-undo"></i>
+          </div>
+          <div class="label">Total Refunded</div>
+          <div class="value">{{ total_refunded|floatformat:2 }} DZD</div>
+        </div>
+      </div>
+
+      <div class="row">
+        <!-- Daily Revenue Chart -->
+        <div class="col-lg-8 mb-4">
+          <div class="report-card">
+            <h5><i class="fas fa-chart-area me-2"></i>Revenue Trend</h5>
+            <div class="chart-container">
+              <canvas id="revenueChart"></canvas>
+            </div>
+          </div>
+        </div>
+
+        <!-- Revenue by Status -->
+        <div class="col-lg-4 mb-4">
+          <div class="report-card">
+            <h5><i class="fas fa-chart-pie me-2"></i>Revenue by Status</h5>
+            <div class="chart-container small">
+              <canvas id="revenueStatusChart"></canvas>
+            </div>
+          </div>
+        </div>
+
+        <!-- Payment Methods -->
+        <div class="col-lg-6 mb-4">
+          <div class="report-card">
+            <h5><i class="fas fa-credit-card me-2"></i>Payment Methods</h5>
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Method</th>
+                  <th class="text-center">Count</th>
+                  <th class="text-end">Total Amount</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for method in payment_methods %}
+                <tr>
+                  <td><span class="badge bg-primary">{{ method.payment_method|title }}</span></td>
+                  <td class="text-center">{{ method.count }}</td>
+                  <td class="text-end fw-bold">{{ method.total_amount|floatformat:2 }} DZD</td>
+                </tr>
+                {% empty %}
+                <tr>
+                  <td colspan="3" class="text-center text-muted">No data available</td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Order Status Breakdown -->
+        <div class="col-lg-6 mb-4">
+          <div class="report-card">
+            <h5><i class="fas fa-shopping-bag me-2"></i>Order Status</h5>
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Status</th>
+                  <th class="text-end">Count</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for status in order_stats.by_status %}
+                <tr>
+                  <td>{{ status.status|title }}</td>
+                  <td class="text-end"><strong>{{ status.count }}</strong></td>
+                </tr>
+                {% empty %}
+                <tr>
+                  <td colspan="2" class="text-center text-muted">No data available</td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PRODUCTS TAB -->
+    <div class="tab-pane fade" id="products">
+      <div class="metric-grid">
+        <div class="metric-box warning">
+          <div class="stat-icon orange">
+            <i class="fas fa-exclamation-triangle"></i>
+          </div>
+          <div class="label">Low Stock Items</div>
+          <div class="value">{{ low_stock_products|length }}</div>
+        </div>
+        <div class="metric-box danger">
+          <div class="stat-icon red">
+            <i class="fas fa-times-circle"></i>
+          </div>
+          <div class="label">Out of Stock</div>
+          <div class="value">{{ out_of_stock_count }}</div>
+        </div>
+      </div>
+
+      <div class="row">
+        <!-- Top Products -->
+        <div class="col-lg-8 mb-4">
+          <div class="report-card">
+            <h5><i class="fas fa-trophy me-2"></i>Top Selling Products</h5>
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Rank</th>
+                  <th>Product</th>
+                  <th>Category</th>
+                  <th class="text-center">Qty Sold</th>
+                  <th class="text-end">Revenue</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for product in top_products %}
+                <tr>
+                  <td><span class="badge badge-custom bg-primary">#{{ forloop.counter }}</span></td>
+                  <td class="fw-medium">{{ product.product__name|truncatewords:5 }}</td>
+                  <td><small class="text-muted">{{ product.product__category__name }}</small></td>
+                  <td class="text-center"><strong>{{ product.total_quantity }}</strong></td>
+                  <td class="text-end text-success fw-bold">{{ product.total_revenue|floatformat:2 }} DZD</td>
+                </tr>
+                {% empty %}
+                <tr>
+                  <td colspan="5" class="text-center text-muted">No data available</td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Low Stock Alert -->
+        <div class="col-lg-4 mb-4">
+          <div class="report-card">
+            <h5><i class="fas fa-warehouse me-2"></i>Low Stock Alert</h5>
+            <div style="max-height: 400px; overflow-y: auto;">
+              {% for product in low_stock_products %}
+              <div class="mb-3 p-2 border-start border-warning border-3 bg-light">
+                <div class="fw-medium">{{ product.name|truncatewords:4 }}</div>
+                <div class="text-danger small">Stock: {{ product.stock_quantity }} units</div>
+              </div>
+              {% empty %}
+              <p class="text-muted text-center py-3">No low stock items</p>
+              {% endfor %}
+            </div>
+          </div>
+        </div>
+
+        <!-- Category Performance -->
+        <div class="col-lg-6 mb-4">
+          <div class="report-card">
+            <h5><i class="fas fa-layer-group me-2"></i>Category Performance</h5>
+            <div class="chart-container">
+              <canvas id="categoryChart"></canvas>
+            </div>
+          </div>
+        </div>
+
+        <!-- Specialty Performance -->
+        <div class="col-lg-6 mb-4">
+          <div class="report-card">
+            <h5><i class="fas fa-stethoscope me-2"></i>Specialty Performance</h5>
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Specialty</th>
+                  <th class="text-center">Orders</th>
+                  <th class="text-end">Revenue</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for specialty in specialty_performance %}
+                <tr>
+                  <td>{{ specialty.product__specialty|title }}</td>
+                  <td class="text-center">{{ specialty.total_orders }}</td>
+                  <td class="text-end fw-bold">{{ specialty.total_revenue|floatformat:2 }} DZD</td>
+                </tr>
+                {% empty %}
+                <tr>
+                  <td colspan="3" class="text-center text-muted">No data available</td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CUSTOMERS TAB -->
+    <div class="tab-pane fade" id="customers">
+      <div class="metric-grid">
+        <div class="metric-box">
+          <div class="stat-icon blue">
+            <i class="fas fa-users"></i>
+          </div>
+          <div class="label">Total Users</div>
+          <div class="value">{{ total_users }}</div>
+        </div>
+        <div class="metric-box success">
+          <div class="stat-icon green">
+            <i class="fas fa-user-check"></i>
+          </div>
+          <div class="label">Active Customers</div>
+          <div class="value">{{ active_users }}</div>
+          <div class="subvalue">Placed orders in period</div>
+        </div>
+      </div>
+
+      <div class="row">
+        <!-- User Registration Trend -->
+        <div class="col-lg-8 mb-4">
+          <div class="report-card">
+            <h5><i class="fas fa-user-plus me-2"></i>User Registration Trend</h5>
+            <div class="chart-container">
+              <canvas id="registrationChart"></canvas>
+            </div>
+          </div>
+        </div>
+
+        <!-- User Type Distribution -->
+        <div class="col-lg-4 mb-4">
+          <div class="report-card">
+            <h5><i class="fas fa-user-tag me-2"></i>User Types</h5>
+            <div class="chart-container small">
+              <canvas id="userTypeChart"></canvas>
+            </div>
+          </div>
+        </div>
+
+        <!-- Top Customers -->
+        <div class="col-12 mb-4">
+          <div class="report-card">
+            <h5><i class="fas fa-crown me-2"></i>Top Customers by Lifetime Value</h5>
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Rank</th>
+                  <th>Customer</th>
+                  <th>Email</th>
+                  <th class="text-center">Orders</th>
+                  <th class="text-end">Total Spent</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for customer in top_customers %}
+                <tr>
+                  <td><span class="badge badge-custom bg-warning text-dark">#{{ forloop.counter }}</span></td>
+                  <td class="fw-medium">{{ customer.user__username }}</td>
+                  <td><small class="text-muted">{{ customer.user__email }}</small></td>
+                  <td class="text-center">{{ customer.order_count }}</td>
+                  <td class="text-end text-success fw-bold">{{ customer.total_spent|floatformat:2 }} DZD</td>
+                </tr>
+                {% empty %}
+                <tr>
+                  <td colspan="5" class="text-center text-muted">No data available</td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- REVIEWS TAB -->
+    <div class="tab-pane fade" id="reviews">
+      <div class="row">
+        <!-- Rating Distribution -->
+        <div class="col-lg-4 mb-4">
+          <div class="report-card">
+            <h5><i class="fas fa-star-half-alt me-2"></i>Rating Distribution</h5>
+            <div class="chart-container small">
+              <canvas id="ratingDistChart"></canvas>
+            </div>
+          </div>
+        </div>
+
+        <!-- Review Trend -->
+        <div class="col-lg-8 mb-4">
+          <div class="report-card">
+            <h5><i class="fas fa-chart-line me-2"></i>Review Volume & Average Rating</h5>
+            <div class="chart-container">
+              <canvas id="reviewTrendChart"></canvas>
+            </div>
+          </div>
+        </div>
+
+        <!-- Ratings by Category -->
+        <div class="col-12 mb-4">
+          <div class="report-card">
+            <h5><i class="fas fa-layer-group me-2"></i>Average Ratings by Category</h5>
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Category</th>
+                  <th class="text-center">Reviews</th>
+                  <th class="text-center">Avg Rating</th>
+                  <th>Rating</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for rating in ratings_by_category %}
+                <tr>
+                  <td class="fw-medium">{{ rating.product__category__name }}</td>
+                  <td class="text-center">{{ rating.review_count }}</td>
+                  <td class="text-center">
+                    <span class="badge bg-warning text-dark">{{ rating.avg_rating|floatformat:1 }} ★</span>
+                  </td>
+                  <td>
+                    <div class="progress-custom">
+                        <div class="progress-bar-custom" style="width: {% widthratio rating.avg_rating 5 100 %}%"></div>
+                    </div>
+                  </td>
+                </tr>
+                {% empty %}
+                <tr>
+                  <td colspan="4" class="text-center text-muted">No reviews available</td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SUPPORT TAB -->
+    <div class="tab-pane fade" id="support">
+      <div class="metric-grid">
+        <div class="metric-box">
+          <div class="stat-icon orange">
+            <i class="fas fa-envelope"></i>
+          </div>
+          <div class="label">Contact Messages</div>
+          <div class="value">{{ contact_by_type|length }}</div>
+        </div>
+        <div class="metric-box warning">
+          <div class="stat-icon orange">
+            <i class="fas fa-clock"></i>
+          </div>
+          <div class="label">Pending Payments</div>
+          <div class="value">{{ payment_stats.pending_verifications }}</div>
+        </div>
+        <div class="metric-box info">
+          <div class="stat-icon blue">
+            <i class="fas fa-flag"></i>
+          </div>
+          <div class="label">Open Complaints</div>
+          <div class="value">{{ complaint_stats.open_complaints }}</div>
+        </div>
+        <div class="metric-box success">
+          <div class="stat-icon green">
+            <i class="fas fa-check-circle"></i>
+          </div>
+          <div class="label">Resolution Rate</div>
+          <div class="value">{{ complaint_stats.resolution_rate|floatformat:1 }}%</div>
+          {% if complaint_stats.avg_resolution_time %}
+          <div class="subvalue">Avg: {{ complaint_stats.avg_resolution_time|floatformat:1 }}h</div>
+          {% endif %}
+        </div>
+      </div>
+
+      <div class="row">
+        <!-- Contact Messages by Type -->
+        <div class="col-lg-6 mb-4">
+          <div class="report-card">
+            <h5><i class="fas fa-envelope-open-text me-2"></i>Contact Inquiries</h5>
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Type</th>
+                  <th class="text-center">Total</th>
+                  <th class="text-center">Responded</th>
+                  <th class="text-center">Rate</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for contact in contact_by_type %}
+                <tr>
+                  <td>{{ contact.inquiry_type|title }}</td>
+                  <td class="text-center">{{ contact.count }}</td>
+                  <td class="text-center">{{ contact.responded }}</td>
+                  <td class="text-center">
+                    {% widthratio contact.responded contact.count 100 as response_rate %}
+                    <span class="badge {% if response_rate >= 80 %}bg-success{% elif response_rate >= 50 %}bg-warning{% else %}bg-danger{% endif %}">
+                      {{ response_rate }}%
+                    </span>
+                  </td>
+                </tr>
+                {% empty %}
+                <tr>
+                  <td colspan="4" class="text-center text-muted">No data available</td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Payment Status -->
+        <div class="col-lg-6 mb-4">
+          <div class="report-card">
+            <h5><i class="fas fa-money-check-alt me-2"></i>Payment Verifications</h5>
+            <div class="chart-container small">
+              <canvas id="paymentStatusChart"></canvas>
+            </div>
+          </div>
+        </div>
+
+        <!-- Complaint Statistics -->
+        <div class="col-lg-6 mb-4">
+          <div class="report-card">
+            <h5><i class="fas fa-flag me-2"></i>Complaint Status</h5>
+            <table class="data-table">
+              <tbody>
+                <tr>
+                  <td>Open Complaints</td>
+                  <td class="text-end"><span class="badge bg-danger">{{ complaint_stats.open_complaints }}</span></td>
+                </tr>
+                <tr>
+                  <td>In Review</td>
+                  <td class="text-end"><span class="badge bg-warning">{{ complaint_stats.in_review }}</span></td>
+                </tr>
+                <tr>
+                  <td>Resolved</td>
+                  <td class="text-end"><span class="badge bg-success">{{ complaint_stats.resolved_complaints }}</span></td>
+                </tr>
+              </tbody>
+            </table>
+
+            {% if complaint_stats.by_reason %}
+            <h6 class="mt-3 mb-2">By Reason:</h6>
+            <table class="data-table">
+              <tbody>
+                {% for reason in complaint_stats.by_reason %}
+                <tr>
+                  <td>{{ reason.reason__name }}</td>
+                  <td class="text-end"><strong>{{ reason.count }}</strong></td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+            {% endif %}
+          </div>
+        </div>
+
+        <!-- Refund Statistics -->
+        <div class="col-lg-6 mb-4">
+          <div class="report-card">
+            <h5><i class="fas fa-undo me-2"></i>Refund Overview</h5>
+            <table class="data-table">
+              <tbody>
+                <tr>
+                  <td>Pending Refunds</td>
+                  <td class="text-end"><span class="badge bg-warning">{{ refund_stats.pending_refunds }}</span></td>
+                </tr>
+                <tr>
+                  <td>Completed Refunds</td>
+                  <td class="text-end"><span class="badge bg-success">{{ refund_stats.completed_refunds }}</span></td>
+                </tr>
+                <tr>
+                  <td>Total Refunded</td>
+                  <td class="text-end"><strong class="text-danger">{{ refund_stats.total_refunded|floatformat:2 }} DZD</strong></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script>
+  // Pass data to external JS file
+  window.reportData = {
+    dailyRevenue: {{ daily_revenue|safe }},
+    revenueByStatus: {{ revenue_by_status|safe }},
+    userRegistrations: {{ user_registrations|safe }},
+    userTypes: {{ user_types|safe }},
+    reviewTrend: {{ review_trend|safe }},
+    ratingDistribution: {{ rating_distribution|safe }},
+    categoryPerformance: {{ category_performance|safe }},
+    paymentStats: {
+      pending: {{ payment_stats.pending_verifications }},
+      verified: {{ payment_stats.verified_payments }},
+      rejected: {{ payment_stats.rejected_payments }}
+    }
+  };
+</script>
+<script src="{% static 'js/reports.js' %}"></script>
+{% endblock %}

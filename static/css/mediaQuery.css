@@ -1,0 +1,160 @@
+/* Tablet Breakpoints */
+@media (max-width: 1024px) {
+  .nav-links {
+    gap: 1rem;
+  }
+
+  .nav-links a {
+    font-size: 0.9rem;
+  }
+
+  .nav-buttons .btn {
+    padding: 0.5rem 1rem;
+    font-size: 0.9rem;
+  }
+
+  .specialty-card {
+    flex: 1 1 calc(33.333% - 1.25rem); /* 3 cards per row on tablet */
+    min-width: 140px;
+    max-width: 200px;
+  }
+}
+
+@media (max-width: 900px) {
+  .nav-links {
+    display: none;
+  }
+
+  .nav-buttons {
+    display: none;
+  }
+
+  .menu-toggle {
+    display: block;
+  }
+
+  .mobile-menu-overlay,
+  .mobile-menu {
+    display: block;
+  }
+
+  .about-us-container {
+    flex-direction: column;
+  }
+
+  .about-us-image,
+  .about-us-content {
+    min-width: 100%;
+  }
+
+  .products-container {
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 12.5rem), 1fr));
+    gap: 1.25rem;
+  }
+
+  .specialties-container {
+    gap: 1rem;
+  }
+
+  .specialty-card {
+    flex: 1 1 calc(33.333% - 1rem); /* 3 cards per row */
+    min-width: 120px;
+    padding: 1.25rem;
+  }
+
+  .testimonial-section {
+    margin: 1.25rem 1rem;
+  }
+
+  .footer-container {
+    gap: 1.5rem;
+  }
+}
+
+/* Phone Breakpoints */
+@media (max-width: 480px) {
+  .header {
+    padding: 0.75rem 0;
+  }
+
+  .navbar {
+    padding: 0 1rem;
+  }
+
+  .logo {
+    font-size: 1.125rem;
+  }
+
+  .logo-img {
+    width: 1.75rem;
+    margin-right: 0.5rem;
+  }
+
+  .hero {
+    padding: 2rem 1rem;
+    min-height: 25rem;
+    align-items: center;
+    text-align: center;
+  }
+
+  .hero h1 {
+    font-size: 1.75rem;
+  }
+
+  .hero p {
+    font-size: 0.938rem;
+  }
+
+  .hero-buttons {
+    justify-content: center;
+    width: 100%;
+  }
+
+  .hero .btn {
+    width: 100%;
+    max-width: 10rem;
+  }
+
+  .products-container {
+    grid-template-columns: 1fr;
+  }
+
+  .specialty-card {
+    flex: 1 1 100%; /* 1 card per row on phone */
+    max-width: 100%;
+    min-width: unset;
+    padding: 1.5rem;
+  }
+
+  .specialties-container {
+    gap: 0.875rem;
+  }
+
+  .specialty-icon img {
+    width: 4rem;
+    height: 4rem;
+  }
+
+  .specialty-card h3 {
+    font-size: 1rem;
+  }
+
+  .testimonial-container {
+    grid-template-columns: 1fr;
+  }
+
+  .testimonial-section {
+    margin: 1rem 0.5rem;
+    padding: 2rem 1rem;
+  }
+
+  .footer-container {
+    grid-template-columns: 1fr;
+    gap: 2rem;
+  }
+
+  .mobile-menu {
+    width: 100%;
+    max-width: 100%;
+  }
+}

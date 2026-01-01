@@ -1,411 +1,199 @@
 {% extends 'base.html' %}
 {% load static %}
 
+{% block title %}Fennec Med - Premium Medical Equipment{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/index.css' %}">
+<link rel="stylesheet" href="{% static 'css/mediaQuery.css' %}">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+{% endblock %}
+
 {% block content %}
 <!-- Hero Section -->
-<section class="hero-section text-white">
-    <div class="container">
-        <div class="row align-items-center">
-            <div class="col-lg-6 hero-content">
-                <h1 class="hero-title">Premium Medical Equipment for Healthcare Professionals</h1>
-                <p class="hero-subtitle">Discover cutting-edge medical devices and equipment from trusted brands. Serving hospitals, clinics, and healthcare providers worldwide.</p>
-                <div class="hero-buttons" style="opacity: 0; transform: translateY(30px);">
-                    <a href="{% url 'products:list' %}" class="btn btn-light btn-custom me-3">
-                        <i class="fas fa-search me-2"></i>Browse Products
-                    </a>
-                    <a href="{% url 'pages:contact' %}" class="btn btn-outline-light btn-custom">
-                        <i class="fas fa-phone me-2"></i>Get Quote
-                    </a>
-                </div>
-            </div>
-            <div class="col-lg-6 text-center">
-                <img src="https://images.pexels.com/photos/263402/pexels-photo-263402.jpeg?auto=compress&cs=tinysrgb&w=600" alt="Medical Equipment" class="img-fluid rounded" style="max-height: 500px;">
-            </div>
-        </div>
-    </div>
+<section class="hero">
+  <h1>Welcome to Fennec Med</h1>
+  <p>
+    Providing quality medical materials to families across the region since
+    2022.
+  </p>
+  <div class="hero-buttons">
+    <a href="{% url 'pages:contact' %}" class="btn btn-call">Call Us</a>
+    {% if user.is_authenticated %}
+      <a href="{% url 'accounts:dashboard' %}" class="btn btn-login">Dashboard</a>
+    {% else %}
+      <a href="{% url 'accounts:login' %}" class="btn btn-login">Login</a>
+    {% endif %}
+  </div>
 </section>
 
-<!-- Services Section -->
-<section class="py-5 bg-light">
-    <div class="container">
-        <div class="row text-center mb-5">
-            <div class="col-12">
-                <h2 class="display-5 fw-bold mb-3">Our Services</h2>
-                <p class="lead text-muted">Comprehensive medical equipment solutions for every healthcare need</p>
-            </div>
-        </div>
-        
-        <div class="row g-4">
-            <div class="col-md-4 animate-on-scroll">
-                <div class="service-card">
-                    <div class="service-icon">
-                        <i class="fas fa-stethoscope"></i>
-                    </div>
-                    <h5 class="mb-3">Diagnostic Equipment</h5>
-                    <p class="text-muted">Advanced diagnostic tools and imaging equipment for accurate patient assessment and monitoring.</p>
-                </div>
-            </div>
-            
-            <div class="col-md-4 animate-on-scroll">
-                <div class="service-card">
-                    <div class="service-icon">
-                        <i class="fas fa-heartbeat"></i>
-                    </div>
-                    <h5 class="mb-3">Patient Monitoring</h5>
-                    <p class="text-muted">State-of-the-art monitoring systems for continuous patient care and vital sign tracking.</p>
-                </div>
-            </div>
-            
-            <div class="col-md-4 animate-on-scroll">
-                <div class="service-card">
-                    <div class="service-icon">
-                        <i class="fas fa-procedures"></i>
-                    </div>
-                    <h5 class="mb-3">Surgical Equipment</h5>
-                    <p class="text-muted">Precision surgical instruments and equipment for safe and effective medical procedures.</p>
-                </div>
-            </div>
-            
-            <div class="col-md-4 animate-on-scroll">
-                <div class="service-card">
-                    <div class="service-icon">
-                        <i class="fas fa-microscope"></i>
-                    </div>
-                    <h5 class="mb-3">Laboratory Equipment</h5>
-                    <p class="text-muted">Complete laboratory solutions including analyzers, microscopes, and testing equipment.</p>
-                </div>
-            </div>
-            
-            <div class="col-md-4 animate-on-scroll">
-                <div class="service-card">
-                    <div class="service-icon">
-                        <i class="fas fa-wheelchair"></i>
-                    </div>
-                    <h5 class="mb-3">Mobility Solutions</h5>
-                    <p class="text-muted">Comprehensive mobility aids and rehabilitation equipment for patient care and recovery.</p>
-                </div>
-            </div>
-            
-            <div class="col-md-4 animate-on-scroll">
-                <div class="service-card">
-                    <div class="service-icon">
-                        <i class="fas fa-shield-alt"></i>
-                    </div>
-                    <h5 class="mb-3">Safety & Protection</h5>
-                    <p class="text-muted">Personal protective equipment and safety solutions for healthcare workers and patients.</p>
-                </div>
-            </div>
-        </div>
+<!-- About Us Section -->
+<section class="about-us-section">
+  <div class="about-us-container">
+    <div class="about-us-image">
+      <img src="{% static 'images/aboutUs-section.png' %}" alt="Fennec Med" />
     </div>
+    <div class="about-us-content">
+      <h2>About Our Brighton-Based Practice</h2>
+      {% if site_info.about_hero_description %}
+        {{ site_info.about_hero_description }}
+      {% else %}
+        <p>
+          We know visiting the doctor can feel a bit daunting. At Newbay
+          Medical Clinic, we've shaped our practice to make every visit feel
+          safe, calm, and comfortable. We keep our space clean and welcoming,
+          and we're mindful of your time—so you can focus on feeling cared
+          for, not stressed.
+        </p>
+      {% endif %}
+      <a href="{% url 'pages:about' %}" class="btn btn-learn-more">Learn More About Us</a>
+    </div>
+  </div>
 </section>
 
-<!-- Featured Products -->
+<!-- Products Section -->
 {% if featured_products %}
-<section class="py-5">
-    <div class="container">
-        <div class="row text-center mb-5">
-            <div class="col-12">
-                <h2 class="display-5 fw-bold mb-3">Featured Products</h2>
-                <p class="lead text-muted">Discover our most popular medical equipment and devices</p>
-            </div>
-        </div>
-        
-        <div class="row g-4">
-            {% for product in featured_products %}
-            <div class="col-md-6 col-lg-3">
-                <div class="card product-card">
-                    {% if product.images.first %}
-                        <img src="{{ product.images.first.image.url }}" class="card-img-top product-image" alt="{{ product.name }}">
-                    {% else %}
-                        <img src="https://images.pexels.com/photos/40568/medical-appointment-doctor-healthcare-40568.jpeg?auto=compress&cs=tinysrgb&w=400" class="card-img-top product-image" alt="{{ product.name }}">
-                    {% endif %}
-                    
-                    <div class="card-body">
-                        <h6 class="card-title">{{ product.name|truncatechars:50 }}</h6>
-                        <p class="card-text text-muted small">{{ product.short_description|truncatechars:80 }}</p>
-                        
-                        <div class="d-flex justify-content-between align-items-center mb-2">
-                            <div class="product-rating">
-                                {% for i in "12345"|make_list %}
-                                    {% if forloop.counter <= product.get_average_rating %}
-                                        <i class="fas fa-star"></i>
-                                    {% else %}
-                                        <i class="far fa-star"></i>
-                                    {% endif %}
-                                {% endfor %}
-                                <small class="text-muted">({{ product.get_review_count }})</small>
-                            </div>
-                            <span class="price-tag">${{ product.price }}</span>
-                        </div>
-                        
-                        <div class="d-flex gap-2">
-                            <a href="{{ product.get_absolute_url }}" class="btn btn-outline-primary btn-sm flex-fill">
-                                <i class="fas fa-eye"></i> View
-                            </a>
-                            {% if user.is_authenticated %}
-                            <button class="btn btn-primary btn-sm add-to-cart" data-product-id="{{ product.id }}">
-                                <i class="fas fa-cart-plus"></i>
-                            </button>
-                            {% endif %}
-                        </div>
-                    </div>
-                </div>
-            </div>
-            {% endfor %}
-        </div>
-        
-        <div class="text-center mt-5">
-            <a href="{% url 'products:list' %}" class="btn btn-primary btn-lg">
-                View All Products <i class="fas fa-arrow-right ms-2"></i>
-            </a>
-        </div>
+<section class="products-section">
+  <h2 class="h2-p">Our Products</h2>
+  <div class="products-container">
+    {% for product in featured_products %}
+    <div class="product-card">
+      <div class="product-image">
+        {% if product.images.first %}
+          <img src="{{ product.images.first.image.url }}" alt="{{ product.name }}" />
+        {% else %}
+          <img src="{% static 'images/prdct1.png' %}" alt="{{ product.name }}" />
+        {% endif %}
+      </div>
+      <h3>{{ product.short_description|truncatechars:80 }}</h3>
+      <p class="product-price">
+        {% if product.bulk_price %}
+          {{ product.bulk_price }} - {{ product.price }} DZD
+        {% else %}
+          {{ product.price }} DZD
+        {% endif %}
+      </p>
+      <a href="{{ product.get_absolute_url }}" class="btn btn-view-details">View Details</a>
     </div>
+    {% endfor %}
+  </div>
 </section>
 {% endif %}
 
-<!-- Trending Products Carousel -->
-{% if trending_products %}
-<section class="py-5 bg-light">
-    <div class="container">
-        <div class="row text-center mb-5">
-            <div class="col-12">
-                <h2 class="display-5 fw-bold mb-3">Trending Products</h2>
-                <p class="lead text-muted">Most popular items this month</p>
-            </div>
-        </div>
-        
-        <div class="row g-4">
-            {% for product in trending_products %}
-            <div class="col-md-6 col-lg-4">
-                <div class="card product-card">
-                    {% if product.images.first %}
-                        <img src="{{ product.images.first.image.url }}" class="card-img-top product-image" alt="{{ product.name }}">
-                    {% else %}
-                        <img src="https://images.pexels.com/photos/356040/pexels-photo-356040.jpeg?auto=compress&cs=tinysrgb&w=400" class="card-img-top product-image" alt="{{ product.name }}">
-                    {% endif %}
-                    
-                    <div class="card-body">
-                        <div class="badge bg-danger position-absolute top-0 end-0 m-2">
-                            <i class="fas fa-fire me-1"></i>Trending
-                        </div>
-                        
-                        <h6 class="card-title">{{ product.name|truncatechars:50 }}</h6>
-                        <p class="card-text text-muted small">{{ product.short_description|truncatechars:80 }}</p>
-                        
-                        <div class="d-flex justify-content-between align-items-center mb-2">
-                            <div class="product-rating">
-                                {% for i in "12345"|make_list %}
-                                    {% if forloop.counter <= product.get_average_rating %}
-                                        <i class="fas fa-star"></i>
-                                    {% else %}
-                                        <i class="far fa-star"></i>
-                                    {% endif %}
-                                {% endfor %}
-                            </div>
-                            <span class="price-tag">${{ product.price }}</span>
-                        </div>
-                        
-                        <div class="d-flex gap-2">
-                            <a href="{{ product.get_absolute_url }}" class="btn btn-outline-primary btn-sm flex-fill">
-                                View Details
-                            </a>
-                            {% if user.is_authenticated %}
-                            <button class="btn btn-primary btn-sm add-to-cart" data-product-id="{{ product.id }}">
-                                <i class="fas fa-cart-plus"></i>
-                            </button>
-                            {% endif %}
-                        </div>
-                    </div>
-                </div>
-            </div>
-            {% endfor %}
-        </div>
+<!-- Specialties Section -->
+<section class="specialties-section">
+  <h2 class="h2-specialty">Our Specialties</h2>
+  <div class="specialties-container">
+    {% for category in categories %}
+    <div class="specialty-card">
+      <div class="specialty-icon">
+          {% if category.image %}
+          <a href="{% url 'products:list' %}?category={{ category.slug }}">
+            <img src="{{ category.image.url }}" alt="{{ category.name }} Icon" />
+          </a>
+          {% else %}
+          <a href="{% url 'products:list' %}?category={{ category.slug }}">
+            <img src="{% static 'images/specialties-'|add:category.slug|add:'.png' %}" alt="{{ category.name }} Icon" />
+          </a>
+          {% endif %}
+      </div>
+      <h3>{{ category.name }}</h3>
     </div>
+    {% endfor %}
+  </div>
 </section>
-{% endif %}
 
 <!-- Testimonials -->
 {% if testimonials %}
-<section class="py-5">
-    <div class="container">
-        <div class="row text-center mb-5">
-            <div class="col-12">
-                <h2 class="display-5 fw-bold mb-3">What Our Clients Say</h2>
-                <p class="lead text-muted">Trusted by healthcare professionals worldwide</p>
-            </div>
-        </div>
-        
-        <div class="row g-4 testimonial-carousel">
-            {% for testimonial in testimonials %}
-            <div class="col-md-6 col-lg-4">
-                <div class="testimonial-card">
-                    <div class="d-flex align-items-center mb-3">
-                        {% if testimonial.image %}
-                            <img src="{{ testimonial.image.url }}" alt="{{ testimonial.name }}" class="testimonial-avatar me-3">
-                        {% else %}
-                            <div class="testimonial-avatar bg-primary text-white d-flex align-items-center justify-content-center me-3">
-                                {{ testimonial.name|first }}
-                            </div>
-                        {% endif %}
-                        <div>
-                            <h6 class="mb-1">{{ testimonial.name }}</h6>
-                            <small class="text-muted">{{ testimonial.position }}<br>{{ testimonial.company }}</small>
-                        </div>
-                    </div>
-                    
-                    <div class="product-rating mb-3">
-                        {% for i in "12345"|make_list %}
-                            {% if forloop.counter <= testimonial.rating %}
-                                <i class="fas fa-star"></i>
-                            {% else %}
-                                <i class="far fa-star"></i>
-                            {% endif %}
-                        {% endfor %}
-                    </div>
-                    
-                    <p class="text-muted">{{ testimonial.content }}</p>
-                </div>
-            </div>
-            {% endfor %}
-        </div>
+<section class="testimonial-section">
+  <h2>What Our Customers Say</h2>
+  <div class="testimonial-container">
+    {% for testimonial in testimonials %}
+    <div class="testimonial-card">
+      <p class="testimonial-text">
+        "{{ testimonial.content }}"
+      </p>
+      <p class="testimonial-author">- {{ testimonial.name }}</p>
+      <div class="rating">
+        {% for i in "12345" %}
+          {% if forloop.counter <= testimonial.rating %}★{% else %}☆{% endif %}
+        {% endfor %}
+      </div>
     </div>
+    {% endfor %}
+  </div>
 </section>
 {% endif %}
 
+<!-- Trending Products -->
+{% if trending_products %}
+<section class="products-section" style="background-color: #f0f4f8;">
+  <h2 class="h2-p" style="color: #34588f;">Trending Products</h2>
+  <div class="products-container">
+    {% for product in trending_products %}
+    <div class="product-card">
+      <div class="product-image">
+        {% if product.images.first %}
+          <img src="{{ product.images.first.image.url }}" alt="{{ product.name }}" />
+        {% else %}
+          <img src="{% static 'images/prdct1.png' %}" alt="{{ product.name }}" />
+        {% endif %}
+      </div>
+      <h3>{{ product.short_description|truncatechars:80 }}</h3>
+      <p class="product-price">{{ product.price }} DZD</p>
+      <a href="{{ product.get_absolute_url }}" class="btn btn-view-details">View Details</a>
+    </div>
+    {% endfor %}
+  </div>
+</section>
+{% endif %}
+
+<!-- Find Us Section -->
+<section class="find-us-section">
+  <h2>Where To Find Us</h2>
+  <p>
+    Looking for your new go-to Fennec Med in Brighton and Bayside?
+    Newbay Medical is based in the Brighton area, offering care to anyone in
+    and around Brighton; including <a href="#">Caulfield South</a>,
+    <a href="#">Elwood</a>, <a href="#">Bentleigh</a>,
+    <a href="#">Gardenvale</a>, <a href="#">Hampton</a>,
+    <a href="#">Sandringham</a>. If you're from the Brighton area and want a
+    local medical practice you know you can trust when things get tough,
+    we're ready to take your call.
+  </p>
+</section>
+
+<section class="map-section">
+  <div class="map-container">
+    <iframe
+      src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3151.83512499764!2d145.000000!3d-37.900000!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMzfCsDU2JzI4LjQiTiAxNjXCsDMwJzQ5LjYiUyA!5e0!3m2!1sen!2sau!4v1234567890123"
+      width="100%"
+      height="450"
+      style="border: 0"
+      allowfullscreen=""
+      loading="lazy"
+    ></iframe>
+  </div>
+</section>
+
 <!-- CTA Section -->
-<section class="py-5 bg-primary text-white">
-    <div class="container">
-        <div class="row text-center">
-            <div class="col-12">
-                <h2 class="display-5 fw-bold mb-3">Ready to Upgrade Your Medical Equipment?</h2>
-                <p class="lead mb-4">Join thousands of healthcare professionals who trust MedEquip Pro for their equipment needs</p>
-                <div class="d-flex flex-column flex-md-row gap-3 justify-content-center">
-                    <a href="{% url 'products:list' %}" class="btn btn-light btn-lg">
-                        <i class="fas fa-search me-2"></i>Browse Catalog
-                    </a>
-                    <a href="{% url 'pages:contact' %}" class="btn btn-outline-light btn-lg">
-                        <i class="fas fa-phone me-2"></i>Request Quote
-                    </a>
-                    {% if not user.is_authenticated %}
-                    <a href="{% url 'accounts:register' %}" class="btn btn-warning btn-lg">
-                        <i class="fas fa-user-plus me-2"></i>Create Account
-                    </a>
-                    {% endif %}
-                </div>
-            </div>
-        </div>
-    </div>
-</section>
-
-<!-- Contact Form Section -->
-<section class="py-5 bg-light">
-    <div class="container">
-        <div class="row">
-            <div class="col-lg-8 mx-auto">
-                <div class="text-center mb-5">
-                    <h2 class="display-5 fw-bold mb-3">Get in Touch</h2>
-                    <p class="lead text-muted">Have questions? Our team is here to help you find the right medical equipment</p>
-                </div>
-                
-                <div class="card shadow-sm">
-                    <div class="card-body p-5">
-                        <form method="post" action="{% url 'pages:contact' %}" class="needs-validation" novalidate>
-                            {% csrf_token %}
-                            <div class="row g-3">
-                                <div class="col-md-6">
-                                    <label for="id_name" class="form-label">Full Name</label>
-                                    <input type="text" class="form-control" name="name" id="id_name" required>
-                                </div>
-                                <div class="col-md-6">
-                                    <label for="id_email" class="form-label">Email Address</label>
-                                    <input type="email" class="form-control" name="email" id="id_email" required>
-                                </div>
-                                <div class="col-md-6">
-                                    <label for="id_phone" class="form-label">Phone Number</label>
-                                    <input type="tel" class="form-control" name="phone" id="id_phone">
-                                </div>
-                                <div class="col-md-6">
-                                    <label for="id_inquiry_type" class="form-label">Inquiry Type</label>
-                                    <select class="form-control" name="inquiry_type" id="id_inquiry_type" required>
-                                        <option value="">Select inquiry type</option>
-                                        <option value="general">General Inquiry</option>
-                                        <option value="technical">Technical Support</option>
-                                        <option value="partnership">Partnership</option>
-                                        <option value="complaint">Complaint</option>
-                                    </select>
-                                </div>
-                                <div class="col-12">
-                                    <label for="id_subject" class="form-label">Subject</label>
-                                    <input type="text" class="form-control" name="subject" id="id_subject" required>
-                                </div>
-                                <div class="col-12">
-                                    <label for="id_message" class="form-label">Message</label>
-                                    <textarea class="form-control" name="message" id="id_message" rows="5" required></textarea>
-                                </div>
-                                <div class="col-12 text-center">
-                                    <button type="submit" class="btn btn-primary btn-lg px-5">
-                                        <i class="fas fa-paper-plane me-2"></i>Send Message
-                                    </button>
-                                </div>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</section>
-
-<!-- Google Maps -->
-<section class="py-0">
-    <div class="container-fluid p-0">
-        <div class="embed-responsive embed-responsive-21by9" style="height: 400px;">
-            <iframe 
-                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3024.123456789!2d-74.0059728!3d40.7127837!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zNDDCsDQyJzQ2LjAiTiA3NMKwMDAnMjEuNSJX!5e0!3m2!1sen!2sus!4v1234567890"
-                width="100%" 
-                height="100%" 
-                style="border:0;" 
-                allowfullscreen="" 
-                loading="lazy">
-            </iframe>
-        </div>
-    </div>
+<section class="cta-section">
+  <h2>Ready to Take the Next Step?</h2>
+  <p>
+    Contact us today to learn more about our medical materials and services.
+  </p>
+  {% if user.is_authenticated %}
+    <a href="{% url 'products:list' %}" class="btn btn-cta">Browse Products</a>
+  {% else %}
+    <a href="{% url 'accounts:register' %}" class="btn btn-cta">Get Started</a>
+  {% endif %}
 </section>
 {% endblock %}
 
 {% block extra_js %}
-<script>
-// Additional homepage specific JavaScript
-document.addEventListener('DOMContentLoaded', function() {
-    // Animate statistics or counters
-    const stats = document.querySelectorAll('.stat-number');
-    stats.forEach(stat => {
-        const target = parseInt(stat.textContent);
-        const increment = target / 100;
-        let current = 0;
-        
-        const updateCounter = () => {
-            if (current < target) {
-                current += increment;
-                stat.textContent = Math.ceil(current);
-                setTimeout(updateCounter, 20);
-            } else {
-                stat.textContent = target;
-            }
-        };
-        
-        // Start animation when element is in view
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    updateCounter();
-                    observer.unobserve(entry.target);
-                }
-            });
-        });
-        
-        observer.observe(stat);
-    });
-});
-</script>
+<script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+<script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
+<script src="{% static 'js/index.js' %}"></script>
 {% endblock %}

@@ -1,0 +1,406 @@
+/* Reset and base styles */
+/* Header styles */
+
+.header {
+  background-color: white;
+  padding: 15px 0;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.header-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 20px;
+}
+
+.logo img {
+  height: 40px;
+}
+
+.main-nav ul {
+  display: flex;
+  list-style: none;
+  gap: 20px;
+}
+
+.main-nav a {
+  text-decoration: none;
+  color: #333;
+  font-weight: 500;
+}
+
+.header-buttons {
+  display: flex;
+  gap: 10px;
+}
+
+.btn {
+  padding: 10px 20px;
+  border-radius: 25px;
+  text-decoration: none;
+  font-weight: bold;
+}
+
+.call-us {
+  background-color: #34588f;
+  color: white;
+}
+
+.login {
+  background-color: transparent;
+  color: #34588f;
+  border: 2px solid #34588f;
+}
+
+/* Page banner */
+/* .page-banner {
+  background-color: #34588f;
+  color: white;
+  text-align: center;
+  padding: 40px 20px;
+}
+
+.page-banner h1 {
+  font-size: 36px;
+  margin-bottom: 15px;
+}
+
+.page-banner p {
+  font-size: 18px;
+} */
+
+/* Main container layout */
+.main-container {
+  max-width: 1200px;
+  margin: 40px auto;
+  padding: 0 20px;
+  display: flex;
+  gap: 30px;
+}
+
+.sidebar {
+  width: 250px;
+  background-color: white;
+  border-radius: 10px;
+  padding: 20px;
+  height: fit-content;
+}
+
+.product-grid {
+  flex: 1;
+}
+
+/* Filter sidebar */
+.filter-section h3 {
+  color: #34588f;
+  margin-bottom: 20px;
+  font-size: 18px;
+}
+
+.filter-group {
+  margin-bottom: 25px;
+}
+
+.filter-group h4 {
+  margin-bottom: 10px;
+  color: #666;
+}
+
+.filter-options {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.filter-options label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+}
+
+.price-slider {
+  height: 4px;
+  background-color: #ddd;
+  border-radius: 2px;
+  margin: 10px 0;
+  position: relative;
+}
+
+.price-slider::after {
+  content: "";
+  position: absolute;
+  left: 30%;
+  top: -3px;
+  width: 12px;
+  height: 12px;
+  background-color: #34588f;
+  border-radius: 50%;
+}
+
+.apply-filters {
+  background-color: #34588f;
+  color: white;
+  border: none;
+  padding: 10px;
+  border-radius: 5px;
+  width: 100%;
+  cursor: pointer;
+}
+
+/* Product grid */
+.product-sort {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.sort-options select {
+  padding: 8px;
+  border-radius: 5px;
+  border: 1px solid #ddd;
+}
+
+.products {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+  margin-bottom: 30px;
+}
+
+.product-card {
+  background-color: white;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.product-image {
+  height: 200px;
+  background-color: #f9f9f9;
+}
+
+.product-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  padding: 20px;
+}
+
+.product-info {
+  padding: 15px;
+}
+
+.product-info h3 {
+  font-size: 16px;
+  margin-bottom: 8px;
+}
+
+.product-info a {
+  text-decoration: none;
+  color: #333;
+}
+
+.product-info a:hover {
+  color: #34588f;
+}
+.product-desc {
+  color: #666;
+  font-size: 14px;
+  margin-bottom: 10px;
+}
+
+.product-price {
+  font-weight: bold;
+  color: #34588f;
+  margin-bottom: 8px;
+}
+
+.product-rating {
+  color: #ffc107;
+  margin-bottom: 10px;
+}
+
+.add-to-cart {
+  background-color: #34588f;
+  color: white;
+  border: none;
+  padding: 8px 15px;
+  border-radius: 5px;
+  cursor: pointer;
+  width: 100%;
+}
+
+.load-more {
+  background-color: #34588f;
+  color: white;
+  border: none;
+  padding: 12px 30px;
+  border-radius: 25px;
+  cursor: pointer;
+  display: block;
+  margin: 0 auto;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .main-container {
+    flex-direction: column;
+  }
+
+  .sidebar {
+    width: 100%;
+  }
+
+  .products {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 480px) {
+  .products {
+    grid-template-columns: 1fr;
+  }
+}
+/* Product card positioning for wishlist */
+.product-card {
+  background-color: white;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  position: relative; /* Add this */
+}
+
+/* Wishlist button styling */
+.wishlist-btn {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background-color: white;
+  border: none;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+  transition: all 0.3s ease;
+  z-index: 10;
+}
+
+.wishlist-btn:hover {
+  transform: scale(1.1);
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.25);
+}
+
+.wishlist-btn svg,
+.wishlist-btn i {
+  font-size: 20px;
+  color: #666;
+  transition: color 0.3s ease;
+}
+
+.wishlist-btn:hover svg,
+.wishlist-btn:hover i {
+  color: #e74c3c;
+}
+
+/* When item is in wishlist */
+.wishlist-btn.in-wishlist svg,
+.wishlist-btn.in-wishlist i {
+  color: #e74c3c;
+  fill: #e74c3c;
+}
+
+/* Alternative filled heart style */
+.wishlist-btn.in-wishlist::before {
+  content: "♥";
+  position: absolute;
+  font-size: 22px;
+  color: #e74c3c;
+}
+
+/* Loading state */
+.wishlist-btn.loading {
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+/* Adjust product image container to prevent overlap */
+.product-image {
+  height: 200px;
+  background-color: #f9f9f9;
+  position: relative; /* Add this */
+}
+
+/* Wishlist container */
+.wishlist-container {
+  position: absolute;
+  top: 0;
+  right: 0;
+  z-index: 10;
+  padding: 10px;
+}
+
+.wishlist-form {
+  margin: 0;
+  padding: 0;
+}
+
+.wishlist-btn {
+  position: relative;
+  background-color: rgba(255, 255, 255, 0.95);
+  border: none;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  transition: all 0.3s ease;
+  padding: 0;
+}
+
+.wishlist-btn:hover {
+  transform: scale(1.1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  background-color: #fff;
+}
+
+.wishlist-btn svg {
+  color: #666;
+  transition: color 0.3s ease;
+}
+
+.wishlist-btn:hover svg {
+  color: #e74c3c;
+}
+
+.wishlist-btn.in-wishlist svg {
+  color: #e74c3c;
+}
+
+/* Add animation for toggle */
+@keyframes heartPop {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.3);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.wishlist-btn.animating {
+  animation: heartPop 0.3s ease;
+}

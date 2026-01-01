@@ -1,705 +1,129 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}Shopping Cart - MedEquip Pro{% endblock %}
+{% block title %}Shopping Cart - Fennec Med{% endblock %}
 
 {% block extra_css %}
-<style>
-    .cart-container {
-        background: #f8f9fa;
-        min-height: 100vh;
-        padding: 2rem 0;
-    }
-    
-    .cart-header {
-        background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
-        color: white;
-        border-radius: 15px 15px 0 0;
-        padding: 2rem;
-        margin-bottom: 0;
-        position: relative;
-        overflow: hidden;
-    }
-    
-    .cart-header::before {
-        content: '';
-        position: absolute;
-        top: -50%;
-        right: -50%;
-        width: 200%;
-        height: 200%;
-        background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
-        animation: pulse 4s ease-in-out infinite;
-    }
-    
-    @keyframes pulse {
-        0%, 100% { transform: scale(1); opacity: 0.5; }
-        50% { transform: scale(1.1); opacity: 0.3; }
-    }
-    
-    .cart-content {
-        background: white;
-        border-radius: 0 0 15px 15px;
-        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-        padding: 0;
-    }
-    
-    .cart-item {
-        border-bottom: 1px solid #e9ecef;
-        padding: 2rem;
-        transition: all 0.3s ease;
-        position: relative;
-    }
-    
-    .cart-item:hover {
-        background: #f8f9fa;
-        transform: translateX(5px);
-    }
-    
-    .cart-item:last-child {
-        border-bottom: none;
-        border-radius: 0 0 15px 15px;
-    }
-    
-    .item-image {
-        width: 120px;
-        height: 120px;
-        object-fit: cover;
-        border-radius: 10px;
-        border: 2px solid #f8f9fa;
-        transition: transform 0.3s ease;
-    }
-    
-    .cart-item:hover .item-image {
-        transform: scale(1.05);
-        border-color: var(--accent-color);
-    }
-    
-    .item-details {
-        flex: 1;
-        padding: 0 1.5rem;
-    }
-    
-    .item-title {
-        font-size: 1.25rem;
-        font-weight: 600;
-        color: var(--primary-color);
-        margin-bottom: 0.5rem;
-        text-decoration: none;
-        transition: color 0.3s ease;
-    }
-    
-    .item-title:hover {
-        color: var(--accent-color);
-    }
-    
-    .item-specialty {
-        color: #6c757d;
-        font-size: 0.9rem;
-        margin-bottom: 1rem;
-        text-transform: capitalize;
-    }
-    
-    .item-price {
-        font-size: 1.5rem;
-        font-weight: 700;
-        color: var(--success-color);
-        margin-bottom: 0.5rem;
-    }
-    
-    .bulk-discount {
-        background: linear-gradient(45deg, #fff3cd, #ffeaa7);
-        color: #856404;
-        padding: 0.5rem 1rem;
-        border-radius: 20px;
-        font-size: 0.8rem;
-        font-weight: 600;
-        display: inline-block;
-        margin-bottom: 1rem;
-        border: 1px solid #ffeaa7;
-    }
-    
-    .quantity-controls {
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-        margin-bottom: 1rem;
-    }
-    
-    .quantity-btn {
-        width: 35px;
-        height: 35px;
-        border: 2px solid var(--accent-color);
-        background: white;
-        color: var(--accent-color);
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        cursor: pointer;
-        transition: all 0.3s ease;
-        font-weight: bold;
-    }
-    
-    .quantity-btn:hover {
-        background: var(--accent-color);
-        color: white;
-        transform: scale(1.1);
-    }
-    
-    .quantity-btn:disabled {
-        opacity: 0.5;
-        cursor: not-allowed;
-        transform: none;
-    }
-    
-    .quantity-input {
-        width: 60px;
-        text-align: center;
-        border: 2px solid #e9ecef;
-        border-radius: 8px;
-        padding: 0.5rem;
-        font-weight: 600;
-        transition: border-color 0.3s ease;
-    }
-    
-    .quantity-input:focus {
-        border-color: var(--accent-color);
-        outline: none;
-        box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
-    }
-    
-    .remove-btn {
-        background: linear-gradient(45deg, var(--danger-color), #c82333);
-        color: white;
-        border: none;
-        padding: 0.5rem 1rem;
-        border-radius: 20px;
-        font-size: 0.8rem;
-        font-weight: 600;
-        transition: all 0.3s ease;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-    }
-    
-    .remove-btn:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 5px 15px rgba(231, 76, 60, 0.3);
-    }
-    
-    .cart-summary {
-        background: linear-gradient(135deg, #2c3e50, #34495e);
-        color: white;
-        border-radius: 15px;
-        padding: 2rem;
-        position: sticky;
-        top: 100px;
-        box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-    }
-    
-    .summary-row {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 0.75rem 0;
-        border-bottom: 1px solid rgba(255,255,255,0.1);
-    }
-    
-    .summary-row:last-child {
-        border-bottom: none;
-        font-size: 1.25rem;
-        font-weight: 700;
-        padding-top: 1.5rem;
-        border-top: 2px solid rgba(255,255,255,0.2);
-    }
-    
-    .checkout-btn {
-        background: linear-gradient(45deg, var(--success-color), #2ecc71);
-        border: none;
-        color: white;
-        padding: 1rem 2rem;
-        border-radius: 50px;
-        font-weight: 600;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-        width: 100%;
-        margin-top: 1.5rem;
-        transition: all 0.3s ease;
-        box-shadow: 0 4px 15px rgba(39, 174, 96, 0.3);
-    }
-    
-    .checkout-btn:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 8px 25px rgba(39, 174, 96, 0.4);
-    }
-    
-    .continue-shopping {
-        background: transparent;
-        border: 2px solid rgba(255,255,255,0.3);
-        color: white;
-        padding: 0.75rem 1.5rem;
-        border-radius: 25px;
-        font-weight: 500;
-        width: 100%;
-        margin-top: 1rem;
-        transition: all 0.3s ease;
-    }
-    
-    .continue-shopping:hover {
-        background: rgba(255,255,255,0.1);
-        border-color: rgba(255,255,255,0.5);
-        color: white;
-    }
-    
-    .empty-cart {
-        text-align: center;
-        padding: 4rem 2rem;
-        color: #6c757d;
-    }
-    
-    .empty-icon {
-        font-size: 5rem;
-        color: #dee2e6;
-        margin-bottom: 2rem;
-    }
-    
-    .shipping-notice {
-        background: rgba(255,255,255,0.1);
-        border-radius: 10px;
-        padding: 1rem;
-        margin-top: 1rem;
-        text-align: center;
-    }
-    
-    .shipping-notice i {
-        color: #2ecc71;
-        margin-right: 0.5rem;
-    }
-    
-    .item-actions {
-        display: flex;
-        align-items: center;
-        gap: 1rem;
-        flex-wrap: wrap;
-    }
-    
-    .stock-warning {
-        background: #fff3cd;
-        color: #856404;
-        padding: 0.5rem 1rem;
-        border-radius: 20px;
-        font-size: 0.8rem;
-        font-weight: 600;
-        border: 1px solid #ffeaa7;
-    }
-    
-    .loading-overlay {
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background: rgba(255,255,255,0.8);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        border-radius: 10px;
-        z-index: 10;
-    }
-    
-    .spinner {
-        width: 40px;
-        height: 40px;
-        border: 4px solid #f3f3f3;
-        border-top: 4px solid var(--accent-color);
-        border-radius: 50%;
-        animation: spin 1s linear infinite;
-    }
-    
-    @keyframes spin {
-        0% { transform: rotate(0deg); }
-        100% { transform: rotate(360deg); }
-    }
-    
-    .cart-progress {
-        background: rgba(255,255,255,0.1);
-        border-radius: 10px;
-        padding: 1rem;
-        margin-bottom: 1rem;
-    }
-    
-    .progress-bar {
-        background: rgba(255,255,255,0.2);
-        height: 8px;
-        border-radius: 4px;
-        overflow: hidden;
-        margin-bottom: 0.5rem;
-    }
-    
-    .progress-fill {
-        background: linear-gradient(90deg, #2ecc71, #27ae60);
-        height: 100%;
-        border-radius: 4px;
-        transition: width 0.3s ease;
-    }
-    
-    .recommended-products {
-        margin-top: 3rem;
-    }
-    
-    .recommended-card {
-        border: none;
-        border-radius: 10px;
-        overflow: hidden;
-        transition: all 0.3s ease;
-        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-        height: 100%;
-    }
-    
-    .recommended-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 10px 30px rgba(0,0,0,0.15);
-    }
-    
-    .recommended-image {
-        height: 150px;
-        object-fit: cover;
-    }
-    
-    @media (max-width: 768px) {
-        .cart-item {
-            flex-direction: column;
-            text-align: center;
-        }
-        
-        .item-details {
-            padding: 1rem 0;
-        }
-        
-        .item-actions {
-            justify-content: center;
-        }
-        
-        .cart-summary {
-            position: static;
-            margin-top: 2rem;
-        }
-    }
-</style>
+<link rel="stylesheet" href="{% static 'css/cart.css' %}">
 {% endblock %}
 
 {% block content %}
-<div class="cart-container">
-    <div class="container">
-        <!-- Cart Header -->
-        <div class="cart-header">
-            <div class="row align-items-center">
-                <div class="col-md-8">
-                    <h1 class="mb-2">
-                        <i class="fas fa-shopping-cart me-3"></i>Shopping Cart
-                    </h1>
-                    <p class="mb-0 opacity-75">Review your selected medical equipment</p>
-                </div>
-                <div class="col-md-4 text-md-end">
-                    {% if cart_items %}
-                        <div class="h3 mb-0">{{ cart.get_total_items }}</div>
-                        <small class="opacity-75">Item{{ cart.get_total_items|pluralize }}</small>
-                    {% endif %}
-                </div>
-            </div>
+<!-- Cart Header -->
+<div class="cart-header">
+  <div class="cart-header-content">
+    <h1>Shopping Cart</h1>
+    <p>Review your medical supplies and equipment</p>
+  </div>
+</div>
+
+<!-- Cart Content -->
+<div class="cart-section">
+  <div class="cart-container">
+    <div class="cart-items">
+      {% if cart_items %}
+        {% for item in cart_items %}
+        <div class="cart-item">
+          <div class="item-image">
+            <img
+              src="{% if item.product.image %}{{ item.product.image.url }}{% else %}{% static 'images/product-placeholder.jpg' %}{% endif %}"
+              alt="{{ item.product.name }}"
+            />
+          </div>
+          <div class="item-details">
+            <h3>{{ item.product.name }}</h3>
+            <p class="item-category">{{ item.product.get_category_display|default:"Medical Equipment" }}</p>
+            <p class="item-description">
+              {{ item.product.short_description|default:item.product.description|truncatewords:15 }}
+            </p>
+          </div>
+          <div class="item-quantity">
+            <button class="qty-btn minus" onclick="updateQuantity({{ item.id }}, {{ item.quantity|add:'-1' }})"
+                    {% if item.quantity <= 1 %}disabled{% endif %}>-</button>
+            <input type="number" value="{{ item.quantity }}" min="1" max="{{ item.product.stock_quantity }}" 
+                   class="qty-input" onchange="updateQuantity({{ item.id }}, this.value)" />
+            <button class="qty-btn plus" onclick="updateQuantity({{ item.id }}, {{ item.quantity|add:'1' }})"
+                    {% if item.quantity >= item.product.stock_quantity %}disabled{% endif %}>+</button>
+          </div>
+          <div class="item-price">
+            <span class="price">
+              {% if item.quantity >= item.product.bulk_quantity and item.product.bulk_price %}
+                ${{ item.product.bulk_price|floatformat:2 }}
+              {% else %}
+                ${{ item.product.price|floatformat:2 }}
+              {% endif %}
+            </span>
+          </div>
+          <div class="item-actions">
+            <button class="remove-btn" onclick="removeItem({{ item.id }})">Remove</button>
+            <button class="save-btn" onclick="saveForLater({{ item.id }})">Save for Later</button>
+          </div>
         </div>
-        
-        <div class="row">
-            <!-- Cart Items -->
-            <div class="col-lg-8">
-                <div class="cart-content">
-                    {% if cart_items %}
-                        {% for item in cart_items %}
-                        <div class="cart-item" data-item-id="{{ item.id }}">
-                            <div class="d-flex align-items-center">
-                                <!-- Product Image -->
-                                <div class="flex-shrink-0">
-                                    <img src="{{ item.product.image.url|default:'/static/images/product-placeholder.jpg' }}" 
-                                         alt="{{ item.product.name }}" class="item-image">
-                                </div>
-                                
-                                <!-- Product Details -->
-                                <div class="item-details">
-                                    <a href="{% url 'products:detail' item.product.id %}" class="item-title">
-                                        {{ item.product.name }}
-                                    </a>
-                                    <div class="item-specialty">
-                                        <i class="fas fa-tag me-1"></i>{{ item.product.specialty|title }} Equipment
-                                    </div>
-                                    
-                                    <!-- Pricing -->
-                                    <div class="item-price">
-                                        {% if item.quantity >= item.product.bulk_quantity and item.product.bulk_price %}
-                                            ${{ item.product.bulk_price|floatformat:2 }} each
-                                            <small class="text-muted text-decoration-line-through ms-2">
-                                                ${{ item.product.price|floatformat:2 }}
-                                            </small>
-                                        {% else %}
-                                            ${{ item.product.price|floatformat:2 }} each
-                                        {% endif %}
-                                    </div>
-                                    
-                                    <!-- Bulk Discount Notice -->
-                                    {% if item.product.bulk_quantity and item.product.bulk_price %}
-                                        {% if item.quantity >= item.product.bulk_quantity %}
-                                            <div class="bulk-discount">
-                                                <i class="fas fa-percentage me-1"></i>
-                                                Bulk discount applied!
-                                            </div>
-                                        {% else %}
-                                            <div class="bulk-discount">
-                                                <i class="fas fa-info-circle me-1"></i>
-                                                Buy {{ item.product.bulk_quantity }}+ for ${{ item.product.bulk_price|floatformat:2 }} each
-                                            </div>
-                                        {% endif %}
-                                    {% endif %}
-                                    
-                                    <!-- Stock Warning -->
-                                    {% if item.product.stock_quantity <= 5 %}
-                                        <div class="stock-warning">
-                                            <i class="fas fa-exclamation-triangle me-1"></i>
-                                            Only {{ item.product.stock_quantity }} left in stock
-                                        </div>
-                                    {% endif %}
-                                </div>
-                                
-                                <!-- Quantity and Actions -->
-                                <div class="flex-shrink-0">
-                                    <div class="item-actions">
-                                        <!-- Quantity Controls -->
-                                        <div class="quantity-controls">
-                                            <button class="quantity-btn" onclick="updateQuantity({{ item.id }}, {{ item.quantity|add:'-1' }})"
-                                                    {% if item.quantity <= 1 %}disabled{% endif %}>
-                                                <i class="fas fa-minus"></i>
-                                            </button>
-                                            <input type="number" class="quantity-input" value="{{ item.quantity }}" 
-                                                   min="1" max="{{ item.product.stock_quantity }}"
-                                                   onchange="updateQuantity({{ item.id }}, this.value)">
-                                            <button class="quantity-btn" onclick="updateQuantity({{ item.id }}, {{ item.quantity|add:'1' }})"
-                                                    {% if item.quantity >= item.product.stock_quantity %}disabled{% endif %}>
-                                                <i class="fas fa-plus"></i>
-                                            </button>
-                                        </div>
-                                        
-                                        <!-- Item Total -->
-                                        <div class="text-center">
-                                            <div class="h5 mb-1 text-success item-total">
-                                                ${{ item.get_total_price|floatformat:2 }}
-                                            </div>
-                                            <small class="text-muted">Subtotal</small>
-                                        </div>
-                                        
-                                        <!-- Remove Button -->
-                                        <button class="remove-btn" onclick="removeItem({{ item.id }})">
-                                            <i class="fas fa-trash me-1"></i>Remove
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <!-- Loading Overlay -->
-                            <div class="loading-overlay d-none">
-                                <div class="spinner"></div>
-                            </div>
-                        </div>
-                        {% endfor %}
-                    {% else %}
-                        <!-- Empty Cart -->
-                        <div class="empty-cart">
-                            <div class="empty-icon">
-                                <i class="fas fa-shopping-cart"></i>
-                            </div>
-                            <h3 class="mb-3">Your cart is empty</h3>
-                            <p class="mb-4">Discover our wide range of medical equipment and add items to your cart.</p>
-                            <a href="{% url 'products:list' %}" class="btn btn-primary btn-lg">
-                                <i class="fas fa-shopping-bag me-2"></i>Start Shopping
-                            </a>
-                        </div>
-                    {% endif %}
-                </div>
-            </div>
-            
-            <!-- Cart Summary -->
-            {% if cart_items %}
-            <div class="col-lg-4">
-                <div class="cart-summary">
-                    <h5 class="mb-4">
-                        <i class="fas fa-calculator me-2"></i>Order Summary
-                    </h5>
-                    
-                    <!-- Free Shipping Progress -->
-                    <div class="cart-progress">
-                        <div class="d-flex justify-content-between align-items-center mb-2">
-                            <span class="small">Free Shipping Progress</span>
-                            <span class="small">
-                                {% if cart.get_total_price >= 500 %}
-                                    <i class="fas fa-check text-success"></i> Qualified!
-                                {% else %}
-                                    ${{ cart.get_total_price|floatformat:2 }} / $500.00
-                                {% endif %}
-                            </span>
-                        </div>
-                        <div class="progress-bar">
-                            <div class="progress-fill" style="width: {% widthratio cart.get_total_price 500 100 %}%"></div>
-                        </div>
-                        {% if cart.get_total_price < 500 %}
-                            <small class="text-light opacity-75">
-                                Add ${{ 500|floatformat:2|add:cart.get_total_price|floatformat:2|add:"-"|add:cart.get_total_price|floatformat:2 }} more for free shipping
-                            </small>
-                        {% endif %}
-                    </div>
-                    
-                    <!-- Summary Breakdown -->
-                    <div class="summary-row">
-                        <span>Subtotal ({{ cart.get_total_items }} items)</span>
-                        <span class="cart-subtotal">${{ cart.get_total_price|floatformat:2 }}</span>
-                    </div>
-                    
-                    <div class="summary-row">
-                        <span>Estimated Tax</span>
-                        <span>${{ cart.get_total_price|floatformat:2|add:"*0.08"|floatformat:2 }}</span>
-                    </div>
-                    
-                    <div class="summary-row">
-                        <span>Shipping</span>
-                        <span>
-                            {% if cart.get_total_price >= 500 %}
-                                <span class="text-success">FREE</span>
-                            {% else %}
-                                $25.00
-                            {% endif %}
-                        </span>
-                    </div>
-                    
-                    <div class="summary-row">
-                        <strong>Total</strong>
-                        <strong class="cart-total">
-                            {% if cart.get_total_price >= 500 %}
-                                {% widthratio cart.get_total_price 1 1.08 as total_with_tax %}
-                                ${{ total_with_tax|floatformat:2 }}
-                            {% else %}
-                                {% widthratio cart.get_total_price 1 1.08 as total_with_tax %}
-                                ${{ total_with_tax|add:25|floatformat:2 }}
-                            {% endif %}
-                        </strong>
-                    </div>
-                    
-                    <!-- Action Buttons -->
-                    <a href="{% url 'payments:checkout' %}" class="btn checkout-btn">
-                        <i class="fas fa-credit-card me-2"></i>Proceed to Checkout
-                    </a>
-                    
-                    <a href="{% url 'products:list' %}" class="btn continue-shopping">
-                        <i class="fas fa-arrow-left me-2"></i>Continue Shopping
-                    </a>
-                    
-                    <!-- Shipping Notice -->
-                    <div class="shipping-notice">
-                        <div class="small">
-                            <i class="fas fa-shield-alt"></i>
-                            Secure checkout with 256-bit SSL encryption
-                        </div>
-                        <div class="small mt-1">
-                            <i class="fas fa-truck"></i>
-                            Free shipping on orders over $500
-                        </div>
-                    </div>
-                </div>
-            </div>
-            {% endif %}
+        {% endfor %}
+      {% else %}
+        <div style="text-align: center; padding: 3rem;">
+          <p style="font-size: 1.2rem; color: #666;">Your cart is empty</p>
+          <a href="{% url 'products:list' %}" class="btn btn-call" style="margin-top: 1rem;">Start Shopping</a>
         </div>
-        
-        <!-- Recommended Products -->
-        {% if cart_items %}
-        <div class="recommended-products">
-            <h4 class="mb-4">
-                <i class="fas fa-lightbulb me-2 text-warning"></i>
-                You might also like
-            </h4>
-            <div class="row">
-                <!-- This would be populated with recommended products -->
-                <div class="col-md-3 mb-3">
-                    <div class="card recommended-card">
-                        <img src="https://images.pexels.com/photos/4386466/pexels-photo-4386466.jpeg" 
-                             class="card-img-top recommended-image" alt="Recommended Product">
-                        <div class="card-body p-3">
-                            <h6 class="card-title mb-2">Digital Stethoscope</h6>
-                            <p class="card-text small text-muted mb-2">Advanced cardiac monitoring</p>
-                            <div class="d-flex justify-content-between align-items-center">
-                                <span class="text-success fw-bold">$299.99</span>
-                                <button class="btn btn-outline-primary btn-sm">
-                                    <i class="fas fa-plus"></i>
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="col-md-3 mb-3">
-                    <div class="card recommended-card">
-                        <img src="https://images.pexels.com/photos/4386467/pexels-photo-4386467.jpeg" 
-                             class="card-img-top recommended-image" alt="Recommended Product">
-                        <div class="card-body p-3">
-                            <h6 class="card-title mb-2">Blood Pressure Monitor</h6>
-                            <p class="card-text small text-muted mb-2">Professional grade accuracy</p>
-                            <div class="d-flex justify-content-between align-items-center">
-                                <span class="text-success fw-bold">$149.99</span>
-                                <button class="btn btn-outline-primary btn-sm">
-                                    <i class="fas fa-plus"></i>
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="col-md-3 mb-3">
-                    <div class="card recommended-card">
-                        <img src="https://images.pexels.com/photos/4386468/pexels-photo-4386468.jpeg" 
-                             class="card-img-top recommended-image" alt="Recommended Product">
-                        <div class="card-body p-3">
-                            <h6 class="card-title mb-2">Pulse Oximeter</h6>
-                            <p class="card-text small text-muted mb-2">Instant oxygen saturation</p>
-                            <div class="d-flex justify-content-between align-items-center">
-                                <span class="text-success fw-bold">$89.99</span>
-                                <button class="btn btn-outline-primary btn-sm">
-                                    <i class="fas fa-plus"></i>
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="col-md-3 mb-3">
-                    <div class="card recommended-card">
-                        <img src="https://images.pexels.com/photos/4386469/pexels-photo-4386469.jpeg" 
-                             class="card-img-top recommended-image" alt="Recommended Product">
-                        <div class="card-body p-3">
-                            <h6 class="card-title mb-2">Thermometer Set</h6>
-                            <p class="card-text small text-muted mb-2">Digital and infrared options</p>
-                            <div class="d-flex justify-content-between align-items-center">
-                                <span class="text-success fw-bold">$59.99</span>
-                                <button class="btn btn-outline-primary btn-sm">
-                                    <i class="fas fa-plus"></i>
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        {% endif %}
+      {% endif %}
     </div>
+
+    {% if cart_items %}
+    <div class="cart-summary">
+      <div class="summary-card">
+        <h3>Order Summary</h3>
+        <div class="summary-row">
+          <span>Subtotal ({{ cart.get_total_items }} item{{ cart.get_total_items|pluralize }})</span>
+          <span>${{ cart.get_total_price|floatformat:2 }}</span>
+        </div>
+        <div class="summary-row">
+          <span>Shipping</span>
+          <span>{% if cart.get_total_price >= 500 %}FREE{% else %}$9.99{% endif %}</span>
+        </div>
+        <div class="summary-row">
+          <span>Tax</span>
+          <span>${{ cart.get_total_price|floatformat:2|add:"*0.08"|floatformat:2 }}</span>
+        </div>
+        <div class="summary-divider"></div>
+        <div class="summary-row total">
+          <span>Total</span>
+          <span>
+            {% widthratio cart.get_total_price 1 1.08 as total_with_tax %}
+            {% if cart.get_total_price >= 500 %}
+              ${{ total_with_tax|floatformat:2 }}
+            {% else %}
+              ${{ total_with_tax|add:9.99|floatformat:2 }}
+            {% endif %}
+          </span>
+        </div>
+        <button class="checkout-btn" onclick="location.href='{% url 'payments:checkout' %}'">
+          Proceed to Checkout
+        </button>
+        <button class="continue-shopping-btn" onclick="location.href='{% url 'products:list' %}'">
+          Continue Shopping
+        </button>
+      </div>
+
+      <div class="promo-card">
+        <h4>Have a Promo Code?</h4>
+        <form method="post" action="#" class="promo-input-group">
+          {% csrf_token %}
+          <input
+            type="text"
+            name="promo_code"
+            placeholder="Enter promo code"
+            class="promo-input"
+          />
+          <button type="submit" class="apply-btn">Apply</button>
+        </form>
+      </div>
+    </div>
+    {% endif %}
+  </div>
 </div>
 {% endblock %}
 
 {% block extra_js %}
 <script>
-// CSRF token for AJAX requests
 function getCookie(name) {
     let cookieValue = null;
     if (document.cookie && document.cookie !== '') {
@@ -717,13 +141,8 @@ function getCookie(name) {
 
 const csrftoken = getCookie('csrftoken');
 
-// Update quantity function
 function updateQuantity(itemId, newQuantity) {
-    const cartItem = document.querySelector(`[data-item-id="${itemId}"]`);
-    const loadingOverlay = cartItem.querySelector('.loading-overlay');
-    
-    // Show loading
-    loadingOverlay.classList.remove('d-none');
+    if (newQuantity < 1) return;
     
     fetch('{% url "payments:update_cart" %}', {
         method: 'POST',
@@ -733,40 +152,13 @@ function updateQuantity(itemId, newQuantity) {
         },
         body: JSON.stringify({
             cart_item_id: itemId,
-            quantity: newQuantity
+            quantity: parseInt(newQuantity)
         })
     })
     .then(response => response.json())
     .then(data => {
         if (data.success) {
-            if (newQuantity <= 0) {
-                // Remove item from DOM
-                cartItem.style.transition = 'all 0.3s ease';
-                cartItem.style.opacity = '0';
-                cartItem.style.transform = 'translateX(-100%)';
-                setTimeout(() => {
-                    cartItem.remove();
-                    updateCartSummary();
-                    checkEmptyCart();
-                }, 300);
-            } else {
-                // Update quantity input
-                const quantityInput = cartItem.querySelector('.quantity-input');
-                quantityInput.value = newQuantity;
-                
-                // Update item total
-                const itemTotal = cartItem.querySelector('.item-total');
-                itemTotal.textContent = '$' + data.item_total;
-                
-                // Update quantity buttons state
-                const minusBtn = cartItem.querySelector('.quantity-btn:first-child');
-                const plusBtn = cartItem.querySelector('.quantity-btn:last-child');
-                
-                minusBtn.disabled = newQuantity <= 1;
-                // You might want to check stock quantity for plus button
-                
-                updateCartSummary();
-            }
+            location.reload();
         } else {
             alert('Error updating cart: ' + data.message);
         }
@@ -774,102 +166,32 @@ function updateQuantity(itemId, newQuantity) {
     .catch(error => {
         console.error('Error:', error);
         alert('An error occurred while updating the cart');
-    })
-    .finally(() => {
-        loadingOverlay.classList.add('d-none');
     });
 }
 
-// Remove item function
 function removeItem(itemId) {
-    if (confirm('Are you sure you want to remove this item from your cart?')) {
-        const cartItem = document.querySelector(`[data-item-id="${itemId}"]`);
-        const loadingOverlay = cartItem.querySelector('.loading-overlay');
-        
-        // Show loading
-        loadingOverlay.classList.remove('d-none');
-        
-        // Redirect to remove URL
-        window.location.href = `{% url 'payments:remove_from_cart' 0 %}`.replace('0', itemId);
+    if (confirm('Remove this item from your cart?')) {
+        location.href = '{% url "payments:remove_from_cart" 0 %}'.replace('0', itemId);
     }
 }
 
-// Update cart summary
-function updateCartSummary() {
-    let subtotal = 0;
-    const itemTotals = document.querySelectorAll('.item-total');
-    
-    itemTotals.forEach(total => {
-        const amount = parseFloat(total.textContent.replace('$', ''));
-        subtotal += amount;
-    });
-    
-    const tax = subtotal * 0.08;
-    const shipping = subtotal >= 500 ? 0 : 25;
-    const total = subtotal + tax + shipping;
-    
-    // Update summary display
-    document.querySelector('.cart-subtotal').textContent = '$' + subtotal.toFixed(2);
-    document.querySelector('.cart-total').textContent = '$' + total.toFixed(2);
-    
-    // Update free shipping progress
-    const progressFill = document.querySelector('.progress-fill');
-    const progressPercent = Math.min((subtotal / 500) * 100, 100);
-    progressFill.style.width = progressPercent + '%';
-    
-    // Update shipping status
-    const shippingSpan = document.querySelector('.summary-row:nth-child(3) span:last-child');
-    if (subtotal >= 500) {
-        shippingSpan.innerHTML = '<span class="text-success">FREE</span>';
-    } else {
-        shippingSpan.textContent = '$25.00';
-    }
-}
-
-// Check if cart is empty and show empty state
-function checkEmptyCart() {
-    const cartItems = document.querySelectorAll('.cart-item');
-    if (cartItems.length === 0) {
-        location.reload(); // Reload to show empty cart state
-    }
-}
-
-// Add entrance animations
-document.addEventListener('DOMContentLoaded', function() {
-    const cartItems = document.querySelectorAll('.cart-item');
-    
-    cartItems.forEach((item, index) => {
-        item.style.opacity = '0';
-        item.style.transform = 'translateY(30px)';
-        
-        setTimeout(() => {
-            item.style.transition = 'all 0.6s ease';
-            item.style.opacity = '1';
-            item.style.transform = 'translateY(0)';
-        }, index * 100);
-    });
-    
-    // Initialize tooltips if using Bootstrap
-    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
-    var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
-        return new bootstrap.Tooltip(tooltipTriggerEl);
-    });
-});
-
-// Handle quantity input changes
-document.addEventListener('input', function(e) {
-    if (e.target.classList.contains('quantity-input')) {
-        const itemId = e.target.closest('[data-item-id]').dataset.itemId;
-        const newQuantity = parseInt(e.target.value);
-        
-        if (newQuantity > 0) {
-            // Debounce the update
-            clearTimeout(e.target.updateTimeout);
-            e.target.updateTimeout = setTimeout(() => {
-                updateQuantity(itemId, newQuantity);
-            }, 500);
+function saveForLater(itemId) {
+    fetch('#', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': csrftoken,
+        },
+        body: JSON.stringify({ cart_item_id: itemId })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            location.reload();
+        } else {
+            alert('Error: ' + data.message);
         }
-    }
-});
+    });
+}
 </script>
 {% endblock %}

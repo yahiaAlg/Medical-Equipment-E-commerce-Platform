@@ -1,0 +1,109 @@
+/* General styles */
+
+body {
+  background-color: #f5f5f5;
+  color: #333;
+}
+
+/* Header Styles */
+
+.cta-buttons {
+  display: flex;
+  gap: 10px;
+}
+
+.btn {
+  padding: 10px 20px;
+  border-radius: 25px;
+  text-decoration: none;
+  font-weight: bold;
+}
+
+.call-us {
+  background-color: #34588f;
+  color: white;
+}
+
+.login-now {
+  background-color: transparent;
+  color: #34588f;
+  border: 2px solid #34588f;
+}
+
+/* Auth container styles */
+.auth-container {
+  max-width: 1200px;
+  margin: 50px auto;
+  padding: 0 20px;
+}
+
+.auth-form {
+  background-color: white;
+  border-radius: 10px;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+  padding: 40px;
+  max-width: 500px;
+  margin: 0 auto;
+}
+
+.auth-form h2 {
+  color: #34588f;
+  font-size: 28px;
+  margin-bottom: 10px;
+}
+
+.auth-form p {
+  color: #666;
+  margin-bottom: 30px;
+}
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-group input {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  font-size: 16px;
+  box-sizing: border-box;
+}
+
+.forgot-password {
+  display: block;
+  color: #34588f;
+  text-decoration: none;
+  margin-bottom: 20px;
+}
+
+.submit-btn {
+  background-color: #34588f;
+  color: white;
+  border: none;
+  border-radius: 25px;
+  padding: 12px 30px;
+  font-size: 16px;
+  cursor: pointer;
+  width: 100%;
+}
+
+.submit-btn:hover {
+  background-color: #2b4a7a;
+}
+
+.signup-link {
+  text-align: center;
+  margin-top: 20px;
+  color: #666;
+}
+
+.signup-link a {
+  color: #34588f;
+  text-decoration: none;
+}
+
+.signup-link a:hover {
+  color: #34588f;
+  text-decoration: underline;
+}

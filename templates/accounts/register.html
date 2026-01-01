@@ -1,171 +1,154 @@
 {% extends 'base.html' %}
 {% load static %}
-{% load crispy_forms_tags %}
 
-{% block title %}Register - MedEquip Pro{% endblock %}
+{% block title %}Sign Up - Fennec Med{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/signup.css' %}">
+{% endblock %}
 
 {% block content %}
-<section class="py-5">
-    <div class="container">
-        <div class="row justify-content-center">
-            <div class="col-lg-8 col-xl-6">
-                <div class="card shadow-lg border-0">
-                    <div class="card-header bg-primary text-white text-center py-4">
-                        <h2 class="mb-0">
-                            <i class="fas fa-user-plus me-2"></i>Create Your Account
-                        </h2>
-                        <p class="mb-0 mt-2">Join the MedEquip Pro community</p>
-                    </div>
-                    
-                    <div class="card-body p-5">
-                        <!-- User Type Selection Info -->
-                        <div class="alert alert-info mb-4">
-                            <h6 class="alert-heading">
-                                <i class="fas fa-info-circle me-2"></i>Choose Your Account Type
-                            </h6>
-                            <div class="row g-2 mt-2">
-                                <div class="col-6">
-                                    <small><strong>General User:</strong> Individual purchases</small>
-                                </div>
-                                <div class="col-6">
-                                    <small><strong>Pharmacy:</strong> Bulk orders & special pricing</small>
-                                </div>
-                                <div class="col-6">
-                                    <small><strong>Clinic Staff:</strong> Department-based ordering</small>
-                                </div>
-                                <div class="col-6">
-                                    <small><strong>Doctor:</strong> Specialty recommendations</small>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        {% crispy form %}
-                        
-                        <div class="text-center mt-4">
-                            <p class="text-muted">
-                                Already have an account? 
-                                <a href="{% url 'accounts:login' %}" class="text-decoration-none">Sign in here</a>
-                            </p>
-                        </div>
-                    </div>
-                    
-                    <div class="card-footer bg-light text-center py-3">
-                        <small class="text-muted">
-                            By creating an account, you agree to our 
-                            <a href="#" class="text-decoration-none">Terms of Service</a> and 
-                            <a href="#" class="text-decoration-none">Privacy Policy</a>
-                        </small>
-                    </div>
-                </div>
-            </div>
+<div class="auth-container">
+  <div class="auth-form">
+    <h2>Create Your Account</h2>
+    <p>Join Fennec Med to access our services and products.</p>
+    
+    {% if messages %}
+      {% for message in messages %}
+        <div class="alert alert-{{ message.tags }}">
+          {{ message }}
         </div>
-    </div>
-</section>
-
-<!-- Benefits Section -->
-<section class="py-5 bg-light">
-    <div class="container">
-        <div class="text-center mb-5">
-            <h3 class="fw-bold">Why Join MedEquip Pro?</h3>
-            <p class="text-muted">Discover the benefits of being part of our medical equipment community</p>
+      {% endfor %}
+    {% endif %}
+    
+    <form method="post" id="signupForm">
+      {% csrf_token %}
+      
+      <div class="form-row">
+        <div class="form-group">
+          <input
+            type="text"
+            id="{{ form.first_name.id_for_label }}"
+            name="{{ form.first_name.name }}"
+            placeholder="First Name"
+            required
+            {% if form.first_name.value %}value="{{ form.first_name.value }}"{% endif %}
+          />
+          {% if form.first_name.errors %}
+            <span class="error-message">{{ form.first_name.errors.0 }}</span>
+          {% endif %}
         </div>
-        
-        <div class="row g-4">
-            <div class="col-lg-3 col-md-6">
-                <div class="text-center">
-                    <div class="benefit-icon bg-primary text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 60px; height: 60px;">
-                        <i class="fas fa-tags"></i>
-                    </div>
-                    <h5 class="fw-bold">Exclusive Pricing</h5>
-                    <p class="text-muted small">Access special member pricing and bulk discounts</p>
-                </div>
-            </div>
-            
-            <div class="col-lg-3 col-md-6">
-                <div class="text-center">
-                    <div class="benefit-icon bg-success text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 60px; height: 60px;">
-                        <i class="fas fa-shipping-fast"></i>
-                    </div>
-                    <h5 class="fw-bold">Fast Shipping</h5>
-                    <p class="text-muted small">Priority shipping and expedited delivery options</p>
-                </div>
-            </div>
-            
-            <div class="col-lg-3 col-md-6">
-                <div class="text-center">
-                    <div class="benefit-icon bg-info text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 60px; height: 60px;">
-                        <i class="fas fa-headset"></i>
-                    </div>
-                    <h5 class="fw-bold">Expert Support</h5>
-                    <p class="text-muted small">Dedicated support from medical equipment specialists</p>
-                </div>
-            </div>
-            
-            <div class="col-lg-3 col-md-6">
-                <div class="text-center">
-                    <div class="benefit-icon bg-warning text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 60px; height: 60px;">
-                        <i class="fas fa-chart-line"></i>
-                    </div>
-                    <h5 class="fw-bold">Order Tracking</h5>
-                    <p class="text-muted small">Real-time order tracking and purchase history</p>
-                </div>
-            </div>
+        <div class="form-group">
+          <input
+            type="text"
+            id="{{ form.last_name.id_for_label }}"
+            name="{{ form.last_name.name }}"
+            placeholder="Last Name"
+            required
+            {% if form.last_name.value %}value="{{ form.last_name.value }}"{% endif %}
+          />
+          {% if form.last_name.errors %}
+            <span class="error-message">{{ form.last_name.errors.0 }}</span>
+          {% endif %}
         </div>
-    </div>
-</section>
+      </div>
+      
+      <div class="form-group">
+        <input
+          type="text"
+          id="{{ form.username.id_for_label }}"
+          name="{{ form.username.name }}"
+          placeholder="Username"
+          required
+          {% if form.username.value %}value="{{ form.username.value }}"{% endif %}
+        />
+        {% if form.username.errors %}
+          <span class="error-message">{{ form.username.errors.0 }}</span>
+        {% endif %}
+      </div>
+      
+      <div class="form-group">
+        <input
+          type="email"
+          id="{{ form.email.id_for_label }}"
+          name="{{ form.email.name }}"
+          placeholder="Email Address"
+          required
+          {% if form.email.value %}value="{{ form.email.value }}"{% endif %}
+        />
+        {% if form.email.errors %}
+          <span class="error-message">{{ form.email.errors.0 }}</span>
+        {% endif %}
+      </div>
+      
+      <div class="form-group">
+        <select
+          id="{{ form.user_type.id_for_label }}"
+          name="{{ form.user_type.name }}"
+          required
+          style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px; font-size: 16px;">
+          <option value="">Select Account Type</option>
+          {% for value, label in form.user_type.field.choices %}
+            <option value="{{ value }}" {% if form.user_type.value == value %}selected{% endif %}>{{ label }}</option>
+          {% endfor %}
+        </select>
+        {% if form.user_type.errors %}
+          <span class="error-message">{{ form.user_type.errors.0 }}</span>
+        {% endif %}
+      </div>
+      
+      <div class="form-group">
+        <input
+          type="password"
+          id="{{ form.password1.id_for_label }}"
+          name="{{ form.password1.name }}"
+          placeholder="Password"
+          required
+        />
+        {% if form.password1.errors %}
+          <span class="error-message">{{ form.password1.errors.0 }}</span>
+        {% endif %}
+      </div>
+      
+      <div class="form-group">
+        <input
+          type="password"
+          id="{{ form.password2.id_for_label }}"
+          name="{{ form.password2.name }}"
+          placeholder="Confirm Password"
+          required
+        />
+        {% if form.password2.errors %}
+          <span class="error-message">{{ form.password2.errors.0 }}</span>
+        {% endif %}
+      </div>
+      
+      {% if form.non_field_errors %}
+        <div class="alert alert-danger">
+          {{ form.non_field_errors.0 }}
+        </div>
+      {% endif %}
+      
+      <button type="submit" class="submit-btn">Sign Up</button>
+    </form>
+    
+    <p class="login-link">
+      Already have an account? <a href="{% url 'accounts:login' %}">Login</a>
+    </p>
+  </div>
+</div>
 {% endblock %}
 
 {% block extra_js %}
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // Show/hide additional info based on user type selection
-    const userTypeField = document.getElementById('id_user_type');
-    const infoAlert = document.querySelector('.alert-info');
+    const form = document.getElementById('signupForm');
     
-    if (userTypeField) {
-        userTypeField.addEventListener('change', function() {
-            const selectedType = this.value;
-            
-            // You can add specific messaging or requirements based on user type
-            if (selectedType === 'pharmacy' || selectedType === 'clinic' || selectedType === 'doctor') {
-                // Show additional verification info
-                if (!document.querySelector('.verification-info')) {
-                    const verificationInfo = document.createElement('div');
-                    verificationInfo.className = 'alert alert-warning verification-info mt-3';
-                    verificationInfo.innerHTML = `
-                        <i class="fas fa-exclamation-triangle me-2"></i>
-                        <strong>Verification Required:</strong> Professional accounts require verification. 
-                        You'll be able to complete your professional profile after registration.
-                    `;
-                    infoAlert.parentNode.insertBefore(verificationInfo, infoAlert.nextSibling);
-                }
-            } else {
-                // Remove verification info for general users
-                const verificationInfo = document.querySelector('.verification-info');
-                if (verificationInfo) {
-                    verificationInfo.remove();
-                }
-            }
-        });
-    }
-    
-    // Form validation enhancements
-    const form = document.querySelector('form');
     if (form) {
         form.addEventListener('submit', function(e) {
-            const password1 = document.getElementById('id_password1').value;
-            const password2 = document.getElementById('id_password2').value;
-            
-            if (password1 !== password2) {
-                e.preventDefault();
-                showToast('Passwords do not match!', 'danger');
-                return false;
-            }
-            
-            // Show loading state
             const submitBtn = form.querySelector('button[type="submit"]');
             if (submitBtn) {
-                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Creating Account...';
+                submitBtn.innerHTML = 'Creating Account...';
                 submitBtn.disabled = true;
             }
         });

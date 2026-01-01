@@ -1,0 +1,328 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Complaint Details - Fennec Med{% endblock %}
+
+{% block extra_css %}
+<style>
+.admin-header {
+  background: linear-gradient(135deg, #34588f 0%, #1a3e75 100%);
+  color: white;
+  padding: 2rem 0;
+  margin-bottom: 2rem;
+}
+
+.card-custom {
+  background: white;
+  border-radius: 10px;
+  padding: 2rem;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  margin-bottom: 1.5rem;
+}
+
+.info-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.75rem 0;
+  border-bottom: 1px solid #e9ecef;
+}
+
+.info-row:last-child {
+  border-bottom: none;
+}
+
+.info-label {
+  font-weight: 600;
+  color: #666;
+}
+
+.info-value {
+  color: #333;
+  font-weight: 500;
+}
+
+.status-badge {
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.status-open { background: #fff3cd; color: #856404; }
+.status-in_review { background: #d1ecf1; color: #0c5460; }
+.status-awaiting_user { background: #e7e7ff; color: #383874; }
+.status-resolved { background: #d4edda; color: #155724; }
+.status-rejected { background: #f8d7da; color: #721c24; }
+
+.attachment-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.attachment-item {
+  position: relative;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.attachment-item img {
+  width: 100%;
+  height: 150px;
+  object-fit: cover;
+}
+
+.attachment-item .file-icon {
+  width: 100%;
+  height: 150px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f8f9fa;
+}
+
+.timeline {
+  position: relative;
+  padding: 1rem 0;
+}
+
+.timeline-item {
+  position: relative;
+  padding-left: 2.5rem;
+  padding-bottom: 1.5rem;
+  border-left: 2px solid #e9ecef;
+}
+
+.timeline-item:last-child {
+  border-left: none;
+  padding-bottom: 0;
+}
+
+.timeline-item::before {
+  content: '';
+  position: absolute;
+  left: -6px;
+  top: 0;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #34588f;
+  border: 2px solid white;
+  box-shadow: 0 0 0 2px #34588f;
+}
+
+.timeline-date {
+  font-size: 0.85rem;
+  color: #666;
+  margin-bottom: 0.25rem;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="admin-header">
+  <div class="container">
+    <div class="d-flex justify-content-between align-items-center">
+      <div>
+        <h1><i class="fas fa-flag me-2"></i>Complaint Details</h1>
+        <p class="mb-0">{{ complaint.complaint_number }}</p>
+      </div>
+      <a href="{% url 'accounts:admin_complaints_management' %}" class="btn btn-light">
+        <i class="fas fa-arrow-left me-2"></i>Back to Complaints
+      </a>
+    </div>
+  </div>
+</div>
+
+<div class="container mb-5">
+  <div class="row">
+    <!-- Complaint Information -->
+    <div class="col-lg-8 mb-4">
+      <div class="card-custom">
+        <div class="d-flex justify-content-between align-items-start mb-3">
+          <h5><i class="fas fa-info-circle me-2"></i>Complaint Information</h5>
+          <span class="status-badge status-{{ complaint.status }}">
+            {{ complaint.get_status_display }}
+          </span>
+        </div>
+        
+        <div class="info-row">
+          <span class="info-label">Complaint Number:</span>
+          <span class="info-value">{{ complaint.complaint_number }}</span>
+        </div>
+        
+        <div class="info-row">
+          <span class="info-label">Order ID:</span>
+          <span class="info-value">
+            <a href="{% url 'accounts:admin_orders_management' %}?search={{ complaint.order.order_id }}">
+              {{ complaint.order.order_id }}
+            </a>
+          </span>
+        </div>
+        
+        <div class="info-row">
+          <span class="info-label">Customer:</span>
+          <span class="info-value">
+            <a href="{% url 'accounts:admin_user_detail' complaint.user.id %}">
+              {{ complaint.user.get_full_name|default:complaint.user.username }}
+            </a>
+          </span>
+        </div>
+        
+        <div class="info-row">
+          <span class="info-label">Reason:</span>
+          <span class="info-value">{{ complaint.reason.name|default:complaint.custom_reason }}</span>
+        </div>
+        
+        <div class="info-row">
+          <span class="info-label">Submitted:</span>
+          <span class="info-value">{{ complaint.created_at|date:"M d, Y H:i" }}</span>
+        </div>
+        
+        {% if complaint.resolved_at %}
+        <div class="info-row">
+          <span class="info-label">Resolved:</span>
+          <span class="info-value">{{ complaint.resolved_at|date:"M d, Y H:i" }}</span>
+        </div>
+        {% endif %}
+        
+        {% if complaint.handled_by %}
+        <div class="info-row">
+          <span class="info-label">Handled By:</span>
+          <span class="info-value">{{ complaint.handled_by.username }}</span>
+        </div>
+        {% endif %}
+        
+        <div class="mt-4">
+          <h6><strong>Description:</strong></h6>
+          <p class="text-muted">{{ complaint.description }}</p>
+        </div>
+        
+        {% if complaint.admin_notes %}
+        <div class="mt-3 alert alert-info">
+          <h6><strong>Admin Notes:</strong></h6>
+          <p class="mb-0">{{ complaint.admin_notes }}</p>
+        </div>
+        {% endif %}
+        
+        {% if complaint.resolution_notes %}
+        <div class="mt-3 alert alert-success">
+          <h6><strong>Resolution Notes:</strong></h6>
+          <p class="mb-0">{{ complaint.resolution_notes }}</p>
+        </div>
+        {% endif %}
+      </div>
+      
+      <!-- Attachments -->
+      {% if attachments %}
+      <div class="card-custom">
+        <h5 class="mb-3"><i class="fas fa-paperclip me-2"></i>Attachments</h5>
+        <div class="attachment-grid">
+          {% for attachment in attachments %}
+          <div class="attachment-item">
+            <a href="{{ attachment.file.url }}" target="_blank">
+              {% if 'image' in attachment.file_type %}
+                <img src="{{ attachment.file.url }}" alt="Attachment">
+              {% elif 'video' in attachment.file_type %}
+                <div class="file-icon">
+                  <i class="fas fa-video fa-3x text-primary"></i>
+                </div>
+              {% else %}
+                <div class="file-icon">
+                  <i class="fas fa-file-pdf fa-3x text-danger"></i>
+                </div>
+              {% endif %}
+            </a>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+      {% endif %}
+    </div>
+    
+    <!-- Actions & Timeline -->
+    <div class="col-lg-4 mb-4">
+      <!-- Update Status Form -->
+      <div class="card-custom">
+        <h5 class="mb-3"><i class="fas fa-tasks me-2"></i>Update Complaint</h5>
+        
+        <form method="post">
+          {% csrf_token %}
+          
+          <div class="mb-3">
+            <label class="form-label"><strong>Status *</strong></label>
+            {{ form.status }}
+          </div>
+          
+          <div class="mb-3">
+            <label class="form-label"><strong>Admin Notes</strong></label>
+            {{ form.admin_notes }}
+            <small class="form-text text-muted">Internal notes for tracking</small>
+          </div>
+          
+          <div class="mb-3">
+            <label class="form-label"><strong>Resolution Notes</strong></label>
+            {{ form.resolution_notes }}
+            <small class="form-text text-muted">Visible to customer if status is resolved</small>
+          </div>
+          
+          <div class="d-grid gap-2">
+            <button type="submit" class="btn btn-primary">
+              <i class="fas fa-save me-2"></i>Update Complaint
+            </button>
+          </div>
+        </form>
+      </div>
+      
+      <!-- Quick Actions -->
+      <div class="card-custom">
+        <h5 class="mb-3"><i class="fas fa-bolt me-2"></i>Quick Actions</h5>
+        
+        <div class="d-grid gap-2">
+          <a href="{% url 'accounts:admin_initiate_refund' complaint.order.order_id %}" class="btn btn-outline-warning">
+            <i class="fas fa-undo me-2"></i>Initiate Refund
+          </a>
+          
+          <a href="{% url 'payments:invoice_detail' complaint.invoice.id %}" class="btn btn-outline-primary" target="_blank">
+            <i class="fas fa-file-invoice me-2"></i>View Invoice
+          </a>
+          
+          <a href="mailto:{{ complaint.user.email }}" class="btn btn-outline-secondary">
+            <i class="fas fa-envelope me-2"></i>Email Customer
+          </a>
+        </div>
+      </div>
+      
+      <!-- Timeline -->
+      <div class="card-custom">
+        <h5 class="mb-3"><i class="fas fa-history me-2"></i>Activity Timeline</h5>
+        
+        <div class="timeline">
+          <div class="timeline-item">
+            <div class="timeline-date">{{ complaint.created_at|date:"M d, Y H:i" }}</div>
+            <strong>Complaint Submitted</strong>
+            <p class="text-muted mb-0 small">By {{ complaint.user.username }}</p>
+          </div>
+          
+          {% if complaint.status == 'in_review' %}
+          <div class="timeline-item">
+            <div class="timeline-date">{{ complaint.updated_at|date:"M d, Y H:i" }}</div>
+            <strong>Status: In Review</strong>
+          </div>
+          {% endif %}
+          
+          {% if complaint.resolved_at %}
+          <div class="timeline-item">
+            <div class="timeline-date">{{ complaint.resolved_at|date:"M d, Y H:i" }}</div>
+            <strong>Complaint Resolved</strong>
+            <p class="text-muted mb-0 small">By {{ complaint.handled_by.username }}</p>
+          </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,139 +1,247 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}My Wishlist - MedEquip Pro{% endblock %}
+{% block title %}My Wishlist - Fennec Med{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/wishlist.css' %}">
+{% endblock %}
 
 {% block content %}
-<div class="container mt-5 pt-5">
-    <div class="row mb-4">
-        <div class="col-md-12">
-            <h2 class="mb-3"><i class="fas fa-heart text-danger me-2"></i>My Wishlist</h2>
-            <p class="text-muted">{{ products.count }} item{{ products.count|pluralize }} in your wishlist</p>
+<!-- Wishlist Header -->
+<section class="wishlist-header">
+    <div class="container">
+        <div class="d-flex justify-content-between align-items-center">
+            <div>
+                <h1><i class="fas fa-heart me-2"></i>My Wishlist</h1>
+                <p>Save your favorite items for later</p>
+            </div>
+            <a href="{% url 'products:list' %}" class="btn btn-light">
+                <i class="fas fa-shopping-bag me-2"></i>Continue Shopping
+            </a>
         </div>
     </div>
-    
-    {% if products %}
-        <div class="row">
-            {% for product in products %}
-            <div class="col-md-4 mb-4">
-                <div class="card h-100 product-card">
-                    {% if product.images.first %}
-                        <img src="{{ product.images.first.image.url }}" class="card-img-top" alt="{{ product.name }}" style="height: 250px; object-fit: cover;">
-                    {% else %}
-                        <div class="bg-light d-flex align-items-center justify-content-center" style="height: 250px;">
-                            <i class="fas fa-image fa-3x text-muted"></i>
-                        </div>
-                    {% endif %}
+</section>
+
+<!-- Main Content -->
+<section class="py-5">
+    <div class="container">
+        <!-- View Controls -->
+        <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
+            <div>
+                <h5 class="mb-0 text-muted">
+                    <span id="item-count">{{ products.count }}</span> Item{{ products.count|pluralize }} in Wishlist
+                </h5>
+            </div>
+            <div class="view-toggle">
+                <button class="active" onclick="switchView('grid')" id="grid-btn">
+                    <i class="fas fa-th"></i>
+                </button>
+                <button onclick="switchView('list')" id="list-btn">
+                    <i class="fas fa-list"></i>
+                </button>
+            </div>
+        </div>
+
+        {% if products %}
+            <!-- Grid View -->
+            <div class="wishlist-grid" id="grid-view">
+                {% for product in products %}
+                <div class="wishlist-item-card">
+                    <div class="wishlist-item-image">
+                        <a href="{% url 'products:detail' product.slug %}">
+                            {% if product.image %}
+                                <img src="{{ product.image.url }}" alt="{{ product.name }}">
+                            {% else %}
+                                <img src="{% static 'images/placeholder.png' %}" alt="{{ product.name }}">
+                            {% endif %}
+                        </a>
+                        
+                        {% if product.stock_quantity > 0 %}
+                            <span class="stock-badge">In Stock</span>
+                        {% else %}
+                            <span class="stock-badge out-of-stock-badge">Out of Stock</span>
+                        {% endif %}
+                        
+                        {% if product.bulk_price and product.price > product.bulk_price %}
+                            {% widthratio product.price|add:0 1 product.bulk_price|default:1 as discount_percent %}
+                            {% if discount_percent %}
+                                <span class="price-badge">-{{ discount_percent|floatformat:0 }}%</span>
+                            {% endif %}
+                        {% endif %}
+                    </div>
                     
-                    <div class="card-body">
-                        <div class="d-flex justify-content-between align-items-start mb-2">
-                            <span class="badge bg-primary">{{ product.get_specialty_display }}</span>
-                            <form method="post" action="{% url 'accounts:wishlist_remove' product.id %}" style="display: inline;">
+                    <div class="wishlist-item-details">
+                        {% if product.brand %}
+                            <div class="wishlist-item-brand">{{ product.brand.name }}</div>
+                        {% endif %}
+                        
+                        <a href="{% url 'products:detail' product.slug %}" style="text-decoration: none;">
+                            <h3>{{ product.name|truncatewords:8 }}</h3>
+                        </a>
+                        
+                        <div class="wishlist-item-rating">
+                            <div class="stars">
+                                {% for i in "12345" %}
+                                    {% if forloop.counter <= product.average_rating|default:0 %}
+                                        <i class="fas fa-star"></i>
+                                    {% else %}
+                                        <i class="far fa-star"></i>
+                                    {% endif %}
+                                {% endfor %}
+                            </div>
+                            <span class="rating-count">({{ product.review_count|default:0 }})</span>
+                        </div>
+                        
+                        <div class="wishlist-item-price">
+                            <span class="current-price">${{ product.price }}</span>
+                            {% if product.bulk_price and product.price > product.bulk_price %}
+                                <span class="original-price">${{ product.bulk_price }}</span>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="wishlist-item-actions">
+                            {% if product.stock_quantity > 0 %}
+                                <form method="post" action="{% url 'payments:add_to_cart'  %}" class="mb-0">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn-add-cart">
+                                        <i class="fas fa-shopping-cart me-2"></i>Add to Cart
+                                    </button>
+                                </form>
+                            {% else %}
+                                <button class="btn-add-cart" disabled style="opacity: 0.5;">
+                                    <i class="fas fa-ban me-2"></i>Out of Stock
+                                </button>
+                            {% endif %}
+                            
+                            <form method="post" action="{% url 'accounts:wishlist_remove' product.id %}" class="mb-0">
                                 {% csrf_token %}
-                                <button type="submit" class="btn btn-sm btn-link text-danger p-0" title="Remove from wishlist">
-                                    <i class="fas fa-times"></i>
+                                <button type="submit" class="btn-remove">
+                                    <i class="fas fa-trash-alt me-2"></i>Remove
                                 </button>
                             </form>
                         </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+
+            <!-- List View (Hidden by default) -->
+            <div class="wishlist-list d-none" id="list-view">
+                {% for product in products %}
+                <div class="wishlist-item-list">
+                    <div class="wishlist-item-image">
+                        <a href="{% url 'products:detail' product.slug %}">
+                            {% if product.image %}
+                                <img src="{{ product.image.url }}" alt="{{ product.name }}">
+                            {% else %}
+                                <img src="{% static 'images/placeholder.png' %}" alt="{{ product.name }}">
+                            {% endif %}
+                        </a>
                         
-                        <h5 class="card-title">{{ product.name }}</h5>
-                        <p class="text-muted small mb-2">{{ product.brand.name }}</p>
-                        <p class="card-text text-truncate">{{ product.short_description }}</p>
-                        
-                        <div class="mb-3">
-                            <div class="d-flex align-items-center mb-1">
-                                <div class="text-warning me-2">
-                                    {% for i in "12345" %}
-                                        {% if forloop.counter <= product.get_average_rating %}
-                                            <i class="fas fa-star"></i>
-                                        {% else %}
-                                            <i class="far fa-star"></i>
-                                        {% endif %}
-                                    {% endfor %}
-                                </div>
-                                <small class="text-muted">({{ product.get_review_count }} reviews)</small>
-                            </div>
-                        </div>
-                        
-                        <div class="d-flex justify-content-between align-items-center">
-                            <div>
-                                <h4 class="text-primary mb-0">${{ product.price }}</h4>
-                                {% if product.bulk_price %}
-                                    <small class="text-muted">Bulk: ${{ product.bulk_price }}</small>
-                                {% endif %}
-                            </div>
-                            <span class="badge {% if product.availability_status == 'in_stock' %}bg-success{% else %}bg-warning{% endif %}">
-                                {{ product.get_availability_status_display }}
-                            </span>
-                        </div>
+                        {% if product.stock_quantity > 0 %}
+                            <span class="stock-badge">In Stock</span>
+                        {% else %}
+                            <span class="stock-badge out-of-stock-badge">Out of Stock</span>
+                        {% endif %}
                     </div>
                     
-                    <div class="card-footer bg-white border-top-0">
-                        <div class="btn-group w-100" role="group">
-                            <a href="{% url 'products:detail' product.slug %}" class="btn btn-outline-primary">
-                                <i class="fas fa-eye me-1"></i> View
-                            </a>
-                            <button class="btn btn-primary add-to-cart" data-product-id="{{ product.id }}">
-                                <i class="fas fa-cart-plus me-1"></i> Add to Cart
-                            </button>
+                    <div class="wishlist-item-details">
+                        {% if product.brand %}
+                            <div class="wishlist-item-brand">{{ product.brand.name }}</div>
+                        {% endif %}
+                        
+                        <a href="{% url 'products:detail' product.slug %}" style="text-decoration: none;">
+                            <h3>{{ product.name }}</h3>
+                        </a>
+                        
+                        <div class="wishlist-item-rating">
+                            <div class="stars">
+                                {% for i in "12345" %}
+                                    {% if forloop.counter <= product.average_rating|default:0 %}
+                                        <i class="fas fa-star"></i>
+                                    {% else %}
+                                        <i class="far fa-star"></i>
+                                    {% endif %}
+                                {% endfor %}
+                            </div>
+                            <span class="rating-count">({{ product.review_count|default:0 }})</span>
+                        </div>
+                        
+                        <div class="wishlist-item-price">
+                            <span class="current-price">${{ product.price }}</span>
+                            {% if product.bulk_price and product.price > product.bulk_price %}
+                                <span class="original-price">${{ product.bulk_price }}</span>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="wishlist-item-actions">
+                            {% if product.stock_quantity > 0 %}
+                                <form method="post" action="{% url 'payments:add_to_cart'  %}" class="mb-0">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn-add-cart">
+                                        <i class="fas fa-shopping-cart me-2"></i>Add to Cart
+                                    </button>
+                                </form>
+                            {% else %}
+                                <button class="btn-add-cart" disabled style="opacity: 0.5;">
+                                    <i class="fas fa-ban me-2"></i>Out of Stock
+                                </button>
+                            {% endif %}
+                            
+                            <form method="post" action="{% url 'accounts:wishlist_remove' product.id %}" class="mb-0">
+                                {% csrf_token %}
+                                <button type="submit" class="btn-remove">
+                                    <i class="fas fa-trash-alt me-2"></i>Remove
+                                </button>
+                            </form>
                         </div>
                     </div>
                 </div>
+                {% endfor %}
             </div>
-            {% endfor %}
-        </div>
-    {% else %}
-        <div class="text-center py-5">
-            <i class="fas fa-heart fa-5x text-muted mb-4"></i>
-            <h3>Your wishlist is empty</h3>
-            <p class="text-muted mb-4">Start adding products you love!</p>
-            <a href="{% url 'products:list' %}" class="btn btn-primary btn-lg">
-                <i class="fas fa-shopping-bag me-2"></i>Browse Products
-            </a>
-        </div>
-    {% endif %}
-</div>
+        {% else %}
+            <!-- Empty State -->
+            <div class="empty-wishlist">
+                <i class="far fa-heart"></i>
+                <h3>Your Wishlist is Empty</h3>
+                <p>Save your favorite items for later! Add products to your wishlist<br>and never lose track of what you want to buy.</p>
+                <a href="{% url 'products:list' %}" class="btn-start-shopping">
+                    <i class="fas fa-shopping-bag me-2"></i>Start Shopping
+                </a>
+            </div>
+        {% endif %}
+    </div>
+</section>
 {% endblock %}
 
 {% block extra_js %}
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    // Add to cart functionality
-    document.querySelectorAll('.add-to-cart').forEach(button => {
-        button.addEventListener('click', function() {
-            const productId = this.dataset.productId;
-            
-            fetch(`/payments/cart/add/${productId}/`, {
-                method: 'POST',
-                headers: {
-                    'X-CSRFToken': getCookie('csrftoken'),
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ quantity: 1 })
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    alert('Product added to cart!');
-                }
-            });
-        });
-    });
+function switchView(view) {
+    const gridView = document.getElementById('grid-view');
+    const listView = document.getElementById('list-view');
+    const gridBtn = document.getElementById('grid-btn');
+    const listBtn = document.getElementById('list-btn');
     
-    function getCookie(name) {
-        let cookieValue = null;
-        if (document.cookie && document.cookie !== '') {
-            const cookies = document.cookie.split(';');
-            for (let i = 0; i < cookies.length; i++) {
-                const cookie = cookies[i].trim();
-                if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                    break;
-                }
-            }
-        }
-        return cookieValue;
+    if (view === 'grid') {
+        gridView.classList.remove('d-none');
+        listView.classList.add('d-none');
+        gridBtn.classList.add('active');
+        listBtn.classList.remove('active');
+        localStorage.setItem('wishlistView', 'grid');
+    } else {
+        gridView.classList.add('d-none');
+        listView.classList.remove('d-none');
+        gridBtn.classList.remove('active');
+        listBtn.classList.add('active');
+        localStorage.setItem('wishlistView', 'list');
     }
+}
+
+// Load saved view preference
+document.addEventListener('DOMContentLoaded', function() {
+    const savedView = localStorage.getItem('wishlistView') || 'grid';
+    switchView(savedView);
 });
 </script>
 {% endblock %}

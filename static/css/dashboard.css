@@ -1,0 +1,430 @@
+/* Dashboard Specific Styles - Matching Home Page Design System */
+
+/* Dashboard Header */
+.bg-primary {
+  background: linear-gradient(135deg, #4a6a9b 0%, #34588f 100%) !important;
+}
+
+/* User Type Badges */
+.badge.user-type-general,
+.badge.user-type-pharmacy,
+.badge.user-type-clinic,
+.badge.user-type-doctor {
+  background-color: rgba(255, 255, 255, 0.2);
+  color: white;
+  font-weight: 500;
+  padding: 0.5rem 1rem;
+  border-radius: 1.563rem;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+.status-payment_under_review {
+  background-color: #ffc107;
+  color: #000;
+  padding: 0.375rem 0.75rem;
+  border-radius: 1rem;
+}
+
+.status-paid {
+  background-color: #198754;
+  color: white;
+  padding: 0.375rem 0.75rem;
+  border-radius: 1rem;
+}
+/* Dashboard Stats Section */
+.dashboard-card {
+  background: white;
+  border-radius: 0.625rem;
+  transition: transform 0.3s, box-shadow 0.3s;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  border: none;
+  overflow: hidden;
+}
+
+.dashboard-card:hover {
+  transform: translateY(-0.313rem);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+}
+
+.dashboard-card .card-body {
+  padding: 1.5rem;
+}
+
+.dashboard-card h3 {
+  font-size: clamp(1.75rem, 4vw, 2.25rem);
+  color: #1a3e75;
+}
+
+.stat-icon {
+  font-size: 2.5rem;
+  opacity: 0.6;
+}
+
+/* Status Badges - Using Design System Colors */
+.badge.status-pending {
+  background-color: #ffc107;
+  color: #000;
+  padding: 0.375rem 0.75rem;
+  border-radius: 1rem;
+}
+
+.badge.status-confirmed {
+  background-color: #34588f;
+  color: white;
+  padding: 0.375rem 0.75rem;
+  border-radius: 1rem;
+}
+
+.badge.status-processing {
+  background-color: #2b96cc;
+  color: white;
+  padding: 0.375rem 0.75rem;
+  border-radius: 1rem;
+}
+
+.badge.status-shipped {
+  background-color: #617da8;
+  color: white;
+  padding: 0.375rem 0.75rem;
+  border-radius: 1rem;
+}
+
+.badge.status-delivered {
+  background-color: #198754;
+  color: white;
+  padding: 0.375rem 0.75rem;
+  border-radius: 1rem;
+}
+
+.badge.status-cancelled,
+.badge.status-refunded {
+  background-color: #6c757d;
+  color: white;
+  padding: 0.375rem 0.75rem;
+  border-radius: 1rem;
+}
+
+/* Card Styling - Matching Home Page */
+.card {
+  background-color: white;
+  border-radius: 0.625rem;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  border: none;
+  margin-bottom: 1.5rem;
+  transition: transform 0.3s;
+}
+
+.card:hover {
+  transform: translateY(-0.313rem);
+}
+
+.card-header {
+  background-color: white;
+  border-bottom: 2px solid #f0f4f8;
+  padding: 1.25rem;
+  font-weight: 600;
+  border-radius: 0.625rem 0.625rem 0 0 !important;
+}
+
+.card-header h5 {
+  color: #1a3e75;
+  margin: 0;
+  font-size: clamp(1rem, 2vw, 1.25rem);
+}
+
+.card-body {
+  padding: 1.5rem;
+}
+
+/* Tables */
+.table {
+  margin-bottom: 0;
+}
+
+.table-hover tbody tr {
+  transition: background-color 0.2s;
+}
+
+.table-hover tbody tr:hover {
+  background-color: #f0f4f8;
+}
+
+.table thead th {
+  background-color: white;
+  color: #1a3e75;
+  font-weight: 600;
+  border-bottom: 2px solid #f0f4f8;
+  padding: 0.75rem;
+  font-size: 0.875rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.table td {
+  vertical-align: middle;
+  padding: 1rem 0.75rem;
+  color: #333;
+  border-bottom: 1px solid #f0f4f8;
+}
+
+.table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+/* Activity Icons - Matching Home Page Style */
+.activity-icon {
+  transition: transform 0.3s ease;
+  width: 60px;
+  height: 60px;
+  font-size: 1.5rem;
+  border-radius: 50%;
+}
+
+.activity-icon:hover {
+  transform: scale(1.1);
+}
+
+.activity-icon.bg-primary {
+  background: linear-gradient(135deg, #34588f, #4a6a9b) !important;
+}
+
+.activity-icon.bg-success {
+  background: linear-gradient(135deg, #198754, #20c997) !important;
+}
+
+.activity-icon.bg-info {
+  background: linear-gradient(135deg, #2b96cc, #0dcaf0) !important;
+}
+
+/* Security Items */
+.security-item {
+  border-bottom: 1px solid #f0f4f8;
+  padding-bottom: 1rem;
+  margin-bottom: 1rem;
+}
+
+.security-item:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+  margin-bottom: 0;
+}
+
+/* Buttons - Matching Design System */
+.btn-primary {
+  background-color: #34588f;
+  border-color: #34588f;
+  border-radius: 1.563rem;
+  padding: 0.75rem 1.5rem;
+  font-weight: bold;
+  transition: all 0.3s;
+}
+
+.btn-primary:hover {
+  background-color: #1a3e75;
+  border-color: #1a3e75;
+}
+
+.btn-outline-primary {
+  border-color: #34588f;
+  color: #34588f;
+  border-radius: 1.563rem;
+  padding: 0.75rem 1.5rem;
+  font-weight: bold;
+  transition: all 0.3s;
+}
+
+.btn-outline-primary:hover {
+  background-color: #34588f;
+  border-color: #34588f;
+  color: white;
+}
+
+.btn-outline-success {
+  border-color: #198754;
+  color: #198754;
+  border-radius: 1.563rem;
+  padding: 0.75rem 1.5rem;
+  font-weight: bold;
+}
+
+.btn-outline-success:hover {
+  background-color: #198754;
+  border-color: #198754;
+  color: white;
+}
+
+.btn-outline-info {
+  border-color: #2b96cc;
+  color: #2b96cc;
+  border-radius: 1.563rem;
+  padding: 0.75rem 1.5rem;
+  font-weight: bold;
+}
+
+.btn-outline-info:hover {
+  background-color: #2b96cc;
+  border-color: #2b96cc;
+  color: white;
+}
+
+.btn-outline-secondary {
+  border-color: #617da8;
+  color: #617da8;
+  border-radius: 1.563rem;
+  padding: 0.75rem 1.5rem;
+  font-weight: bold;
+}
+
+.btn-outline-secondary:hover {
+  background-color: #617da8;
+  border-color: #617da8;
+  color: white;
+}
+
+.btn-outline-warning {
+  border-color: #ffc107;
+  color: #856404;
+  border-radius: 1.563rem;
+  padding: 0.5rem 1rem;
+}
+
+.btn-outline-warning:hover {
+  background-color: #ffc107;
+  border-color: #ffc107;
+  color: #000;
+}
+
+.btn-sm {
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+  border-radius: 1.25rem;
+}
+
+/* Empty State */
+.text-center .fa-shopping-bag,
+.text-center .fa-3x {
+  color: #617da8;
+  opacity: 0.5;
+}
+
+/* Progress Bars */
+.progress {
+  background-color: #f0f4f8;
+  border-radius: 0.25rem;
+  height: 4px;
+}
+
+.progress-bar {
+  transition: width 0.6s ease;
+  border-radius: 0.25rem;
+}
+
+.progress-bar.bg-primary {
+  background-color: #34588f;
+}
+
+/* Quick Actions Grid */
+.d-grid.gap-2 .btn {
+  text-align: left;
+  padding: 0.938rem 1.25rem;
+  font-weight: 500;
+}
+
+.d-grid.gap-2 .btn i {
+  width: 24px;
+  display: inline-block;
+}
+
+/* Section Backgrounds */
+section.py-5 {
+  background-color: white;
+}
+
+section.bg-light {
+  background-color: #f0f4f8;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 991px) {
+  .dashboard-card .card-body {
+    padding: 1.25rem;
+  }
+
+  .activity-icon {
+    width: 50px;
+    height: 50px;
+    font-size: 1.25rem;
+  }
+
+  .stat-icon {
+    font-size: 2rem;
+  }
+
+  .card-header {
+    padding: 1rem;
+  }
+}
+
+@media (max-width: 767px) {
+  .table-responsive {
+    font-size: 0.875rem;
+  }
+
+  .table td,
+  .table th {
+    padding: 0.5rem;
+  }
+
+  .btn {
+    padding: 0.75rem 1.25rem;
+  }
+
+  .dashboard-card h3 {
+    font-size: 1.5rem;
+  }
+}
+
+/* Animation for stats */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.dashboard-card {
+  animation: fadeInUp 0.5s ease;
+}
+
+/* Remove Bootstrap default styles that conflict */
+.card-header:first-child {
+  border-radius: 0.625rem 0.625rem 0 0;
+}
+
+/* Text colors matching design system */
+.text-muted {
+  color: #666 !important;
+}
+
+h1,
+h2,
+main h3,
+h4,
+h5,
+h6 {
+  color: #1a3e75;
+}
+
+/* Links */
+a {
+  color: #34588f;
+  text-decoration: none;
+  transition: color 0.3s;
+}
+
+a:hover {
+  color: #1a3e75;
+}

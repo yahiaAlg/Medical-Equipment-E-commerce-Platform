@@ -1,231 +1,68 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}Login - MedEquip Pro{% endblock %}
+{% block title %}Login - Fennec Med{% endblock %}
 
-{% block content %}
-<section class="py-5">
-    <div class="container">
-        <div class="row justify-content-center">
-            <div class="col-lg-5 col-md-7">
-                <div class="card shadow-lg border-0">
-                    <div class="card-header bg-primary text-white text-center py-4">
-                        <h2 class="mb-0">
-                            <i class="fas fa-sign-in-alt me-2"></i>Welcome Back
-                        </h2>
-                        <p class="mb-0 mt-2">Sign in to your account</p>
-                    </div>
-                    
-                    <div class="card-body p-5">
-                        <form method="post" class="needs-validation" novalidate>
-                            {% csrf_token %}
-                            
-                            <div class="mb-4">
-                                <label for="{{ form.username.id_for_label }}" class="form-label">
-                                    <i class="fas fa-user me-2"></i>Username
-                                </label>
-                                <input type="text" class="form-control form-control-lg" 
-                                       name="{{ form.username.name }}" 
-                                       id="{{ form.username.id_for_label }}"
-                                       placeholder="Enter your username" required>
-                                {% if form.username.errors %}
-                                    <div class="invalid-feedback d-block">
-                                        {{ form.username.errors.0 }}
-                                    </div>
-                                {% endif %}
-                            </div>
-                            
-                            <div class="mb-4">
-                                <label for="{{ form.password.id_for_label }}" class="form-label">
-                                    <i class="fas fa-lock me-2"></i>Password
-                                </label>
-                                <div class="input-group">
-                                    <input type="password" class="form-control form-control-lg" 
-                                           name="{{ form.password.name }}" 
-                                           id="{{ form.password.id_for_label }}"
-                                           placeholder="Enter your password" required>
-                                    <button class="btn btn-outline-secondary" type="button" id="togglePassword">
-                                        <i class="fas fa-eye"></i>
-                                    </button>
-                                </div>
-                                {% if form.password.errors %}
-                                    <div class="invalid-feedback d-block">
-                                        {{ form.password.errors.0 }}
-                                    </div>
-                                {% endif %}
-                            </div>
-                            
-                            <div class="d-flex justify-content-between align-items-center mb-4">
-                                <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" id="rememberMe">
-                                    <label class="form-check-label" for="rememberMe">
-                                        Remember me
-                                    </label>
-                                </div>
-                                <a href="#" class="text-decoration-none">Forgot password?</a>
-                            </div>
-                            
-                            {% if form.non_field_errors %}
-                                <div class="alert alert-danger">
-                                    {{ form.non_field_errors.0 }}
-                                </div>
-                            {% endif %}
-                            
-                            <button type="submit" class="btn btn-primary btn-lg w-100 mb-3">
-                                <i class="fas fa-sign-in-alt me-2"></i>Sign In
-                            </button>
-                            
-                            <div class="text-center">
-                                <p class="text-muted mb-0">
-                                    Don't have an account? 
-                                    <a href="{% url 'accounts:register' %}" class="text-decoration-none">Create one here</a>
-                                </p>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-                
-                <!-- Quick Access for Demo -->
-                <div class="card mt-4 border-0 bg-light">
-                    <div class="card-body text-center">
-                        <h6 class="fw-bold mb-3">Quick Access (Demo)</h6>
-                        <div class="row g-2">
-                            <div class="col-6">
-                                <button class="btn btn-outline-primary btn-sm w-100" onclick="fillDemoCredentials('general')">
-                                    General User
-                                </button>
-                            </div>
-                            <div class="col-6">
-                                <button class="btn btn-outline-success btn-sm w-100" onclick="fillDemoCredentials('pharmacy')">
-                                    Pharmacy
-                                </button>
-                            </div>
-                            <div class="col-6">
-                                <button class="btn btn-outline-info btn-sm w-100" onclick="fillDemoCredentials('clinic')">
-                                    Clinic Staff
-                                </button>
-                            </div>
-                            <div class="col-6">
-                                <button class="btn btn-outline-warning btn-sm w-100" onclick="fillDemoCredentials('doctor')">
-                                    Doctor
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</section>
-
-<!-- Features Section -->
-<section class="py-5 bg-light">
-    <div class="container">
-        <div class="text-center mb-5">
-            <h3 class="fw-bold">Secure & Professional</h3>
-            <p class="text-muted">Your account security and privacy are our top priorities</p>
-        </div>
-        
-        <div class="row g-4">
-            <div class="col-lg-4 col-md-6">
-                <div class="text-center">
-                    <div class="feature-icon bg-success text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 60px; height: 60px;">
-                        <i class="fas fa-shield-alt"></i>
-                    </div>
-                    <h5 class="fw-bold">Secure Login</h5>
-                    <p class="text-muted small">Advanced encryption and security measures protect your account</p>
-                </div>
-            </div>
-            
-            <div class="col-lg-4 col-md-6">
-                <div class="text-center">
-                    <div class="feature-icon bg-primary text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 60px; height: 60px;">
-                        <i class="fas fa-user-md"></i>
-                    </div>
-                    <h5 class="fw-bold">Professional Accounts</h5>
-                    <p class="text-muted small">Specialized features for healthcare professionals and institutions</p>
-                </div>
-            </div>
-            
-            <div class="col-lg-4 col-md-6">
-                <div class="text-center">
-                    <div class="feature-icon bg-info text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 60px; height: 60px;">
-                        <i class="fas fa-clock"></i>
-                    </div>
-                    <h5 class="fw-bold">24/7 Access</h5>
-                    <p class="text-muted small">Access your account and place orders anytime, anywhere</p>
-                </div>
-            </div>
-        </div>
-    </div>
-</section>
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/login.css' %}">
 {% endblock %}
 
-{% block extra_js %}
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    // Password toggle functionality
-    const togglePassword = document.getElementById('togglePassword');
-    const passwordField = document.getElementById('{{ form.password.id_for_label }}');
+{% block content %}
+<div class="auth-container">
+  <div class="auth-form">
+    <h2>Login to Your Account</h2>
+    <p>Welcome back! Please enter your details to login.</p>
     
-    if (togglePassword && passwordField) {
-        togglePassword.addEventListener('click', function() {
-            const type = passwordField.getAttribute('type') === 'password' ? 'text' : 'password';
-            passwordField.setAttribute('type', type);
-            
-            const icon = this.querySelector('i');
-            if (type === 'password') {
-                icon.classList.remove('fa-eye-slash');
-                icon.classList.add('fa-eye');
-            } else {
-                icon.classList.remove('fa-eye');
-                icon.classList.add('fa-eye-slash');
-            }
-        });
-    }
+    {% if form.non_field_errors %}
+      <div class="alert alert-danger" style="background: #f8d7da; color: #721c24; padding: 1rem; border-radius: 5px; margin-bottom: 1rem;">
+        {{ form.non_field_errors.0 }}
+      </div>
+    {% endif %}
     
-    // Form validation
-    const form = document.querySelector('form');
-    if (form) {
-        form.addEventListener('submit', function(e) {
-            const username = document.getElementById('{{ form.username.id_for_label }}').value;
-            const password = document.getElementById('{{ form.password.id_for_label }}').value;
-            
-            if (!username || !password) {
-                e.preventDefault();
-                showToast('Please fill in all required fields', 'warning');
-                return false;
-            }
-            
-            // Show loading state
-            const submitBtn = form.querySelector('button[type="submit"]');
-            if (submitBtn) {
-                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Signing In...';
-                submitBtn.disabled = true;
-            }
-        });
-    }
-});
-
-// Demo credentials function
-function fillDemoCredentials(userType) {
-    const usernameField = document.getElementById('{{ form.username.id_for_label }}');
-    const passwordField = document.getElementById('{{ form.password.id_for_label }}');
+    <form method="post">
+      {% csrf_token %}
+      
+      <div class="form-group">
+        <input
+          type="text"
+          id="{{ form.username.id_for_label }}"
+          name="{{ form.username.name }}"
+          placeholder="Username"
+          required
+          {% if form.username.value %}value="{{ form.username.value }}"{% endif %}
+        />
+        {% if form.username.errors %}
+          <span class="error-message" style="color: #dc3545; font-size: 0.875rem; display: block; margin-top: 0.25rem;">
+            {{ form.username.errors.0 }}
+          </span>
+        {% endif %}
+      </div>
+      
+      <div class="form-group">
+        <input
+          type="password"
+          id="{{ form.password.id_for_label }}"
+          name="{{ form.password.name }}"
+          placeholder="Password"
+          required
+        />
+        {% if form.password.errors %}
+          <span class="error-message" style="color: #dc3545; font-size: 0.875rem; display: block; margin-top: 0.25rem;">
+            {{ form.password.errors.0 }}
+          </span>
+        {% endif %}
+      </div>
+      
+      <div class="form-group">
+        <a href="#" class="forgot-password">Forgot Password?</a>
+      </div>
+      
+      <button type="submit" class="submit-btn">Login</button>
+    </form>
     
-    // These would be actual demo accounts in a real application
-    const demoCredentials = {
-        'general': { username: 'demo_user', password: 'demo123' },
-        'pharmacy': { username: 'demo_pharmacy', password: 'demo123' },
-        'clinic': { username: 'demo_clinic', password: 'demo123' },
-        'doctor': { username: 'demo_doctor', password: 'demo123' }
-    };
-    
-    if (demoCredentials[userType]) {
-        usernameField.value = demoCredentials[userType].username;
-        passwordField.value = demoCredentials[userType].password;
-        
-        showToast(`Demo credentials filled for ${userType} account`, 'info');
-    }
-}
-</script>
+    <p class="signup-link">
+      Don't have an account? <a href="{% url 'accounts:register' %}">Sign Up</a>
+    </p>
+  </div>
+</div>
 {% endblock %}

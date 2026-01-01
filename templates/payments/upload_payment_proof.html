@@ -1,0 +1,218 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Upload Payment Proof - Fennec Med{% endblock %}
+
+{% block extra_css %}
+<style>
+.upload-section {
+  background-color: #f0f4f8;
+  padding: 3.125rem 1.25rem;
+  min-height: 70vh;
+}
+
+.upload-container {
+  max-width: 700px;
+  margin: 0 auto;
+}
+
+.upload-card {
+  background-color: white;
+  border-radius: 0.625rem;
+  padding: 2.5rem;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.upload-header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.upload-header h1 {
+  font-size: clamp(1.5rem, 4vw, 2rem);
+  color: #1a3e75;
+  margin-bottom: 0.5rem;
+}
+
+.upload-header p {
+  color: #666;
+  font-size: 1rem;
+}
+
+.invoice-info-box {
+  background-color: #e3f2fd;
+  border-left: 4px solid #2196f3;
+  padding: 1.25rem;
+  margin-bottom: 2rem;
+  border-radius: 0.625rem;
+}
+
+.invoice-info-box p {
+  margin: 0.375rem 0;
+  color: #333;
+}
+
+.invoice-info-box strong {
+  color: #1565c0;
+}
+
+.form-group {
+  margin-bottom: 1.5rem;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+  color: #333;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid #ddd;
+  border-radius: 0.375rem;
+  font-size: 1rem;
+  transition: border-color 0.3s;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+  outline: none;
+  border-color: #34588f;
+}
+
+.file-upload-area {
+  border: 2px dashed #ddd;
+  border-radius: 0.625rem;
+  padding: 2rem;
+  text-align: center;
+  transition: all 0.3s;
+  cursor: pointer;
+}
+
+.file-upload-area:hover {
+  border-color: #34588f;
+  background-color: #f8f9fa;
+}
+
+.file-upload-area i {
+  font-size: 3rem;
+  color: #34588f;
+  margin-bottom: 1rem;
+}
+
+.file-upload-area p {
+  color: #666;
+  margin: 0.5rem 0;
+}
+
+.submit-button {
+  background-color: #34588f;
+  color: white;
+  padding: 0.938rem 2.5rem;
+  border-radius: 1.563rem;
+  border: none;
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+  width: 100%;
+  transition: background-color 0.3s;
+}
+
+.submit-button:hover {
+  background-color: #1a3e75;
+}
+
+.error-message {
+  color: #d32f2f;
+  font-size: 0.875rem;
+  margin-top: 0.375rem;
+}
+
+.help-text {
+  font-size: 0.875rem;
+  color: #666;
+  margin-top: 0.375rem;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="upload-section">
+  <div class="upload-container">
+    <div class="upload-card">
+      <div class="upload-header">
+        <h1>Upload Payment Proof</h1>
+        <p>Submit proof of your payment for verification</p>
+      </div>
+
+      <div class="invoice-info-box">
+        <p><strong>Invoice:</strong> {{ invoice.invoice_number }}</p>
+        <p><strong>Amount:</strong> {{ invoice.total_amount|floatformat:2 }} DZD</p>
+        <p><strong>Order:</strong> {{ invoice.order.order_id }}</p>
+      </div>
+
+      <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+
+        <div class="form-group">
+          <label for="{{ form.payment_method.id_for_label }}">{{ form.payment_method.label }}</label>
+          {{ form.payment_method }}
+          {% if form.payment_method.errors %}
+            <div class="error-message">{{ form.payment_method.errors }}</div>
+          {% endif %}
+        </div>
+
+        <div class="form-group">
+          <label for="{{ form.proof_file.id_for_label }}">{{ form.proof_file.label }}</label>
+          <div class="file-upload-area" onclick="document.getElementById('{{ form.proof_file.id_for_label }}').click()">
+            <i class="fas fa-cloud-upload-alt"></i>
+            <p><strong>Click to upload</strong> or drag and drop</p>
+            <p class="help-text">PNG, JPG or PDF (max. 5MB)</p>
+          </div>
+          {{ form.proof_file }}
+          {% if form.proof_file.errors %}
+            <div class="error-message">{{ form.proof_file.errors }}</div>
+          {% endif %}
+        </div>
+
+        <div class="form-group">
+          <label for="{{ form.transaction_reference.id_for_label }}">{{ form.transaction_reference.label }}</label>
+          {{ form.transaction_reference }}
+          {% if form.transaction_reference.errors %}
+            <div class="error-message">{{ form.transaction_reference.errors }}</div>
+          {% endif %}
+          <p class="help-text">Enter the transaction ID or reference number from your payment</p>
+        </div>
+
+        <div class="form-group">
+          <label for="{{ form.notes.id_for_label }}">{{ form.notes.label }}</label>
+          {{ form.notes }}
+          {% if form.notes.errors %}
+            <div class="error-message">{{ form.notes.errors }}</div>
+          {% endif %}
+        </div>
+
+        <button type="submit" class="submit-button">
+          <i class="fas fa-paper-plane"></i> Submit Payment Proof
+        </button>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.getElementById('{{ form.proof_file.id_for_label }}').style.display = 'none';
+document.getElementById('{{ form.proof_file.id_for_label }}').addEventListener('change', function(e) {
+  if (e.target.files.length > 0) {
+    document.querySelector('.file-upload-area p strong').textContent = e.target.files[0].name;
+  }
+});
+</script>
+{% endblock %}

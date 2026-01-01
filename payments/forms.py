@@ -1,115 +1,274 @@
 from django import forms
-from crispy_forms.helper import FormHelper
-from crispy_forms.layout import Layout, Row, Column, Submit, Fieldset, Div, HTML
-from .models import Order
+from .models import (
+    PaymentProof,
+    Complaint,
+    ComplaintAttachment,
+    RefundProof,
+    ComplaintReason,
+)
+
 
 class CheckoutForm(forms.Form):
     # Shipping Information
     shipping_address = forms.CharField(
-        max_length=500,
-        widget=forms.Textarea(attrs={'rows': 3}),
-        label='Shipping Address'
+        widget=forms.Textarea(attrs={"rows": 3, "class": "form-control"}),
+        label="Shipping Address",
     )
-    shipping_city = forms.CharField(max_length=100, label='City')
-    shipping_state = forms.CharField(max_length=100, label='State/Province')
-    shipping_zip = forms.CharField(max_length=10, label='ZIP/Postal Code')
-    shipping_country = forms.CharField(max_length=100, label='Country')
-    
-    # Billing Information
-    same_as_shipping = forms.BooleanField(
+    shipping_city = forms.CharField(
+        max_length=100,
+        widget=forms.TextInput(attrs={"class": "form-control"}),
+        label="City",
+    )
+    shipping_state = forms.CharField(
+        max_length=100,
+        widget=forms.TextInput(attrs={"class": "form-control"}),
+        label="State/Province",
+    )
+    shipping_zip = forms.CharField(
+        max_length=10,
+        widget=forms.TextInput(attrs={"class": "form-control"}),
+        label="ZIP Code",
+    )
+
+    # Billing same as shipping
+    billing_same = forms.BooleanField(
         required=False,
         initial=True,
-        label='Billing address is the same as shipping address'
+        widget=forms.CheckboxInput(attrs={"class": "form-check-input"}),
+        label="Billing address same as shipping",
     )
-    billing_address = forms.CharField(
-        max_length=500,
-        widget=forms.Textarea(attrs={'rows': 3}),
-        label='Billing Address',
-        required=False
+
+
+class PaymentProofUploadForm(forms.ModelForm):
+    class Meta:
+        model = PaymentProof
+        fields = ["payment_method", "proof_file", "transaction_reference", "notes"]
+        widgets = {
+            "payment_method": forms.Select(attrs={"class": "form-select"}),
+            "proof_file": forms.FileInput(
+                attrs={"class": "form-control", "accept": "image/*,application/pdf"}
+            ),
+            "transaction_reference": forms.TextInput(
+                attrs={
+                    "class": "form-control",
+                    "placeholder": "Transaction ID or Reference",
+                }
+            ),
+            "notes": forms.Textarea(
+                attrs={
+                    "class": "form-control",
+                    "rows": 3,
+                    "placeholder": "Optional notes about your payment",
+                }
+            ),
+        }
+        labels = {
+            "payment_method": "Payment Method",
+            "proof_file": "Upload Payment Proof (Image or PDF)",
+            "transaction_reference": "Transaction Reference",
+            "notes": "Additional Notes",
+        }
+
+    def clean_proof_file(self):
+        file = self.cleaned_data.get("proof_file")
+        if file:
+            # Validate file size (max 5MB)
+            if file.size > 5 * 1024 * 1024:
+                raise forms.ValidationError("File size must be under 5MB.")
+
+            # Validate file type
+            allowed_types = ["image/jpeg", "image/png", "image/jpg", "application/pdf"]
+            if file.content_type not in allowed_types:
+                raise forms.ValidationError("Only JPG, PNG, and PDF files are allowed.")
+        return file
+
+
+class PaymentVerificationForm(forms.Form):
+    action = forms.ChoiceField(
+        choices=[("approve", "Approve Payment"), ("reject", "Reject Payment")],
+        widget=forms.RadioSelect(attrs={"class": "form-check-input"}),
+        label="Action",
     )
-    billing_city = forms.CharField(max_length=100, label='City', required=False)
-    billing_state = forms.CharField(max_length=100, label='State/Province', required=False)
-    billing_zip = forms.CharField(max_length=10, label='ZIP/Postal Code', required=False)
-    billing_country = forms.CharField(max_length=100, label='Country', required=False)
-    
-    # Payment Information
-    payment_method = forms.ChoiceField(
-        choices=Order.PAYMENT_METHODS,
-        widget=forms.RadioSelect,
-        label='Payment Method'
-    )
-    
-    # Special Instructions
-    special_instructions = forms.CharField(
-        widget=forms.Textarea(attrs={'rows': 3}),
+    rejection_reason = forms.CharField(
         required=False,
-        label='Special Delivery Instructions'
+        widget=forms.Textarea(
+            attrs={
+                "class": "form-control",
+                "rows": 3,
+                "placeholder": "Reason for rejection",
+            }
+        ),
+        label="Rejection Reason (if rejecting)",
     )
-    
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.helper = FormHelper()
-        self.helper.layout = Layout(
-            Fieldset(
-                'Shipping Information',
-                'shipping_address',
-                Row(
-                    Column('shipping_city', css_class='form-group col-md-4 mb-3'),
-                    Column('shipping_state', css_class='form-group col-md-4 mb-3'),
-                    Column('shipping_zip', css_class='form-group col-md-4 mb-3'),
-                ),
-                'shipping_country',
-            ),
-            
-            Fieldset(
-                'Billing Information',
-                'same_as_shipping',
-                Div(
-                    'billing_address',
-                    Row(
-                        Column('billing_city', css_class='form-group col-md-4 mb-3'),
-                        Column('billing_state', css_class='form-group col-md-4 mb-3'),
-                        Column('billing_zip', css_class='form-group col-md-4 mb-3'),
-                    ),
-                    'billing_country',
-                    css_id='billing-fields'
-                ),
-            ),
-            
-            Fieldset(
-                'Payment Method',
-                'payment_method',
-            ),
-            
-            Fieldset(
-                'Additional Information',
-                'special_instructions',
-            ),
-            
-            Submit('submit', 'Continue to Review', css_class='btn btn-primary btn-lg w-100')
-        )
-        
-        # Add Bootstrap classes
-        for field in self.fields:
-            if field not in ['same_as_shipping', 'payment_method']:
-                self.fields[field].widget.attrs.update({'class': 'form-control'})
-    
+
     def clean(self):
         cleaned_data = super().clean()
-        same_as_shipping = cleaned_data.get('same_as_shipping')
-        
-        if same_as_shipping:
-            # Copy shipping data to billing fields
-            cleaned_data['billing_address'] = cleaned_data.get('shipping_address')
-            cleaned_data['billing_city'] = cleaned_data.get('shipping_city')
-            cleaned_data['billing_state'] = cleaned_data.get('shipping_state')
-            cleaned_data['billing_zip'] = cleaned_data.get('shipping_zip')
-            cleaned_data['billing_country'] = cleaned_data.get('shipping_country')
-        else:
-            # Validate billing fields are provided
-            billing_fields = ['billing_address', 'billing_city', 'billing_state', 'billing_zip', 'billing_country']
-            for field in billing_fields:
-                if not cleaned_data.get(field):
-                    self.add_error(field, 'This field is required when billing address is different from shipping.')
-        
+        action = cleaned_data.get("action")
+        rejection_reason = cleaned_data.get("rejection_reason")
+
+        if action == "reject" and not rejection_reason:
+            raise forms.ValidationError(
+                "Rejection reason is required when rejecting a payment."
+            )
+
         return cleaned_data
+
+
+class ComplaintForm(forms.ModelForm):
+    class Meta:
+        model = Complaint
+        fields = ["reason", "custom_reason", "description"]
+        widgets = {
+            "reason": forms.Select(attrs={"class": "form-select"}),
+            "custom_reason": forms.TextInput(
+                attrs={
+                    "class": "form-control",
+                    "placeholder": 'Specify if you selected "Other"',
+                    "id": "custom_reason_field",
+                }
+            ),
+            "description": forms.Textarea(
+                attrs={
+                    "class": "form-control",
+                    "rows": 5,
+                    "placeholder": "Please describe your complaint in detail...",
+                }
+            ),
+        }
+        labels = {
+            "reason": "Complaint Reason",
+            "custom_reason": "Custom Reason",
+            "description": "Description",
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["reason"].queryset = ComplaintReason.objects.filter(is_active=True)
+        self.fields["reason"].empty_label = "Select a reason"
+
+
+class ComplaintAttachmentForm(forms.ModelForm):
+    class Meta:
+        model = ComplaintAttachment
+        fields = ["file"]
+        widgets = {
+            "file": forms.FileInput(
+                attrs={
+                    "class": "form-control",
+                    "accept": "image/*,video/*,application/pdf",
+                    # "multiple": True,
+                }
+            ),
+        }
+
+    def clean_file(self):
+        file = self.cleaned_data.get("file")
+        if file:
+            # Max 10MB per file
+            if file.size > 10 * 1024 * 1024:
+                raise forms.ValidationError("File size must be under 10MB.")
+
+            # Allowed types
+            allowed_types = [
+                "image/jpeg",
+                "image/png",
+                "image/jpg",
+                "image/gif",
+                "video/mp4",
+                "video/quicktime",
+                "application/pdf",
+            ]
+            if file.content_type not in allowed_types:
+                raise forms.ValidationError(
+                    "Only images, videos (MP4), and PDF files are allowed."
+                )
+        return file
+
+
+class ComplaintReasonForm(forms.ModelForm):
+    class Meta:
+        model = ComplaintReason
+        fields = ["name", "description", "is_active", "display_order"]
+        widgets = {
+            "name": forms.TextInput(attrs={"class": "form-control"}),
+            "description": forms.Textarea(attrs={"class": "form-control", "rows": 3}),
+            "is_active": forms.CheckboxInput(attrs={"class": "form-check-input"}),
+            "display_order": forms.NumberInput(attrs={"class": "form-control"}),
+        }
+
+
+class ComplaintStatusUpdateForm(forms.Form):
+    STATUS_CHOICES = [
+        ("in_review", "In Review"),
+        ("awaiting_user", "Awaiting User Response"),
+        ("resolved", "Resolved"),
+        ("rejected", "Rejected"),
+    ]
+
+    status = forms.ChoiceField(
+        choices=STATUS_CHOICES,
+        widget=forms.Select(attrs={"class": "form-select"}),
+        label="New Status",
+    )
+    admin_notes = forms.CharField(
+        widget=forms.Textarea(attrs={"class": "form-control", "rows": 4}),
+        label="Admin Notes",
+        required=False,
+    )
+    resolution_notes = forms.CharField(
+        widget=forms.Textarea(attrs={"class": "form-control", "rows": 4}),
+        label="Resolution Notes",
+        required=False,
+    )
+
+
+class RefundInitiationForm(forms.Form):
+    amount = forms.DecimalField(
+        max_digits=10,
+        decimal_places=2,
+        widget=forms.NumberInput(attrs={"class": "form-control", "step": "0.01"}),
+        label="Refund Amount",
+    )
+    reason = forms.CharField(
+        widget=forms.Textarea(attrs={"class": "form-control", "rows": 4}),
+        label="Refund Reason",
+    )
+
+
+class RefundProofUploadForm(forms.ModelForm):
+    refund_method = forms.ChoiceField(
+        choices=[
+            (m[0], m[1])
+            for m in [
+                ("baridimob", "BaridiMob"),
+                ("ccp", "CCP"),
+                ("bank_transfer", "Bank Transfer"),
+                ("cash", "Cash"),
+                ("other", "Other"),
+            ]
+        ],
+        widget=forms.Select(attrs={"class": "form-select"}),
+        label="Refund Method",
+    )
+
+    class Meta:
+        model = RefundProof
+        fields = ["proof_file", "transaction_reference", "notes"]
+        widgets = {
+            "proof_file": forms.FileInput(
+                attrs={"class": "form-control", "accept": "image/*,application/pdf"}
+            ),
+            "transaction_reference": forms.TextInput(attrs={"class": "form-control"}),
+            "notes": forms.Textarea(attrs={"class": "form-control", "rows": 3}),
+        }
+
+    def clean_proof_file(self):
+        file = self.cleaned_data.get("proof_file")
+        if file:
+            if file.size > 5 * 1024 * 1024:
+                raise forms.ValidationError("File size must be under 5MB.")
+
+            allowed_types = ["image/jpeg", "image/png", "image/jpg", "application/pdf"]
+            if file.content_type not in allowed_types:
+                raise forms.ValidationError("Only JPG, PNG, and PDF files are allowed.")
+        return file

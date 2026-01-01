@@ -1,0 +1,88 @@
+{% load static %}
+
+<div class="dropdown">
+    <button class="btn position-relative p-2" type="button" id="notificationsDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+        <i class="fas fa-bell fs-5"></i>
+        {% if unread_notifications_count > 0 %}
+        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+            {{ unread_notifications_count }}
+            <span class="visually-hidden">unread notifications</span>
+        </span>
+        {% endif %}
+    </button>
+    
+    <ul class="dropdown-menu dropdown-menu-end shadow" style="width: 350px; max-height: 400px; overflow-y: auto;" aria-labelledby="notificationsDropdown">
+        <li class="dropdown-header d-flex justify-content-between align-items-center">
+            <strong>Notifications</strong>
+            {% if unread_notifications_count > 0 %}
+            <button class="btn btn-link btn-sm text-decoration-none" onclick="markAllAsRead()">Mark all as read</button>
+            {% endif %}
+        </li>
+        <li><hr class="dropdown-divider"></li>
+        
+        {% if notifications %}
+            {% for notification in notifications %}
+            <li>
+                <a class="dropdown-item {% if not notification.is_read %}bg-light{% endif %} py-3" 
+                   href="{% if notification.order %}{% url 'payments:invoice_detail' notification.invoice.id %}{% else %}#{% endif %}"
+                   onclick="markAsRead({{ notification.id }})">
+                    <div class="d-flex">
+                        <div class="flex-shrink-0">
+                            {% if notification.notification_type == 'payment_confirmed' %}
+                                <i class="fas fa-check-circle text-success"></i>
+                            {% elif notification.notification_type == 'payment_rejected' %}
+                                <i class="fas fa-times-circle text-danger"></i>
+                            {% elif notification.notification_type == 'refund_completed' %}
+                                <i class="fas fa-money-bill-wave text-info"></i>
+                            {% elif notification.notification_type == 'complaint_created' %}
+                                <i class="fas fa-exclamation-triangle text-warning"></i>
+                            {% else %}
+                                <i class="fas fa-bell text-primary"></i>
+                            {% endif %}
+                        </div>
+                        <div class="flex-grow-1 ms-3">
+                            <strong class="d-block">{{ notification.title }}</strong>
+                            <small class="text-muted d-block">{{ notification.message|truncatewords:15 }}</small>
+                            <small class="text-muted">{{ notification.created_at|timesince }} ago</small>
+                        </div>
+                    </div>
+                </a>
+            </li>
+            {% if not forloop.last %}
+            <li><hr class="dropdown-divider"></li>
+            {% endif %}
+            {% endfor %}
+        {% else %}
+            <li>
+                <div class="dropdown-item-text text-center py-4">
+                    <i class="fas fa-bell-slash fs-3 text-muted"></i>
+                    <p class="mb-0 mt-2">No notifications</p>
+                </div>
+            </li>
+        {% endif %}
+    </ul>
+</div>
+
+<script>
+function markAsRead(notificationId) {
+    fetch(`/payments/notification/${notificationId}/read/`, {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': '{{ csrf_token }}',
+            'Content-Type': 'application/json'
+        }
+    });
+}
+
+function markAllAsRead() {
+    fetch('/payments/notifications/mark-all-read/', {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': '{{ csrf_token }}',
+            'Content-Type': 'application/json'
+        }
+    }).then(() => {
+        location.reload();
+    });
+}
+</script>

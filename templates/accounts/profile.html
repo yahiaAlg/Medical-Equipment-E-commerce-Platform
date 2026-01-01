@@ -1,144 +1,276 @@
 {% extends 'base.html' %}
-{% load crispy_forms_tags %}
+{% load static %}
 
-{% block title %}My Profile - MedEquip Pro{% endblock %}
+{% block title %}My Profile - Fennec Med{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/profile.css' %}">
+{% endblock %}
 
 {% block content %}
-<div class="container mt-5 pt-5">
-    <div class="row">
-        <div class="col-md-3 mb-4">
-            <div class="card">
-                <div class="card-body text-center">
-                    {% if user_profile.avatar %}
-                        <img src="{{ user_profile.avatar.url }}" class="rounded-circle mb-3" width="120" height="120" alt="Avatar">
-                    {% else %}
-                        <div class="bg-primary text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 120px; height: 120px; font-size: 48px;">
-                            {{ user.first_name|first|default:user.username|first }}
-                        </div>
-                    {% endif %}
-                    <h5 class="mb-1">{{ user.get_full_name|default:user.username }}</h5>
-                    <p class="text-muted mb-3">{{ user_profile.get_user_type_display }}</p>
-                    <a href="{% url 'accounts:change_password' %}" class="btn btn-outline-primary btn-sm">
-                        <i class="fas fa-key"></i> Change Password
-                    </a>
-                </div>
-            </div>
-            
-            <div class="card mt-3">
-                <div class="card-body">
-                    <h6 class="card-title mb-3">Quick Links</h6>
-                    <div class="list-group list-group-flush">
-                        <a href="{% url 'accounts:dashboard' %}" class="list-group-item list-group-item-action">
-                            <i class="fas fa-tachometer-alt me-2"></i> Dashboard
+<div class="profile-container">
+    <div class="container">
+        <div class="row">
+            <!-- Sidebar -->
+            <div class="col-lg-3 mb-4">
+                <div class="profile-sidebar">
+                    <div class="profile-card">
+                        {% if user_profile.avatar %}
+                            <img src="{{ user_profile.avatar.url }}" class="profile-avatar" alt="Avatar">
+                        {% else %}
+                            <div class="profile-placeholder">
+                                {{ user.first_name|first|default:user.username|first|upper }}
+                            </div>
+                        {% endif %}
+                        <h5 class="profile-name">{{ user.get_full_name|default:user.username }}</h5>
+                        <p class="profile-type">{{ user_profile.get_user_type_display }}</p>
+                    </div>
+                    
+                    <div class="quick-links-card">
+                        <h6>Quick Links</h6>
+                        <a href="{% url 'accounts:dashboard' %}" class="quick-link-item">
+                            <i class="fas fa-tachometer-alt"></i>
+                            Dashboard
                         </a>
-                        <a href="{% url 'payments:order_list' %}" class="list-group-item list-group-item-action">
-                            <i class="fas fa-shopping-bag me-2"></i> My Orders
+                        <a href="{% url 'payments:invoice_list' %}" class="quick-link-item">
+                            <i class="fas fa-shopping-bag"></i>
+                            My Orders
                         </a>
-                        <a href="{% url 'accounts:wishlist' %}" class="list-group-item list-group-item-action">
-                            <i class="fas fa-heart me-2"></i> Wishlist
+                        <a href="{% url 'accounts:wishlist' %}" class="quick-link-item">
+                            <i class="fas fa-heart"></i>
+                            Wishlist
                         </a>
                     </div>
                 </div>
             </div>
-        </div>
-        
-        <div class="col-md-9">
-            <div class="card">
-                <div class="card-header bg-primary text-white">
-                    <h4 class="mb-0"><i class="fas fa-user-edit me-2"></i>Edit Profile</h4>
-                </div>
-                <div class="card-body">
-                    <form method="post" enctype="multipart/form-data">
-                        {% csrf_token %}
-                        
-                        <h5 class="mb-3">Personal Information</h5>
-                        <div class="row mb-3">
-                            <div class="col-md-6">
-                                <label class="form-label">First Name</label>
-                                {{ user_form.first_name }}
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label">Last Name</label>
-                                {{ user_form.last_name }}
-                            </div>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">Email Address</label>
-                            {{ user_form.email }}
-                        </div>
-                        
-                        <hr class="my-4">
-                        
-                        <h5 class="mb-3">Contact Details</h5>
-                        <div class="row mb-3">
-                            <div class="col-md-6">
-                                <label class="form-label">Phone</label>
-                                {{ profile_form.phone }}
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label">Date of Birth</label>
-                                {{ profile_form.date_of_birth }}
-                            </div>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">Address</label>
-                            {{ profile_form.address }}
-                        </div>
-                        <div class="row mb-3">
-                            <div class="col-md-4">
-                                <label class="form-label">City</label>
-                                {{ profile_form.city }}
-                            </div>
-                            <div class="col-md-4">
-                                <label class="form-label">State</label>
-                                {{ profile_form.state }}
-                            </div>
-                            <div class="col-md-4">
-                                <label class="form-label">Zip Code</label>
-                                {{ profile_form.zip_code }}
-                            </div>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">Country</label>
-                            {{ profile_form.country }}
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">Avatar</label>
-                            {{ profile_form.avatar }}
-                        </div>
-                        
-                        {% if specific_form %}
-                            <hr class="my-4">
-                            <h5 class="mb-3">
-                                {% if user_profile.user_type == 'pharmacy' %}
-                                    Pharmacy Information
-                                {% elif user_profile.user_type == 'clinic' %}
-                                    Clinic Information
-                                {% elif user_profile.user_type == 'doctor' %}
-                                    Medical Information
-                                {% endif %}
-                            </h5>
-                            {% for field in specific_form %}
-                                <div class="mb-3">
-                                    <label class="form-label">{{ field.label }}</label>
-                                    {{ field }}
-                                    {% if field.errors %}
-                                        <div class="text-danger small">{{ field.errors }}</div>
+            
+            <!-- Main Content -->
+            <div class="col-lg-9">
+                <div class="profile-main-content">
+                    <!-- Tabs -->
+                    <div class="profile-tabs">
+                        <button class="profile-tab active" data-tab="profile-info">
+                            <i class="fas fa-user"></i>
+                            Profile Information
+                        </button>
+                        <button class="profile-tab" data-tab="change-password">
+                            <i class="fas fa-key"></i>
+                            Change Password
+                        </button>
+                    </div>
+                    
+                    <!-- Tab Contents -->
+                    <div class="tab-content-wrapper">
+                        <!-- Profile Information Tab -->
+                        <div id="profile-info" class="tab-pane active">
+                            <form method="post" enctype="multipart/form-data">
+                                {% csrf_token %}
+                                <input type="hidden" name="form_type" value="profile">
+                                
+                                <h5 class="section-title">Personal Information</h5>
+                                <div class="row mb-3">
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label">First Name</label>
+                                        {{ user_form.first_name }}
+                                        {% if user_form.first_name.errors %}
+                                            <div class="error-message">{{ user_form.first_name.errors.0 }}</div>
+                                        {% endif %}
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label">Last Name</label>
+                                        {{ user_form.last_name }}
+                                        {% if user_form.last_name.errors %}
+                                            <div class="error-message">{{ user_form.last_name.errors.0 }}</div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                <div class="mb-4">
+                                    <label class="form-label">Email Address</label>
+                                    {{ user_form.email }}
+                                    {% if user_form.email.errors %}
+                                        <div class="error-message">{{ user_form.email.errors.0 }}</div>
                                     {% endif %}
                                 </div>
-                            {% endfor %}
-                        {% endif %}
-                        
-                        <div class="mt-4">
-                            <button type="submit" class="btn btn-primary btn-lg">
-                                <i class="fas fa-save me-2"></i>Update Profile
-                            </button>
-                            <a href="{% url 'accounts:dashboard' %}" class="btn btn-outline-secondary btn-lg">Cancel</a>
+                                
+                                <h5 class="section-title">Contact Details</h5>
+                                <div class="row mb-3">
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label">Phone</label>
+                                        {{ profile_form.phone }}
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label">Date of Birth</label>
+                                        {{ profile_form.date_of_birth }}
+                                    </div>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Address</label>
+                                    {{ profile_form.address }}
+                                </div>
+                                <div class="row mb-3">
+                                    <div class="col-md-4 mb-3">
+                                        <label class="form-label">City</label>
+                                        {{ profile_form.city }}
+                                    </div>
+                                    <div class="col-md-4 mb-3">
+                                        <label class="form-label">State</label>
+                                        {{ profile_form.state }}
+                                    </div>
+                                    <div class="col-md-4 mb-3">
+                                        <label class="form-label">Zip Code</label>
+                                        {{ profile_form.zip_code }}
+                                    </div>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Country</label>
+                                    {{ profile_form.country }}
+                                </div>
+                                <div class="mb-4">
+                                    <label class="form-label">Avatar</label>
+                                    {{ profile_form.avatar }}
+                                    {% if user_profile.avatar %}
+                                        <small class="text-muted d-block mt-2">Current avatar will be replaced if you upload a new one</small>
+                                    {% endif %}
+                                </div>
+                                
+                                {% if specific_form %}
+                                    <h5 class="section-title">
+                                        {% if user_profile.user_type == 'pharmacy' %}
+                                            Pharmacy Information
+                                        {% elif user_profile.user_type == 'clinic' %}
+                                            Clinic Information
+                                        {% elif user_profile.user_type == 'doctor' %}
+                                            Medical Information
+                                        {% endif %}
+                                    </h5>
+                                    {% for field in specific_form %}
+                                        <div class="mb-3">
+                                            <label class="form-label">{{ field.label }}</label>
+                                            {{ field }}
+                                            {% if field.errors %}
+                                                <div class="error-message">{{ field.errors.0 }}</div>
+                                            {% endif %}
+                                        </div>
+                                    {% endfor %}
+                                {% endif %}
+                                
+                                <div class="mt-4 d-flex gap-3">
+                                    <button type="submit" class="btn-update-profile">
+                                        <i class="fas fa-save me-2"></i>Update Profile
+                                    </button>
+                                    <a href="{% url 'accounts:dashboard' %}" class="btn-cancel">Cancel</a>
+                                </div>
+                            </form>
                         </div>
-                    </form>
+                        
+                        <!-- Change Password Tab -->
+                        <div class="tab-pane" id="change-password">
+                            <h5 class="section-title">Change Password</h5>
+                            
+                            <div class="password-requirements">
+                                <h6><i class="fas fa-info-circle"></i> Password Requirements</h6>
+                                <ul>
+                                    <li>Your password must contain at least 8 characters</li>
+                                    <li>Your password can't be too similar to your other personal information</li>
+                                    <li>Your password can't be a commonly used password</li>
+                                    <li>Your password can't be entirely numeric</li>
+                                </ul>
+                            </div>
+
+                            <form method="post" action="{% url 'accounts:change_password' %}">
+                                {% csrf_token %}
+                                
+                                <div class="password-form-group">
+                                    <label for="{{ password_form.old_password.id_for_label }}" class="form-label">
+                                        Current Password
+                                    </label>
+                                    {{ password_form.old_password }}
+                                    {% if password_form.old_password.errors %}
+                                        <div class="error-message">
+                                            {{ password_form.old_password.errors.0 }}
+                                        </div>
+                                    {% endif %}
+                                </div>
+
+                                <div class="password-form-group">
+                                    <label for="{{ password_form.new_password1.id_for_label }}" class="form-label">
+                                        New Password
+                                    </label>
+                                    {{ password_form.new_password1 }}
+                                    {% if password_form.new_password1.errors %}
+                                        {% for error in password_form.new_password1.errors %}
+                                            <div class="error-message">{{ error }}</div>
+                                        {% endfor %}
+                                    {% endif %}
+                                </div>
+
+                                <div class="password-form-group">
+                                    <label for="{{ password_form.new_password2.id_for_label }}" class="form-label">
+                                        Confirm New Password
+                                    </label>
+                                    {{ password_form.new_password2 }}
+                                    {% if password_form.new_password2.errors %}
+                                        <div class="error-message">
+                                            {{ password_form.new_password2.errors.0 }}
+                                        </div>
+                                    {% endif %}
+                                </div>
+
+                                <div class="password-form-actions">
+                                    <button type="submit" class="btn-change-password-submit">
+                                        <i class="fas fa-key"></i> Change Password
+                                    </button>
+                                    <button type="reset" class="btn-reset">
+                                        Reset
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+
+
+
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
+{% endblock %}
+
+{% block extra_js %}
+    <script src="{% static 'js/profile.js' %}"></script>
+
+    <script>
+        // Add form-control class to all password form inputs
+        document.addEventListener('DOMContentLoaded', function() {
+            // Select all input fields in the password form
+            const passwordInputs = document.querySelectorAll('#change-password input[type="password"]');
+            
+            passwordInputs.forEach(function(input) {
+                input.classList.add('form-control');
+            });
+        });
+        
+        // Tab switching functionality
+        const profileTabs = document.querySelectorAll('.profile-tab');
+        const tabPanes = document.querySelectorAll('.tab-pane');
+        
+        profileTabs.forEach(tab => {
+            tab.addEventListener('click', function() {
+                // Remove active class from all tabs and panes
+                profileTabs.forEach(t => t.classList.remove('active'));
+                tabPanes.forEach(p => p.classList.remove('active'));
+                
+                // Add active class to clicked tab
+                this.classList.add('active');
+                
+                // Show corresponding pane
+                const targetPane = document.querySelector(this.getAttribute('data-target'));
+                if (targetPane) {
+                    targetPane.classList.add('active');
+                }
+            });
+        });
+    </script>
+
 {% endblock %}

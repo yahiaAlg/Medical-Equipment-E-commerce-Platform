@@ -1,25 +1,48 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}Dashboard - MedEquip Pro{% endblock %}
+{% block title %}Dashboard - Fennec Med{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
+<style>
+.notification-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+}
+
+.list-group-item {
+  transition: background-color 0.2s;
+}
+
+.btn-group .btn {
+  padding: 0.375rem 0.75rem;
+}
+</style>
+{% endblock %}
 
 {% block content %}
 <!-- Dashboard Header -->
-<section class="bg-primary text-white py-4">
+<section class="bg-primary text-white py-5">
     <div class="container">
         <div class="row align-items-center">
             <div class="col-lg-8">
                 <div class="d-flex align-items-center">
                     {% if user_profile.avatar %}
-                        <img src="{{ user_profile.avatar.url }}" alt="{{ user.get_full_name }}" class="rounded-circle me-3" style="width: 60px; height: 60px; object-fit: cover;">
+                        <img src="{{ user_profile.avatar.url }}" alt="{{ user.get_full_name }}" class="rounded-circle me-3" style="width: 70px; height: 70px; object-fit: cover; border: 3px solid rgba(255,255,255,0.3);">
                     {% else %}
-                        <div class="bg-light text-primary rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 60px; height: 60px;">
+                        <div class="bg-white bg-opacity-25 text-white rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 70px; height: 70px; border: 3px solid rgba(255,255,255,0.3);">
                             <i class="fas fa-user fa-2x"></i>
                         </div>
                     {% endif %}
                     <div>
-                        <h1 class="h3 mb-1">Welcome back, {{ user.get_full_name|default:user.username }}!</h1>
-                        <p class="mb-0">
+                        <h1 class="h2 mb-2">Welcome back, {{ user.get_full_name|default:user.username }}!</h1>
+                        <p class="mb-0 opacity-90">
                             <span class="badge user-type-{{ user_profile.user_type }}">
                                 {{ user_profile.get_user_type_display }}
                             </span>
@@ -32,8 +55,8 @@
                     </div>
                 </div>
             </div>
-            <div class="col-lg-4 text-lg-end">
-                <div class="d-flex flex-column flex-lg-row gap-2">
+            <div class="col-lg-4 text-lg-end mt-3 mt-lg-0">
+                <div class="d-flex flex-column flex-lg-row gap-2 justify-content-lg-end">
                     <a href="{% url 'accounts:profile' %}" class="btn btn-light">
                         <i class="fas fa-edit me-2"></i>Edit Profile
                     </a>
@@ -47,20 +70,20 @@
 </section>
 
 <!-- Dashboard Stats -->
-<section class="py-4 bg-light">
+<section class="py-5 bg-light">
     <div class="container">
         <div class="row g-4">
             <div class="col-lg-3 col-md-6">
-                <div class="card dashboard-card border-0 h-100">
-                    <div class="card-body text-center">
+                <div class="card dashboard-card h-100">
+                    <div class="card-body">
                         <div class="d-flex align-items-center justify-content-between mb-3">
                             <div>
-                                <h3 class="fw-bold text-primary mb-0">{{ total_orders }}</h3>
+                                <h3 class="fw-bold mb-1">{{ total_orders }}</h3>
                                 <small class="text-muted">Total Orders</small>
                             </div>
                             <i class="fas fa-shopping-bag stat-icon text-primary"></i>
                         </div>
-                        <div class="progress" style="height: 4px;">
+                        <div class="progress">
                             <div class="progress-bar bg-primary" style="width: 75%"></div>
                         </div>
                     </div>
@@ -68,16 +91,16 @@
             </div>
             
             <div class="col-lg-3 col-md-6">
-                <div class="card dashboard-card border-0 h-100">
-                    <div class="card-body text-center">
+                <div class="card dashboard-card h-100">
+                    <div class="card-body">
                         <div class="d-flex align-items-center justify-content-between mb-3">
                             <div>
-                                <h3 class="fw-bold text-success mb-0">${{ total_spent|floatformat:0 }}</h3>
+                                <h3 class="fw-bold mb-1">${{ total_spent|floatformat:0 }}</h3>
                                 <small class="text-muted">Total Spent</small>
                             </div>
                             <i class="fas fa-dollar-sign stat-icon text-success"></i>
                         </div>
-                        <div class="progress" style="height: 4px;">
+                        <div class="progress">
                             <div class="progress-bar bg-success" style="width: 60%"></div>
                         </div>
                     </div>
@@ -85,16 +108,16 @@
             </div>
             
             <div class="col-lg-3 col-md-6">
-                <div class="card dashboard-card border-0 h-100">
-                    <div class="card-body text-center">
+                <div class="card dashboard-card h-100">
+                    <div class="card-body">
                         <div class="d-flex align-items-center justify-content-between mb-3">
                             <div>
-                                <h3 class="fw-bold text-info mb-0">{{ cart_items_count }}</h3>
+                                <h3 class="fw-bold mb-1">{{ cart_items_count }}</h3>
                                 <small class="text-muted">Cart Items</small>
                             </div>
                             <i class="fas fa-shopping-cart stat-icon text-info"></i>
                         </div>
-                        <div class="progress" style="height: 4px;">
+                        <div class="progress">
                             <div class="progress-bar bg-info" style="width: 45%"></div>
                         </div>
                     </div>
@@ -102,16 +125,16 @@
             </div>
             
             <div class="col-lg-3 col-md-6">
-                <div class="card dashboard-card border-0 h-100">
-                    <div class="card-body text-center">
+                <div class="card dashboard-card h-100">
+                    <div class="card-body">
                         <div class="d-flex align-items-center justify-content-between mb-3">
                             <div>
-                                <h3 class="fw-bold text-warning mb-0">{{ wishlist_items_count }}</h3>
+                                <h3 class="fw-bold mb-1">{{ wishlist_items_count }}</h3>
                                 <small class="text-muted">Wishlist Items</small>
                             </div>
                             <i class="fas fa-heart stat-icon text-warning"></i>
                         </div>
-                        <div class="progress" style="height: 4px;">
+                        <div class="progress">
                             <div class="progress-bar bg-warning" style="width: 30%"></div>
                         </div>
                     </div>
@@ -124,16 +147,84 @@
 <!-- Main Dashboard Content -->
 <section class="py-5">
     <div class="container">
-        <div class="row">
+        <div class="row g-4">
             <!-- Main Content -->
             <div class="col-lg-8">
-                <!-- Recent Orders -->
+                <!-- Notifications -->
                 <div class="card mb-4">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">
+                            <i class="fas fa-bell me-2"></i>Recent Notifications
+                        </h5>
+                        {% if unread_notifications_count > 0 %}
+                        <button onclick="markAllNotificationsRead()" class="btn btn-sm btn-outline-primary">
+                            Mark All as Read
+                        </button>
+                        {% endif %}
+                    </div>
+                    <div class="card-body">
+                        {% if notifications %}
+                            <div class="list-group list-group-flush">
+                                {% for notification in notifications|slice:":5" %}
+                                <div class="list-group-item {% if not notification.is_read %}bg-light{% endif %} border-0 px-0">
+                                    <div class="d-flex align-items-start">
+                                        <div class="flex-shrink-0 me-3">
+                                            {% if notification.notification_type == 'payment_confirmed' %}
+                                                <div class="notification-icon bg-success">
+                                                    <i class="fas fa-check-circle"></i>
+                                                </div>
+                                            {% elif notification.notification_type == 'payment_rejected' %}
+                                                <div class="notification-icon bg-danger">
+                                                    <i class="fas fa-times-circle"></i>
+                                                </div>
+                                            {% elif notification.notification_type == 'refund_completed' %}
+                                                <div class="notification-icon bg-info">
+                                                    <i class="fas fa-money-bill-wave"></i>
+                                                </div>
+                                            {% elif notification.notification_type == 'complaint_created' %}
+                                                <div class="notification-icon bg-warning">
+                                                    <i class="fas fa-flag"></i>
+                                                </div>
+                                            {% elif notification.notification_type == 'order_shipped' %}
+                                                <div class="notification-icon bg-primary">
+                                                    <i class="fas fa-shipping-fast"></i>
+                                                </div>
+                                            {% else %}
+                                                <div class="notification-icon bg-secondary">
+                                                    <i class="fas fa-bell"></i>
+                                                </div>
+                                            {% endif %}
+                                        </div>
+                                        <div class="flex-grow-1">
+                                            <h6 class="mb-1">{{ notification.title }}</h6>
+                                            <p class="mb-1 text-muted small">{{ notification.message|truncatewords:20 }}</p>
+                                            <small class="text-muted">{{ notification.created_at|timesince }} ago</small>
+                                        </div>
+                                        {% if not notification.is_read %}
+                                        <button onclick="markNotificationRead({{ notification.id }})" class="btn btn-sm btn-link text-primary">
+                                            <i class="fas fa-check"></i>
+                                        </button>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            <div class="text-center py-4">
+                                <i class="fas fa-bell-slash fa-3x mb-3" style="color: #617da8; opacity: 0.3;"></i>
+                                <p class="text-muted">No notifications</p>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Recent Orders -->
+                <div class="card">
                     <div class="card-header d-flex justify-content-between align-items-center">
                         <h5 class="mb-0">
                             <i class="fas fa-clock me-2"></i>Recent Orders
                         </h5>
-                        <a href="{% url 'payments:order_list' %}" class="btn btn-outline-primary btn-sm">View All</a>
+                        <a href="{% url 'payments:invoice_list' %}" class="btn btn-outline-primary btn-sm">View All</a>
                     </div>
                     <div class="card-body">
                         {% if recent_orders %}
@@ -145,15 +236,13 @@
                                             <th>Date</th>
                                             <th>Status</th>
                                             <th>Total</th>
-                                            <th>Action</th>
+                                            <th>Actions</th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         {% for order in recent_orders %}
                                         <tr>
-                                            <td>
-                                                <strong>#{{ order.order_id|truncatechars:8 }}</strong>
-                                            </td>
+                                            <td><strong>#{{ order.order_id|truncatechars:10 }}</strong></td>
                                             <td>{{ order.created_at|date:"M d, Y" }}</td>
                                             <td>
                                                 <span class="badge status-{{ order.status }}">
@@ -162,9 +251,113 @@
                                             </td>
                                             <td><strong>${{ order.total_amount }}</strong></td>
                                             <td>
-                                                <a href="{% url 'payments:order_detail' order.order_id %}" class="btn btn-outline-primary btn-sm">
-                                                    <i class="fas fa-eye"></i>
+                                                <div class="btn-group" role="group">
+                                                    <a href="{% url 'payments:invoice_detail' order.invoice.id %}" 
+                                                       class="btn btn-sm btn-outline-primary" 
+                                                       title="View Details">
+                                                        <i class="fas fa-eye"></i>
+                                                    </a>
+                                                    {% if order.status in 'delivered,shipped,paid' and not order.complaints.exists %}
+                                                    <a href="{% url 'payments:complaint_create' order.id %}" 
+                                                       class="btn btn-sm btn-outline-warning" 
+                                                       title="File Complaint">
+                                                        <i class="fas fa-flag"></i>
+                                                    </a>
+                                                    {% endif %}
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        {% else %}
+                            <div class="text-center py-5">
+                                <i class="fas fa-shopping-bag fa-4x mb-3" style="color: #617da8; opacity: 0.3;"></i>
+                                <h6 class="text-muted mb-2">No orders yet</h6>
+                                <p class="text-muted small mb-4">Start shopping to see your orders here</p>
+                                <a href="{% url 'products:list' %}" class="btn btn-primary">Browse Products</a>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <!-- Complaints -->
+                <div class="card mt-4">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">
+                            <i class="fas fa-flag me-2"></i>My Complaints
+                        </h5>
+                        <a href="{% url 'payments:complaint_list' %}" class="btn btn-outline-primary btn-sm">View All</a>
+                    </div>
+                    <div class="card-body">
+                        {% if user_complaints %}
+                            <div class="list-group list-group-flush">
+                                {% for complaint in user_complaints|slice:":3" %}
+                                <a href="{% url 'payments:complaint_detail' complaint.id %}" 
+                                   class="list-group-item list-group-item-action border-0 px-0">
+                                    <div class="d-flex justify-content-between align-items-start">
+                                        <div>
+                                            <h6 class="mb-1">{{ complaint.complaint_number }}</h6>
+                                            <p class="mb-1 text-muted small">{{ complaint.reason.name }}</p>
+                                            <small class="text-muted">{{ complaint.created_at|date:"M d, Y" }}</small>
+                                        </div>
+                                        <span class="badge status-{{ complaint.status }}">
+                                            {{ complaint.get_status_display }}
+                                        </span>
+                                    </div>
+                                </a>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            <div class="text-center py-4">
+                                <i class="fas fa-check-circle fa-3x mb-3" style="color: #617da8; opacity: 0.3;"></i>
+                                <p class="text-muted">No complaints filed</p>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Refunds -->
+                <div class="card mt-4">
+                    <div class="card-header">
+                        <h5 class="mb-0">
+                            <i class="fas fa-undo me-2"></i>Refund History
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        {% if user_refunds %}
+                            <div class="table-responsive">
+                                <table class="table table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>Refund #</th>
+                                            <th>Order</th>
+                                            <th>Amount</th>
+                                            <th>Status</th>
+                                            <th>Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for refund in user_refunds|slice:":5" %}
+                                        <tr>
+                                            <td><strong>{{ refund.refund_number }}</strong></td>
+                                            <td>{{ refund.order.order_id }}</td>
+                                            <td><strong>${{ refund.amount }}</strong></td>
+                                            <td>
+                                                <span class="badge status-{{ refund.status }}">
+                                                    {{ refund.get_status_display }}
+                                                </span>
+                                            </td>
+                                            <td>
+                                                {% if refund.status == 'refund_completed' %}
+                                                <a href="{% url 'payments:refund_receipt' refund.id %}" 
+                                                   class="btn btn-sm btn-outline-primary">
+                                                    <i class="fas fa-receipt"></i>
                                                 </a>
+                                                {% else %}
+                                                <span class="text-muted small">Pending</span>
+                                                {% endif %}
                                             </td>
                                         </tr>
                                         {% endfor %}
@@ -173,52 +366,44 @@
                             </div>
                         {% else %}
                             <div class="text-center py-4">
-                                <i class="fas fa-shopping-bag fa-3x text-muted mb-3"></i>
-                                <h6 class="text-muted">No orders yet</h6>
-                                <p class="text-muted small">Start shopping to see your orders here</p>
-                                <a href="{% url 'products:list' %}" class="btn btn-primary">Browse Products</a>
+                                <i class="fas fa-money-bill-wave fa-3x mb-3" style="color: #617da8; opacity: 0.3;"></i>
+                                <p class="text-muted">No refunds</p>
                             </div>
                         {% endif %}
                     </div>
                 </div>
-                
+
                 <!-- Recent Activity -->
-                <div class="card">
+                <div class="card mt-4">
                     <div class="card-header">
                         <h5 class="mb-0">
                             <i class="fas fa-chart-line me-2"></i>Recent Activity (Last 30 Days)
                         </h5>
                     </div>
                     <div class="card-body">
-                        <div class="row g-4">
+                        <div class="row g-4 text-center">
                             <div class="col-md-4">
-                                <div class="text-center">
-                                    <div class="activity-icon bg-primary text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-2" style="width: 50px; height: 50px;">
-                                        <i class="fas fa-shopping-cart"></i>
-                                    </div>
-                                    <h4 class="fw-bold">{{ recent_activity.orders }}</h4>
-                                    <small class="text-muted">Orders Placed</small>
+                                <div class="activity-icon bg-primary text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3">
+                                    <i class="fas fa-shopping-cart"></i>
                                 </div>
+                                <h4 class="fw-bold mb-1">{{ recent_activity.orders }}</h4>
+                                <small class="text-muted">Orders Placed</small>
                             </div>
                             
                             <div class="col-md-4">
-                                <div class="text-center">
-                                    <div class="activity-icon bg-success text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-2" style="width: 50px; height: 50px;">
-                                        <i class="fas fa-star"></i>
-                                    </div>
-                                    <h4 class="fw-bold">{{ recent_activity.reviews }}</h4>
-                                    <small class="text-muted">Reviews Written</small>
+                                <div class="activity-icon bg-success text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3">
+                                    <i class="fas fa-star"></i>
                                 </div>
+                                <h4 class="fw-bold mb-1">{{ recent_activity.reviews }}</h4>
+                                <small class="text-muted">Reviews Written</small>
                             </div>
                             
                             <div class="col-md-4">
-                                <div class="text-center">
-                                    <div class="activity-icon bg-info text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-2" style="width: 50px; height: 50px;">
-                                        <i class="fas fa-question-circle"></i>
-                                    </div>
-                                    <h4 class="fw-bold">{{ recent_activity.questions }}</h4>
-                                    <small class="text-muted">Questions Asked</small>
+                                <div class="activity-icon bg-info text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3">
+                                    <i class="fas fa-question-circle"></i>
                                 </div>
+                                <h4 class="fw-bold mb-1">{{ recent_activity.questions }}</h4>
+                                <small class="text-muted">Questions Asked</small>
                             </div>
                         </div>
                     </div>
@@ -229,7 +414,7 @@
             <div class="col-lg-4">
                 <!-- Role-Specific Information -->
                 {% if role_specific_data %}
-                <div class="card mb-4">
+                <div class="card">
                     <div class="card-header">
                         <h5 class="mb-0">
                             <i class="fas fa-id-badge me-2"></i>{{ user_profile.get_user_type_display }} Info
@@ -237,57 +422,57 @@
                     </div>
                     <div class="card-body">
                         {% if user_profile.user_type == 'pharmacy' %}
-                            <div class="mb-3">
-                                <strong>Pharmacy:</strong><br>
+                            <div class="mb-3 pb-3 border-bottom">
+                                <strong class="d-block mb-1">Pharmacy</strong>
                                 <span class="text-muted">{{ role_specific_data.pharmacy_name|default:"Not specified" }}</span>
                             </div>
-                            <div class="mb-3">
-                                <strong>License:</strong><br>
+                            <div class="mb-3 pb-3 border-bottom">
+                                <strong class="d-block mb-1">License</strong>
                                 <span class="text-muted">{{ role_specific_data.license_number|default:"Not specified" }}</span>
                             </div>
-                            <div class="mb-0">
-                                <strong>Status:</strong><br>
+                            <div>
+                                <strong class="d-block mb-1">Status</strong>
                                 {% if role_specific_data.verified %}
                                     <span class="badge bg-success">Verified</span>
                                 {% else %}
-                                    <span class="badge bg-warning">Pending Verification</span>
+                                    <span class="badge bg-warning text-dark">Pending Verification</span>
                                 {% endif %}
                             </div>
                         {% elif user_profile.user_type == 'clinic' %}
-                            <div class="mb-3">
-                                <strong>Clinic:</strong><br>
+                            <div class="mb-3 pb-3 border-bottom">
+                                <strong class="d-block mb-1">Clinic</strong>
                                 <span class="text-muted">{{ role_specific_data.clinic_name|default:"Not specified" }}</span>
                             </div>
-                            <div class="mb-3">
-                                <strong>Department:</strong><br>
+                            <div class="mb-3 pb-3 border-bottom">
+                                <strong class="d-block mb-1">Department</strong>
                                 <span class="text-muted">{{ role_specific_data.department|default:"Not specified" }}</span>
                             </div>
-                            <div class="mb-0">
-                                <strong>Budget Limit:</strong><br>
+                            <div>
+                                <strong class="d-block mb-1">Budget Limit</strong>
                                 <span class="text-muted">${{ role_specific_data.budget_limit|default:"Not set" }}</span>
                             </div>
                         {% elif user_profile.user_type == 'doctor' %}
-                            <div class="mb-3">
-                                <strong>Specialty:</strong><br>
+                            <div class="mb-3 pb-3 border-bottom">
+                                <strong class="d-block mb-1">Specialty</strong>
                                 <span class="text-muted">{{ role_specific_data.specialty|default:"Not specified" }}</span>
                             </div>
-                            <div class="mb-3">
-                                <strong>Hospital:</strong><br>
+                            <div class="mb-3 pb-3 border-bottom">
+                                <strong class="d-block mb-1">Hospital</strong>
                                 <span class="text-muted">{{ role_specific_data.hospital_affiliation|default:"Not specified" }}</span>
                             </div>
-                            <div class="mb-0">
-                                <strong>Status:</strong><br>
+                            <div>
+                                <strong class="d-block mb-1">Status</strong>
                                 {% if role_specific_data.verified %}
                                     <span class="badge bg-success">Verified</span>
                                 {% else %}
-                                    <span class="badge bg-warning">Pending Verification</span>
+                                    <span class="badge bg-warning text-dark">Pending Verification</span>
                                 {% endif %}
                             </div>
                         {% endif %}
                         
-                        <div class="mt-3">
-                            <a href="{% url 'accounts:profile' %}" class="btn btn-outline-primary btn-sm w-100">
-                                Update Information
+                        <div class="mt-4">
+                            <a href="{% url 'accounts:profile' %}" class="btn btn-outline-primary w-100">
+                                <i class="fas fa-edit me-2"></i>Update Information
                             </a>
                         </div>
                     </div>
@@ -295,7 +480,7 @@
                 {% endif %}
                 
                 <!-- Quick Actions -->
-                <div class="card mb-4">
+                <div class="card mt-4">
                     <div class="card-header">
                         <h5 class="mb-0">
                             <i class="fas fa-bolt me-2"></i>Quick Actions
@@ -312,8 +497,11 @@
                             <a href="{% url 'accounts:wishlist' %}" class="btn btn-outline-success">
                                 <i class="fas fa-heart me-2"></i>My Wishlist ({{ wishlist_items_count }})
                             </a>
-                            <a href="{% url 'payments:order_list' %}" class="btn btn-outline-info">
+                            <a href="{% url 'payments:invoice_list' %}" class="btn btn-outline-info">
                                 <i class="fas fa-list me-2"></i>Order History
+                            </a>
+                            <a href="{% url 'payments:complaint_list' %}" class="btn btn-outline-warning">
+                                <i class="fas fa-flag me-2"></i>My Complaints
                             </a>
                             <a href="{% url 'pages:contact' %}" class="btn btn-outline-secondary">
                                 <i class="fas fa-headset me-2"></i>Contact Support
@@ -323,62 +511,83 @@
                 </div>
                 
                 <!-- Account Security -->
-                <div class="card">
+                <div class="card mt-4">
                     <div class="card-header">
                         <h5 class="mb-0">
                             <i class="fas fa-shield-alt me-2"></i>Account Security
                         </h5>
                     </div>
                     <div class="card-body">
-                        <div class="security-item d-flex justify-content-between align-items-center mb-3">
-                            <div>
-                                <strong>Password</strong><br>
-                                <small class="text-muted">Last updated: Never</small>
+                        <div class="security-item">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <strong class="d-block">Password</strong>
+                                    <small class="text-muted">Manage your password</small>
+                                </div>
+                                <a href="{% url 'accounts:profile' %}" class="btn btn-outline-primary btn-sm">Change</a>
                             </div>
-                            <button class="btn btn-outline-primary btn-sm">Change</button>
                         </div>
                         
-                        <div class="security-item d-flex justify-content-between align-items-center mb-3">
-                            <div>
-                                <strong>Email</strong><br>
-                                <small class="text-muted">{{ user.email }}</small>
+                        <div class="security-item">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <strong class="d-block">Email</strong>
+                                    <small class="text-muted">{{ user.email }}</small>
+                                    <span class="badge bg-success">Verified</span>
+                                </div>
+                                <a href="{% url 'accounts:profile' %}" class="btn btn-outline-primary btn-sm">Change</a>
                             </div>
-                            <span class="badge bg-success">Verified</span>
                         </div>
                         
-                        <div class="security-item d-flex justify-content-between align-items-center">
-                            <div>
-                                <strong>Two-Factor Auth</strong><br>
-                                <small class="text-muted">Not enabled</small>
-                            </div>
-                            <button class="btn btn-outline-warning btn-sm">Enable</button>
-                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 </section>
+
+<script>
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
+function markNotificationRead(notificationId) {
+    fetch(`/payments/notification/${notificationId}/read/`, {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': getCookie('csrftoken'),
+            'Content-Type': 'application/json'
+        }
+    }).then(() => {
+        location.reload();
+    });
+}
+
+function markAllNotificationsRead() {
+    fetch('/payments/notifications/mark-all-read/', {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': getCookie('csrftoken'),
+            'Content-Type': 'application/json'
+        }
+    }).then(() => {
+        location.reload();
+    });
+}
+</script>
 {% endblock %}
 
-{% block extra_css %}
-<style>
-.activity-icon {
-    transition: transform 0.3s ease;
-}
-
-.activity-icon:hover {
-    transform: scale(1.1);
-}
-
-.security-item {
-    border-bottom: 1px solid #eee;
-    padding-bottom: 1rem;
-}
-
-.security-item:last-child {
-    border-bottom: none;
-    padding-bottom: 0;
-}
-</style>
+{% block extra_js %}
+<script src="{% static 'js/dashboard.js' %}"></script>
 {% endblock %}

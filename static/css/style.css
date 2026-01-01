@@ -1,0 +1,11 @@
+/* COLORS */
+:root {
+  /* Logo */
+  --primary-color: #1d4582;
+  /* Buttons */
+  --secondary-color: #34588f;
+  /* Buttons hover ++ h3,h2 :#1a3e75 */
+  --accent-color: #4a6a9b;
+  --light-color: #f8f9fa;
+  --dark-color: #333, #666;
+}

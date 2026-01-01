@@ -1,18 +1,18 @@
-from datetime import datetime, timedelta
 from django.shortcuts import render, redirect, get_object_or_404
+
+
+from django.views.decorators.http import require_POST
+import json
+
+
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.http import JsonResponse
-from django.views.decorators.http import require_POST
-from django.db import transaction
-from django.core.mail import send_mail
-from django.conf import settings
-import json
-import uuid
-from decimal import Decimal
-from .models import Cart, CartItem, Order, OrderItem
-from .forms import CheckoutForm
+
 from products.models import Product
+from .models import *
+from .forms import *
+from .services import *
 
 
 @login_required
@@ -110,209 +110,182 @@ def remove_from_cart(request, item_id):
     return redirect("payments:cart")
 
 
+# ========== USER VIEWS ==========
+
+
 @login_required
 def checkout(request):
-    try:
-        cart = Cart.objects.get(user=request.user)
-        cart_items = cart.items.all().select_related("product")
+    cart = get_object_or_404(Cart, user=request.user)
 
-        if not cart_items:
-            messages.warning(request, "Your cart is empty")
-            return redirect("payments:cart")
-
-    except Cart.DoesNotExist:
-        messages.warning(request, "Your cart is empty")
+    if not cart.items.exists():
+        messages.warning(request, "Your cart is empty.")
         return redirect("payments:cart")
 
     if request.method == "POST":
         form = CheckoutForm(request.POST)
         if form.is_valid():
-            # Store checkout data in session
-            request.session["checkout_data"] = form.cleaned_data
-            return redirect("payments:checkout_confirm")
+            order = OrderService.create_order_from_cart(
+                user=request.user, cart=cart, shipping_data=form.cleaned_data
+            )
+            messages.success(request, f"Order {order.order_id} placed successfully!")
+            return redirect("payments:invoice_detail", invoice_id=order.invoice.id)
     else:
-        # Pre-fill form with user profile data
-        initial_data = {}
+        # Pre-fill with user profile data
+        initial = {}
         if hasattr(request.user, "profile"):
             profile = request.user.profile
-            initial_data = {
+            initial = {
                 "shipping_address": profile.address,
                 "shipping_city": profile.city,
                 "shipping_state": profile.state,
                 "shipping_zip": profile.zip_code,
-                "shipping_country": profile.country,
-                "billing_address": profile.address,
-                "billing_city": profile.city,
-                "billing_state": profile.state,
-                "billing_zip": profile.zip_code,
-                "billing_country": profile.country,
             }
+        form = CheckoutForm(initial=initial)
 
-        form = CheckoutForm(initial=initial_data)
-
-    context = {
-        "form": form,
-        "cart": cart,
-        "cart_items": cart_items,
-    }
-
-    return render(request, "payments/checkout.html", context)
+    return render(request, "payments/checkout.html", {"form": form, "cart": cart})
 
 
 @login_required
-def checkout_confirm(request):
-    checkout_data = request.session.get("checkout_data")
-    if not checkout_data:
-        messages.error(request, "Checkout session expired")
-        return redirect("payments:checkout")
+def invoice_list(request):
+    invoices = (
+        Invoice.objects.filter(order__user=request.user)
+        .select_related("order")
+        .order_by("-created_at")
+    )
+    return render(request, "payments/invoice_list.html", {"invoices": invoices})
 
-    try:
-        cart = Cart.objects.get(user=request.user)
-        cart_items = cart.items.all().select_related("product")
 
-        if not cart_items:
-            messages.warning(request, "Your cart is empty")
-            return redirect("payments:cart")
+@login_required
+def invoice_detail(request, invoice_id):
+    invoice = get_object_or_404(Invoice, id=invoice_id, order__user=request.user)
+    return render(request, "payments/invoice_detail.html", {"invoice": invoice})
 
-    except Cart.DoesNotExist:
-        messages.warning(request, "Your cart is empty")
-        return redirect("payments:cart")
+
+@login_required
+def upload_payment_proof(request, invoice_id):
+    invoice = get_object_or_404(Invoice, id=invoice_id, order__user=request.user)
+
+    if invoice.status not in ["unpaid", "payment_rejected"]:
+        messages.warning(
+            request, "Payment proof already submitted or payment already confirmed."
+        )
+        return redirect("payments:invoice_detail", invoice_id=invoice.id)
 
     if request.method == "POST":
-        # Process the order
-        with transaction.atomic():
-            # Calculate totals
-            subtotal = cart.get_total_price()
-            tax_amount = subtotal * Decimal("0.08")  # 8% tax
-            shipping_cost = (
-                Decimal("25.00") if subtotal < 500 else Decimal("0")
-            )  # Free shipping over $500
-            total_amount = subtotal + tax_amount + shipping_cost
-
-            # Create order
-            order = Order.objects.create(
-                order_id=str(uuid.uuid4()),
-                user=request.user,
-                shipping_address=checkout_data["shipping_address"],
-                shipping_city=checkout_data["shipping_city"],
-                shipping_state=checkout_data["shipping_state"],
-                shipping_zip=checkout_data["shipping_zip"],
-                shipping_country=checkout_data["shipping_country"],
-                billing_address=checkout_data["billing_address"],
-                billing_city=checkout_data["billing_city"],
-                billing_state=checkout_data["billing_state"],
-                billing_zip=checkout_data["billing_zip"],
-                billing_country=checkout_data["billing_country"],
-                payment_method=checkout_data["payment_method"],
-                subtotal=subtotal,
-                tax_amount=tax_amount,
-                shipping_cost=shipping_cost,
-                total_amount=total_amount,
-                status="confirmed",
+        form = PaymentProofUploadForm(request.POST, request.FILES)
+        if form.is_valid():
+            payment_proof = form.save(commit=False)
+            payment_proof.invoice = invoice
+            payment_proof.save()
+            messages.success(
+                request, "Payment proof uploaded successfully! It is now under review."
             )
+            return redirect("payments:invoice_detail", invoice_id=invoice.id)
+    else:
+        form = PaymentProofUploadForm()
 
-            # Create order items
-            for cart_item in cart_items:
-                OrderItem.objects.create(
-                    order=order,
-                    product=cart_item.product,
-                    quantity=cart_item.quantity,
-                    price=(
-                        cart_item.product.bulk_price
-                        if cart_item.quantity >= cart_item.product.bulk_quantity
-                        and cart_item.product.bulk_price
-                        else cart_item.product.price
-                    ),
+    return render(
+        request,
+        "payments/upload_payment_proof.html",
+        {"form": form, "invoice": invoice},
+    )
+
+
+@login_required
+def payment_receipt(request, invoice_id):
+    invoice = get_object_or_404(
+        Invoice, id=invoice_id, order__user=request.user, status="paid"
+    )
+
+    if not hasattr(invoice, "receipt"):
+        messages.error(request, "Receipt not available.")
+        return redirect("payments:invoice_detail", invoice_id=invoice.id)
+
+    return render(
+        request,
+        "payments/payment_receipt.html",
+        {"invoice": invoice, "receipt": invoice.receipt},
+    )
+
+
+@login_required
+def complaint_create(request, order_id):
+    order = get_object_or_404(Order, id=order_id, user=request.user)
+
+    if request.method == "POST":
+        form = ComplaintForm(request.POST)
+        files = request.FILES.getlist("attachments")
+
+        if form.is_valid():
+            complaint = form.save(commit=False)
+            complaint.user = request.user
+            complaint.order = order
+            complaint.invoice = order.invoice
+            complaint.save()
+
+            # Handle attachments
+            for file in files:
+                ComplaintAttachment.objects.create(
+                    complaint=complaint, file=file, file_type=file.content_type
                 )
 
-                # Update product stock
-                cart_item.product.stock_quantity -= cart_item.quantity
-                cart_item.product.save()
+            messages.success(
+                request,
+                f"Complaint {complaint.complaint_number} submitted successfully.",
+            )
+            return redirect("payments:complaint_detail", complaint_id=complaint.id)
+    else:
+        form = ComplaintForm()
 
-            # Clear cart
-            cart_items.delete()
-
-            # Clear session
-            del request.session["checkout_data"]
-
-            # Send confirmation email
-            try:
-                send_mail(
-                    subject=f"Order Confirmation - {order.order_id}",
-                    message=f"Thank you for your order! Your order #{order.order_id} has been confirmed.",
-                    from_email=settings.DEFAULT_FROM_EMAIL,
-                    recipient_list=[request.user.email],
-                    fail_silently=True,
-                )
-            except Exception:
-                pass
-
-            messages.success(request, "Your order has been placed successfully!")
-            return redirect("payments:order_success", order_id=order.order_id)
-
-    # Calculate totals
-    subtotal = cart.get_total_price()
-    tax_amount = subtotal * Decimal("0.08")  # 8% tax
-    shipping_cost = (
-        Decimal("25.00") if subtotal < 500 else Decimal("0")
-    )  # Free shipping over $500
-    total_amount = subtotal + tax_amount + shipping_cost
-    delivery_start = datetime.now() + timedelta(days=5)
-    delivery_end = datetime.now() + timedelta(days=7)
-
-    context = {
-        "checkout_data": checkout_data,
-        "cart": cart,
-        "cart_items": cart_items,
-        "subtotal": subtotal,
-        "tax_amount": tax_amount,
-        "shipping_cost": shipping_cost,
-        "total_amount": total_amount,
-        "delivery_start": delivery_start,
-        "delivery_end": delivery_end,
-    }
-
-    return render(request, "payments/checkout_confirm.html", context)
+    return render(
+        request, "payments/complaint_create.html", {"form": form, "order": order}
+    )
 
 
 @login_required
-def order_success(request, order_id):
-    order = get_object_or_404(Order, order_id=order_id, user=request.user)
-
-    # Calculate delivery dates
-    delivery_start = order.created_at + timedelta(days=5)
-    delivery_end = order.created_at + timedelta(days=7)
-
-    context = {
-        "order": order,
-        "delivery_start": delivery_start,
-        "delivery_end": delivery_end,
-    }
-
-    return render(request, "payments/order_success.html", context)
+def complaint_list(request):
+    complaints = (
+        Complaint.objects.filter(user=request.user)
+        .select_related("order", "reason")
+        .order_by("-created_at")
+    )
+    return render(request, "payments/complaint_list.html", {"complaints": complaints})
 
 
 @login_required
-def order_list(request):
-    orders = Order.objects.filter(user=request.user).order_by("-created_at")
-
-    context = {
-        "orders": orders,
-    }
-
-    return render(request, "payments/order_list.html", context)
+def complaint_detail(request, complaint_id):
+    complaint = get_object_or_404(Complaint, id=complaint_id, user=request.user)
+    return render(request, "payments/complaint_detail.html", {"complaint": complaint})
 
 
 @login_required
-def order_detail(request, order_id):
-    order = get_object_or_404(Order, order_id=order_id, user=request.user)
+def refund_receipt(request, refund_id):
+    refund = get_object_or_404(
+        Refund, id=refund_id, order__user=request.user, status="refund_completed"
+    )
 
-    # Calculate estimated delivery
-    delivery_estimate = order.created_at + timedelta(days=5)
+    if not hasattr(refund, "receipt"):
+        messages.error(request, "Refund receipt not available.")
+        return redirect("accounts:dashboard")
 
-    context = {
-        "order": order,
-        "delivery_estimate": delivery_estimate,
-    }
+    return render(
+        request,
+        "payments/refund_receipt.html",
+        {"refund": refund, "receipt": refund.receipt},
+    )
 
-    return render(request, "payments/order_detail.html", context)
+
+@login_required
+def mark_notification_read(request, notification_id):
+    notification = get_object_or_404(
+        Notification, id=notification_id, user=request.user
+    )
+    notification.is_read = True
+    notification.save()
+    return JsonResponse({"success": True})
+
+
+@login_required
+def mark_all_notifications_read(request):
+    NotificationService.mark_all_as_read(request.user)
+    return JsonResponse({"success": True})

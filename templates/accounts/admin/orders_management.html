@@ -1,0 +1,254 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Orders Management - Admin{% endblock %}
+
+{% block extra_css %}
+<style>
+.admin-header {
+  background: linear-gradient(135deg, #34588f 0%, #1a3e75 100%);
+  color: white;
+  padding: 2rem 0;
+  margin-bottom: 2rem;
+}
+
+.stat-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.mini-stat {
+  background: white;
+  padding: 1rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  text-align: center;
+}
+
+.mini-stat .number {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #34588f;
+}
+
+.mini-stat .label {
+  font-size: 0.85rem;
+  color: #666;
+}
+
+.filter-bar {
+  background: white;
+  padding: 1.5rem;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  margin-bottom: 1.5rem;
+}
+
+.table-container {
+  background: white;
+  border-radius: 10px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.status-badge {
+  padding: 0.4rem 0.8rem;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.status-awaiting_payment { background: #fff3cd; color: #856404; }
+.status-payment_under_review { background: #d1ecf1; color: #0c5460; }
+.status-paid { background: #d4edda; color: #155724; }
+.status-processing { background: #d1ecf1; color: #0c5460; }
+.status-shipped { background: #cfe2ff; color: #084298; }
+.status-delivered { background: #d4edda; color: #155724; }
+.status-cancelled { background: #f8d7da; color: #721c24; }
+.status-refund_pending { background: #fff3cd; color: #856404; }
+.status-refunded { background: #e7e7e7; color: #666; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="admin-header">
+  <div class="container">
+    <h1><i class="fas fa-shopping-bag me-2"></i>Orders Management</h1>
+    <p class="mb-0">Track and manage all customer orders</p>
+  </div>
+</div>
+
+<div class="container mb-5">
+  <div class="mb-3">
+    <a href="{% url 'accounts:admin_dashboard' %}" class="btn btn-outline-secondary">
+      <i class="fas fa-arrow-left me-2"></i>Back to Dashboard
+    </a>
+  </div>
+
+  <!-- Order Statistics -->
+  <div class="stat-row">
+    <div class="mini-stat">
+      <div class="number">{{ order_stats.total }}</div>
+      <div class="label">Total Orders</div>
+    </div>
+    <div class="mini-stat">
+      <div class="number">{{ order_stats.awaiting_payment }}</div>
+      <div class="label">Awaiting Payment</div>
+    </div>
+    <div class="mini-stat">
+      <div class="number">{{ order_stats.paid }}</div>
+      <div class="label">Paid</div>
+    </div>
+    <div class="mini-stat">
+      <div class="number">{{ order_stats.shipped }}</div>
+      <div class="label">Shipped</div>
+    </div>
+    <div class="mini-stat">
+      <div class="number">{{ order_stats.delivered }}</div>
+      <div class="label">Delivered</div>
+    </div>
+  </div>
+
+  <!-- Filters -->
+  <div class="filter-bar">
+    <form method="get" class="row g-3">
+      <div class="col-md-4">
+        <label class="form-label">Status</label>
+        <select name="status" class="form-select">
+          <option value="all" {% if status_filter == 'all' %}selected{% endif %}>All Orders</option>
+          <option value="awaiting_payment" {% if status_filter == 'awaiting_payment' %}selected{% endif %}>Awaiting Payment</option>
+          <option value="payment_under_review" {% if status_filter == 'payment_under_review' %}selected{% endif %}>Under Review</option>
+          <option value="paid" {% if status_filter == 'paid' %}selected{% endif %}>Paid</option>
+          <option value="processing" {% if status_filter == 'processing' %}selected{% endif %}>Processing</option>
+          <option value="shipped" {% if status_filter == 'shipped' %}selected{% endif %}>Shipped</option>
+          <option value="delivered" {% if status_filter == 'delivered' %}selected{% endif %}>Delivered</option>
+          <option value="cancelled" {% if status_filter == 'cancelled' %}selected{% endif %}>Cancelled</option>
+          <option value="refund_pending" {% if status_filter == 'refund_pending' %}selected{% endif %}>Refund Pending</option>
+          <option value="refunded" {% if status_filter == 'refunded' %}selected{% endif %}>Refunded</option>
+        </select>
+      </div>
+      <div class="col-md-6">
+        <label class="form-label">Search</label>
+        <input type="text" name="search" class="form-control" 
+               placeholder="Order ID, username, email..." value="{{ search }}">
+      </div>
+      <div class="col-md-2 d-flex align-items-end">
+        <button type="submit" class="btn btn-primary w-100">
+          <i class="fas fa-search me-2"></i>Filter
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <!-- Orders Table -->
+  <div class="table-container">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <h5 class="mb-0">Orders List ({{ orders.count }})</h5>
+    </div>
+
+    <div class="table-responsive">
+      <table class="table table-hover">
+        <thead>
+          <tr>
+            <th>Order ID</th>
+            <th>Customer</th>
+            <th>Date</th>
+            <th>Items</th>
+            <th>Total</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for order in orders %}
+          <tr>
+            <td><strong>{{ order.order_id }}</strong></td>
+            <td>
+              {{ order.user.username }}
+              <br><small class="text-muted">{{ order.user.email }}</small>
+            </td>
+            <td>{{ order.created_at|date:"M d, Y H:i" }}</td>
+            <td>{{ order.items.count }} items</td>
+            <td><strong>{{ order.total_amount }} DZD</strong></td>
+            <td>
+              <span class="status-badge status-{{ order.status }}">
+                {{ order.get_status_display }}
+              </span>
+            </td>
+            <td>
+              <div class="btn-group" role="group">
+                <button type="button" class="btn btn-sm btn-outline-primary dropdown-toggle" 
+                        data-bs-toggle="dropdown" aria-expanded="false">
+                  Actions
+                </button>
+                <ul class="dropdown-menu">
+                  <li><h6 class="dropdown-header">Change Status</h6></li>
+                  <li>
+                    <a class="dropdown-item" href="#" onclick="updateOrderStatus('{{ order.order_id }}', 'paid')">
+                      <i class="fas fa-check-circle text-success"></i> Mark as Paid
+                    </a>
+                  </li>
+                  <li>
+                    <a class="dropdown-item" href="#" onclick="updateOrderStatus('{{ order.order_id }}', 'processing')">
+                      <i class="fas fa-cog text-info"></i> Mark as Processing
+                    </a>
+                  </li>
+                  <li>
+                    <a class="dropdown-item" href="#" onclick="updateOrderStatus('{{ order.order_id }}', 'shipped')">
+                      <i class="fas fa-shipping-fast text-primary"></i> Mark as Shipped
+                    </a>
+                  </li>
+                  <li>
+                    <a class="dropdown-item" href="#" onclick="updateOrderStatus('{{ order.order_id }}', 'delivered')">
+                      <i class="fas fa-box-open text-success"></i> Mark as Delivered
+                    </a>
+                  </li>
+                  <li><hr class="dropdown-divider"></li>
+                  <li>
+                    <a class="dropdown-item" href="{% url 'accounts:admin_initiate_refund' order.order_id %}">
+                      <i class="fas fa-undo text-warning"></i> Initiate Refund
+                    </a>
+                  </li>
+                </ul>
+              </div>
+            </td>
+          </tr>
+          {% empty %}
+          <tr>
+            <td colspan="7" class="text-center text-muted py-4">No orders found</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<script>
+function updateOrderStatus(orderId, status) {
+  if (confirm('Are you sure you want to update this order status?')) {
+    const form = document.createElement('form');
+    form.method = 'POST';
+    form.action = `/accounts/admin/order/${orderId}/update-status/`;
+    
+    const csrfToken = document.createElement('input');
+    csrfToken.type = 'hidden';
+    csrfToken.name = 'csrfmiddlewaretoken';
+    csrfToken.value = '{{ csrf_token }}';
+    form.appendChild(csrfToken);
+    
+    const statusInput = document.createElement('input');
+    statusInput.type = 'hidden';
+    statusInput.name = 'status';
+    statusInput.value = status;
+    form.appendChild(statusInput);
+    
+    document.body.appendChild(form);
+    form.submit();
+  }
+}
+</script>
+{% endblock %}

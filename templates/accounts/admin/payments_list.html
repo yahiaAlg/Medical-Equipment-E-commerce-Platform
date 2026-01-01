@@ -1,0 +1,238 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Payments Management - Fennec Med{% endblock %}
+
+{% block extra_css %}
+<style>
+.admin-header {
+  background: linear-gradient(135deg, #34588f 0%, #1a3e75 100%);
+  color: white;
+  padding: 2rem 0;
+  margin-bottom: 2rem;
+}
+
+.stat-card {
+  background: white;
+  border-radius: 10px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  transition: transform 0.3s;
+}
+
+.stat-card:hover {
+  transform: translateY(-5px);
+}
+
+.stat-card .icon {
+  font-size: 2rem;
+  margin-bottom: 0.5rem;
+}
+
+.stat-card .number {
+  font-size: 1.8rem;
+  font-weight: bold;
+  color: #34588f;
+}
+
+.stat-card .label {
+  color: #666;
+  font-size: 0.9rem;
+  text-transform: uppercase;
+}
+
+.table-container {
+  background: white;
+  border-radius: 10px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.status-badge {
+  padding: 0.4rem 0.8rem;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.status-pending { background: #fff3cd; color: #856404; }
+.status-verified { background: #d4edda; color: #155724; }
+.status-rejected { background: #f8d7da; color: #721c24; }
+
+.filter-section {
+  background: white;
+  padding: 1.5rem;
+  border-radius: 10px;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.payment-proof-thumb {
+  width: 60px;
+  height: 60px;
+  object-fit: cover;
+  border-radius: 5px;
+  cursor: pointer;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="admin-header">
+  <div class="container">
+    <div class="d-flex justify-content-between align-items-center">
+      <div>
+        <h1><i class="fas fa-credit-card me-2"></i>Payments Management</h1>
+        <p class="mb-0">Verify and manage payment submissions</p>
+      </div>
+      <a href="{% url 'accounts:admin_dashboard' %}" class="btn btn-light">
+        <i class="fas fa-arrow-left me-2"></i>Back to Dashboard
+      </a>
+    </div>
+  </div>
+</div>
+
+<div class="container mb-5">
+  <!-- Statistics Cards -->
+  <div class="row mb-4">
+    <div class="col-md-3 mb-3">
+      <div class="stat-card">
+        <div class="icon text-warning"><i class="fas fa-clock"></i></div>
+        <div class="number">{{ payment_stats.pending }}</div>
+        <div class="label">Pending Verification</div>
+      </div>
+    </div>
+    <div class="col-md-3 mb-3">
+      <div class="stat-card">
+        <div class="icon text-success"><i class="fas fa-check-circle"></i></div>
+        <div class="number">{{ payment_stats.verified }}</div>
+        <div class="label">Verified</div>
+      </div>
+    </div>
+    <div class="col-md-3 mb-3">
+      <div class="stat-card">
+        <div class="icon text-danger"><i class="fas fa-times-circle"></i></div>
+        <div class="number">{{ payment_stats.rejected }}</div>
+        <div class="label">Rejected</div>
+      </div>
+    </div>
+    <div class="col-md-3 mb-3">
+      <div class="stat-card">
+        <div class="icon text-primary"><i class="fas fa-file-invoice-dollar"></i></div>
+        <div class="number">{{ payment_stats.total }}</div>
+        <div class="label">Total Payments</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Filters -->
+  <div class="filter-section">
+    <form method="get" class="row g-3">
+      <div class="col-md-4">
+        <label class="form-label">Status</label>
+        <select name="status" class="form-select" onchange="this.form.submit()">
+          <option value="all" {% if status_filter == 'all' %}selected{% endif %}>All Payments</option>
+          <option value="pending" {% if status_filter == 'pending' %}selected{% endif %}>Pending</option>
+          <option value="verified" {% if status_filter == 'verified' %}selected{% endif %}>Verified</option>
+          <option value="rejected" {% if status_filter == 'rejected' %}selected{% endif %}>Rejected</option>
+        </select>
+      </div>
+      <div class="col-md-6">
+        <label class="form-label">Search</label>
+        <input type="text" name="search" class="form-control" placeholder="Invoice number, order ID, username..." value="{{ search }}">
+      </div>
+      <div class="col-md-2 d-flex align-items-end">
+        <button type="submit" class="btn btn-primary w-100">
+          <i class="fas fa-search me-2"></i>Search
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <!-- Payments Table -->
+  <div class="table-container">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <h5><i class="fas fa-list me-2"></i>Payment Submissions</h5>
+      <span class="text-muted">{{ payments|length }} results</span>
+    </div>
+    
+    <div class="table-responsive">
+      <table class="table table-hover">
+        <thead>
+          <tr>
+            <th>Invoice</th>
+            <th>Order ID</th>
+            <th>User</th>
+            <th>Amount</th>
+            <th>Method</th>
+            <th>Proof</th>
+            <th>Uploaded</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for payment in payments %}
+          <tr>
+            <td><strong>{{ payment.invoice.invoice_number }}</strong></td>
+            <td>{{ payment.invoice.order.order_id }}</td>
+            <td>{{ payment.invoice.order.user.username }}</td>
+            <td><strong>{{ payment.invoice.total_amount }} DZD</strong></td>
+            <td>
+              <span class="badge bg-secondary">
+                {{ payment.get_payment_method_display }}
+              </span>
+            </td>
+            <td>
+              <a href="{{ payment.proof_file.url }}" target="_blank">
+                {% if payment.proof_file.url|slice:"-4:" == ".pdf" %}
+                  <i class="fas fa-file-pdf text-danger fa-2x"></i>
+                {% else %}
+                  <img src="{{ payment.proof_file.url }}" alt="Payment Proof" class="payment-proof-thumb">
+                {% endif %}
+              </a>
+            </td>
+            <td>{{ payment.uploaded_at|timesince }} ago</td>
+            <td>
+              {% if payment.verified %}
+                <span class="status-badge status-verified">
+                  <i class="fas fa-check-circle"></i> Verified
+                </span>
+              {% elif payment.rejection_reason %}
+                <span class="status-badge status-rejected">
+                  <i class="fas fa-times-circle"></i> Rejected
+                </span>
+              {% else %}
+                <span class="status-badge status-pending">
+                  <i class="fas fa-clock"></i> Pending
+                </span>
+              {% endif %}
+            </td>
+            <td>
+              {% if not payment.verified and not payment.rejection_reason %}
+                <a href="{% url 'accounts:admin_verify_payment' payment.id %}" 
+                   class="btn btn-sm btn-primary">
+                  <i class="fas fa-check"></i> Review
+                </a>
+              {% else %}
+                <a href="{% url 'accounts:admin_verify_payment' payment.id %}" 
+                   class="btn btn-sm btn-outline-secondary">
+                  <i class="fas fa-eye"></i> View
+                </a>
+              {% endif %}
+            </td>
+          </tr>
+          {% empty %}
+          <tr>
+            <td colspan="9" class="text-center text-muted py-4">
+              <i class="fas fa-inbox fa-3x mb-3 d-block"></i>
+              No payment submissions found
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}
