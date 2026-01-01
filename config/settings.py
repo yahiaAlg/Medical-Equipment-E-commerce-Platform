@@ -1,12 +1,15 @@
+import os
 from pathlib import Path
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-SECRET_KEY = "django-insecure-your-secret-key-change-in-production"
+SECRET_KEY = os.environ.get(
+    "SECRET_KEY", "django-insecure-your-secret-key-change-in-production"
+)
 
-DEBUG = True
+DEBUG = os.environ.get("DEBUG", "True") == "True"
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS", "localhost,127.0.0.1").split(",")
 
 INSTALLED_APPS = [
     "django.contrib.admin",
@@ -25,6 +28,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
+    "whitenoise.middleware.WhiteNoiseMiddleware",  # Add WhiteNoise
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -34,8 +38,6 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = "config.urls"
-
-# Add to TEMPLATES context_processors in settings.py
 
 TEMPLATES = [
     {
@@ -48,7 +50,6 @@ TEMPLATES = [
                 "django.template.context_processors.request",
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
-                # Add this line:
                 "pages.context_processors.site_info",
                 "accounts.context_processors.wishlist_items",
             ],
@@ -85,12 +86,17 @@ TIME_ZONE = "UTC"
 USE_I18N = True
 USE_TZ = True
 
+# Static files configuration with WhiteNoise
 STATIC_URL = "/static/"
 STATICFILES_DIRS = [
     BASE_DIR / "static",
 ]
 STATIC_ROOT = BASE_DIR / "staticfiles"
 
+# WhiteNoise configuration
+STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
+
+# Media files
 MEDIA_URL = "/media/"
 MEDIA_ROOT = BASE_DIR / "media"
 
@@ -100,8 +106,18 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
 CRISPY_TEMPLATE_PACK = "bootstrap5"
 
-# Email settings
-EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+# Email settings - defaults to console for development
+EMAIL_BACKEND = os.environ.get(
+    "EMAIL_BACKEND", "django.core.mail.backends.console.EmailBackend"
+)
+
+# Optional email settings for production (SMTP)
+EMAIL_HOST = os.environ.get("EMAIL_HOST", "smtp.gmail.com")
+EMAIL_PORT = int(os.environ.get("EMAIL_PORT", 587))
+EMAIL_USE_TLS = os.environ.get("EMAIL_USE_TLS", "True") == "True"
+EMAIL_HOST_USER = os.environ.get("EMAIL_HOST_USER", "")
+EMAIL_HOST_PASSWORD = os.environ.get("EMAIL_HOST_PASSWORD", "")
+DEFAULT_FROM_EMAIL = os.environ.get("DEFAULT_FROM_EMAIL", "noreply@example.com")
 
 # Login/Logout URLs
 LOGIN_URL = "accounts:login"

@@ -40,21 +40,52 @@ def contact(request):
         if form.is_valid():
             contact_message = form.save()
 
-            # Send email notification
+            # Send email notification to admin
             try:
+                admin_message = f"""
+New Contact Message Received
+
+Name: {contact_message.name}
+Email: {contact_message.email}
+Phone: {contact_message.phone}
+Inquiry Type: {contact_message.get_inquiry_type_display()}
+
+Message:
+{contact_message.message}
+
+Reply to: {contact_message.email}
+                """
+
                 send_mail(
                     subject=f"New Contact Message: {contact_message.subject}",
-                    message=f"""
-                    Name: {contact_message.name}
-                    Email: {contact_message.email}
-                    Phone: {contact_message.phone}
-                    Inquiry Type: {contact_message.get_inquiry_type_display()}
-                    
-                    Message:
-                    {contact_message.message}
-                    """,
+                    message=admin_message,
                     from_email=settings.DEFAULT_FROM_EMAIL,
                     recipient_list=[site_info.email],
+                    fail_silently=True,
+                )
+
+                # Send confirmation email to user
+                user_message = f"""
+Dear {contact_message.name},
+
+Thank you for contacting us! We have received your message and will get back to you as soon as possible.
+
+Your Message Details:
+Subject: {contact_message.subject}
+Inquiry Type: {contact_message.get_inquiry_type_display()}
+
+Your Message:
+{contact_message.message}
+
+Best regards,
+{site_info.site_name}
+                """
+
+                send_mail(
+                    subject=f"Message Received: {contact_message.subject}",
+                    message=user_message,
+                    from_email=settings.DEFAULT_FROM_EMAIL,
+                    recipient_list=[contact_message.email],
                     fail_silently=True,
                 )
             except Exception:
