@@ -5,3 +5,5 @@ crispy-bootstrap5
 requests
 whitenoise[brotli]
 gunicorn
+psycopg2-binary
+python-dotenv
