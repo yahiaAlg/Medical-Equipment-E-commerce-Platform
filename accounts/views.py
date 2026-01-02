@@ -11,6 +11,9 @@ from django.http import JsonResponse
 from datetime import timedelta
 from django.db.models import Sum, Count, Avg, F, Q, DecimalField
 from django.db.models.functions import TruncDate
+from django.contrib.auth.decorators import login_required, user_passes_test
+from django.shortcuts import get_object_or_404
+from .utils import send_account_status_email
 
 from .models import *
 from .forms import (
@@ -25,11 +28,56 @@ from pages.models import ContactMessage
 from products.models import *
 from payments.models import *
 
+from django.contrib.auth.views import (
+    PasswordResetView,
+    PasswordResetDoneView,
+    PasswordResetConfirmView,
+    PasswordResetCompleteView,
+)
+from django.urls import reverse_lazy
 
+
+# ========== USER VIEWS ==========
 def register(request):
     if request.method == "POST":
         form = UserRegistrationForm(request.POST)
         if form.is_valid():
+            # Validate email domain
+            email = form.cleaned_data.get("email", "").lower()
+
+            # List of allowed email domains from famous email providers
+            allowed_domains = [
+                "gmail.com",
+                "yahoo.com",
+                "outlook.com",
+                "hotmail.com",
+                "icloud.com",
+                "mail.com",
+                "aol.com",
+                "protonmail.com",
+                "zoho.com",
+                "yandex.com",
+                "gmx.com",
+                "live.com",
+                "msn.com",
+                "me.com",
+                "mac.com",
+            ]
+
+            # Extract domain from email
+            if "@" in email:
+                domain = email.split("@")[1]
+
+                if domain not in allowed_domains:
+                    messages.error(
+                        request,
+                        f"Please use an email from a recognized provider. Allowed providers: {', '.join(sorted(set([d.split('.')[0].title() for d in allowed_domains])))}.",
+                    )
+                    return render(request, "accounts/register.html", {"form": form})
+            else:
+                messages.error(request, "Invalid email format.")
+                return render(request, "accounts/register.html", {"form": form})
+
             user = form.save()
             user.is_active = False  # Disable account until admin approval
             user.save()
@@ -81,6 +129,67 @@ def register(request):
     return render(request, "accounts/register.html", {"form": form})
 
 
+# ========== PASSWORD RESET VIEWS ==========
+
+
+class CustomPasswordResetView(PasswordResetView):
+    """Custom password reset view"""
+
+    template_name = "accounts/password_reset/password_reset_form.html"
+    email_template_name = "accounts/password_reset/password_reset_email.html"
+    html_email_template_name = "accounts/password_reset/password_reset_email.html"
+    subject_template_name = "accounts/password_reset/password_reset_subject.txt"
+    success_url = reverse_lazy("accounts:password_reset_done")
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        from pages.models import SiteInformation
+
+        context["site_info"] = SiteInformation.get_instance()
+        return context
+
+
+class CustomPasswordResetDoneView(PasswordResetDoneView):
+    """Password reset email sent confirmation"""
+
+    template_name = "accounts/password_reset/password_reset_done.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        from pages.models import SiteInformation
+
+        context["site_info"] = SiteInformation.get_instance()
+        return context
+
+
+class CustomPasswordResetConfirmView(PasswordResetConfirmView):
+    """Password reset confirmation view"""
+
+    template_name = "accounts/password_reset/password_reset_confirm.html"
+    success_url = reverse_lazy("accounts:password_reset_complete")
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        from pages.models import SiteInformation
+
+        context["site_info"] = SiteInformation.get_instance()
+        return context
+
+
+class CustomPasswordResetCompleteView(PasswordResetCompleteView):
+    """Password reset complete view"""
+
+    template_name = "accounts/password_reset/password_reset_complete.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        from pages.models import SiteInformation
+
+        context["site_info"] = SiteInformation.get_instance()
+        return context
+
+
+# dashboard functionalities
 @login_required
 def dashboard(request):
     # Redirect superusers to admin dashboard
@@ -572,9 +681,24 @@ def admin_toggle_user_status(request, user_id):
         user.save()
 
         status = "activated" if user.is_active else "deactivated"
-        messages.success(request, f"User {user.username} has been {status}.")
 
-        return JsonResponse({"success": True, "is_active": user.is_active})
+        # Send email notification
+        email_sent = send_account_status_email(user, user.is_active)
+
+        if email_sent:
+            messages.success(
+                request,
+                f"User {user.username} has been {status} and notified via email.",
+            )
+        else:
+            messages.warning(
+                request,
+                f"User {user.username} has been {status}, but email notification failed.",
+            )
+
+        return JsonResponse(
+            {"success": True, "is_active": user.is_active, "email_sent": email_sent}
+        )
 
     return JsonResponse({"success": False})
 

@@ -2,14 +2,12 @@ from .models import Notification
 
 
 def notifications(request):
-    """Add user notifications to all templates"""
+    """Add user notifications to all templates - Only unread"""
     if request.user.is_authenticated:
-        user_notifications = Notification.objects.filter(user=request.user).order_by(
-            "-created_at"
-        )[:10]
-        unread_count = Notification.objects.filter(
-            user=request.user, is_read=False
-        ).count()
+        user_notifications = Notification.objects.filter(
+            user=request.user, is_read=False  # Only show unread notifications
+        ).order_by("-created_at")[:10]
+        unread_count = user_notifications.count()
 
         return {
             "notifications": user_notifications,

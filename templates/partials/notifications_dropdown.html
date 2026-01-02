@@ -1,5 +1,41 @@
 {% load static %}
+<style>
 
+        .dropdown-header {
+            font-size: 1.25rem;
+            padding: 10px 15px;
+        }
+        .dropdown-item {
+            transition: background-color 0.2s;
+        }
+        .dropdown-item.bg-light {
+            background-color: #f8f9fa;
+        }
+        .dropdown-item:hover {
+            background-color: #e9ecef;
+        }
+        .dropdown-item-text {
+            text-align: center;
+        }
+        btn {
+            cursor: pointer;
+        }
+        btn:disabled {
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+        btn-link {
+            padding: 0;
+            font-size: 0.875rem;
+        }
+        btn-sm {
+            font-size: 0.875rem;
+            padding: 0.25rem 0.5rem;
+        }
+        btn-link:hover {
+            text-decoration: underline;
+        }
+</style>
 <div class="dropdown">
     <button class="btn position-relative p-2" type="button" id="notificationsDropdown" data-bs-toggle="dropdown" aria-expanded="false">
         <i class="fas fa-bell fs-5"></i>
@@ -15,7 +51,7 @@
         <li class="dropdown-header d-flex justify-content-between align-items-center">
             <strong>Notifications</strong>
             {% if unread_notifications_count > 0 %}
-            <button class="btn btn-link btn-sm text-decoration-none" onclick="markAllAsRead()">Mark all as read</button>
+            <button class="btn btn-link bg-primary btn-sm text-decoration-none" onclick="markAllAsRead()">Mark all as read</button>
             {% endif %}
         </li>
         <li><hr class="dropdown-divider"></li>
