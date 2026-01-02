@@ -56,6 +56,8 @@ TEMPLATES = [
                 "django.contrib.messages.context_processors.messages",
                 "pages.context_processors.site_info",
                 "accounts.context_processors.wishlist_items",
+                "payments.context_processors.notifications",  # Add this
+                "payments.context_processors.cart_items_count",  # Add this
             ],
         },
     },

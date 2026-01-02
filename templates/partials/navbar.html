@@ -62,6 +62,11 @@
                   <i class="fas fa-shopping-cart me-2"></i> Cart
                 </a>
               </li>
+              <li>
+                <a class="dropdown-item" href="{% url 'accounts:wishlist' %}">
+                  <i class="fas fa-heart me-2"></i> Wishlist
+                </a>
+              </li>
               <li><hr class="dropdown-divider"></li>
               <li>
                 <form method="post" action="{% url 'accounts:logout' %}">
@@ -113,6 +118,9 @@
             
             {% if user.is_authenticated %}
               <a href="{% url 'accounts:dashboard' %}" class="btn btn-outline-primary rounded-pill">Dashboard</a>
+              <a href="{% url 'accounts:profile' %}" class="btn btn-outline-primary rounded-pill">Profile</a>
+              <a href="{% url 'payments:cart' %}" class="btn btn-outline-primary rounded-pill">Cart</a>
+              <a href="{% url 'accounts:wishlist' %}" class="btn btn-outline-primary rounded-pill">Wishlist</a>
               <form method="post" action="{% url 'accounts:logout' %}">
                 {% csrf_token %}
                 <button type="submit" class="btn btn-outline-secondary rounded-pill w-100">Logout</button>

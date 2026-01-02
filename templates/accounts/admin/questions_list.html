@@ -1,0 +1,79 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Manage Questions - Admin{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
+{% endblock %}
+
+{% block content %}
+<section class="py-5">
+    <div class="container">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2><i class="fas fa-question-circle me-2"></i>Product Questions</h2>
+            <a href="{% url 'accounts:admin_dashboard' %}" class="btn btn-outline-secondary">
+                <i class="fas fa-arrow-left me-2"></i>Back to Dashboard
+            </a>
+        </div>
+
+        <!-- Filters -->
+        <div class="card mb-4">
+            <div class="card-body">
+                <div class="btn-group" role="group">
+                    <a href="?status=all" class="btn btn-outline-primary {% if status_filter == 'all' %}active{% endif %}">All</a>
+                    <a href="?status=unanswered" class="btn btn-outline-warning {% if status_filter == 'unanswered' %}active{% endif %}">Unanswered</a>
+                    <a href="?status=answered" class="btn btn-outline-success {% if status_filter == 'answered' %}active{% endif %}">Answered</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Questions List -->
+        <div class="card">
+            <div class="card-body">
+                {% if questions %}
+                <div class="list-group list-group-flush">
+                    {% for question in questions %}
+                    <div class="list-group-item">
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                            <div class="flex-grow-1">
+                                <h5 class="mb-1">
+                                    <a href="{% url 'products:detail' question.product.slug %}">{{ question.product.name }}</a>
+                                </h5>
+                                <p class="mb-2"><strong>Q:</strong> {{ question.question }}</p>
+                                {% if question.answer %}
+                                <div class="alert alert-success mb-2">
+                                    <strong>A:</strong> {{ question.answer }}
+                                    <br><small class="text-muted">Answered by {{ question.answered_by.username }} on {{ question.answered_at|date:"M d, Y" }}</small>
+                                </div>
+                                {% else %}
+                                <span class="badge bg-warning">Unanswered</span>
+                                {% endif %}
+                                <small class="text-muted">Asked by {{ question.user.username }} on {{ question.created_at|date:"M d, Y" }}</small>
+                            </div>
+                            <div class="d-flex gap-2 ms-3">
+                                <a href="{% url 'accounts:admin_question_reply' question.id %}" class="btn btn-sm btn-primary">
+                                    <i class="fas fa-reply"></i> Answer
+                                </a>
+                                <form method="post" action="{% url 'accounts:admin_question_delete' question.id %}" class="d-inline">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Delete this question?')">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="text-center py-5">
+                    <i class="fas fa-question-circle fa-4x mb-3 text-muted"></i>
+                    <p class="text-muted">No questions</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

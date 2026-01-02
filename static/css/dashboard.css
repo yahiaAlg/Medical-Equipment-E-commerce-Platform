@@ -103,6 +103,26 @@
   border-radius: 1rem;
 }
 
+.badge.status-refund_pending {
+  background-color: #ffc107;
+  color: #000;
+}
+.badge.status-refund_approved {
+  background-color: #198754;
+  color: white;
+}
+.badge.status-refund_processing {
+  background-color: #2b96cc;
+  color: white;
+}
+.badge.status-refund_completed {
+  background-color: #617da8;
+  color: white;
+}
+.badge.status-refund_rejected {
+  background-color: #dc3545;
+  color: white;
+}
 /* Card Styling - Matching Home Page */
 .card {
   background-color: white;

@@ -22,19 +22,33 @@ class Cart(models.Model):
 class CartItem(models.Model):
     cart = models.ForeignKey(Cart, on_delete=models.CASCADE, related_name="items")
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    variant = models.ForeignKey(
+        "products.ProductVariant", on_delete=models.CASCADE, null=True, blank=True
+    )
     quantity = models.PositiveIntegerField(default=1)
     added_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
-        unique_together = ("cart", "product")
+        unique_together = ("cart", "product", "variant")
 
     def __str__(self):
-        return f"{self.quantity} x {self.product.name}"
+        variant_info = f" ({self.variant.variant_value})" if self.variant else ""
+        return f"{self.quantity} x {self.product.name}{variant_info}"
+
+    def get_unit_price(self):
+        """Get price per unit including variant cost"""
+        base_price = self.product.price
+        if self.variant:
+            base_price += self.variant.additional_cost
+
+        # Apply bulk pricing if applicable
+        if self.quantity >= self.product.bulk_quantity and self.product.bulk_price:
+            return self.product.bulk_price
+
+        return base_price
 
     def get_total_price(self):
-        if self.quantity >= self.product.bulk_quantity and self.product.bulk_price:
-            return self.quantity * self.product.bulk_price
-        return self.quantity * self.product.price
+        return self.quantity * self.get_unit_price()
 
 
 class Order(models.Model):
@@ -408,6 +422,9 @@ class RefundReceipt(models.Model):
         super().save(*args, **kwargs)
 
 
+# Add to payments/models.py - Update the Notification model TYPE_CHOICES
+
+
 class Notification(models.Model):
     TYPE_CHOICES = [
         ("order_created", "Order Created"),
@@ -422,6 +439,11 @@ class Notification(models.Model):
         ("refund_completed", "Refund Completed"),
         ("order_shipped", "Order Shipped"),
         ("order_delivered", "Order Delivered"),
+        # New notification types
+        ("user_registered", "New User Registered"),
+        ("review_submitted", "New Review Submitted"),
+        ("question_submitted", "New Question Submitted"),
+        ("contact_message", "New Contact Message"),
     ]
 
     user = models.ForeignKey(
@@ -440,6 +462,18 @@ class Notification(models.Model):
         Complaint, on_delete=models.CASCADE, null=True, blank=True
     )
     refund = models.ForeignKey(Refund, on_delete=models.CASCADE, null=True, blank=True)
+
+    # Add new related objects - you'll need to add these fields
+    related_user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        related_name="notifications_about",
+    )
+    review_id = models.IntegerField(null=True, blank=True)
+    question_id = models.IntegerField(null=True, blank=True)
+    contact_id = models.IntegerField(null=True, blank=True)
 
     is_read = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)

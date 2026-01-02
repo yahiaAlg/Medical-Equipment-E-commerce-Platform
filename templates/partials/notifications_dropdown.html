@@ -23,8 +23,37 @@
         {% if notifications %}
             {% for notification in notifications %}
             <li>
+                {% comment %} Determine the link based on notification type {% endcomment %}
+                {% if notification.notification_type == 'user_registered' %}
+                    {% url 'accounts:admin_users_management' as notif_url %}
+                {% elif notification.notification_type == 'review_submitted' %}
+                    {% url 'accounts:admin_reviews_list' as notif_url %}
+                {% elif notification.notification_type == 'question_submitted' %}
+                    {% url 'accounts:admin_questions_list' as notif_url %}
+                {% elif notification.notification_type == 'contact_message' %}
+                    {% url 'accounts:admin_contacts_list' as notif_url %}
+                {% elif notification.notification_type == 'order_created' or notification.notification_type == 'order_shipped' or notification.notification_type == 'order_delivered' %}
+                    {% url 'accounts:admin_orders_management' as notif_url %}
+                {% elif notification.notification_type == 'payment_submitted' %}
+                    {% url 'accounts:admin_payments_list' as notif_url %}
+                {% elif notification.notification_type == 'complaint_created' or notification.notification_type == 'complaint_updated' or notification.notification_type == 'complaint_resolved' %}
+                    {% url 'accounts:admin_complaints_management' as notif_url %}
+                {% elif notification.notification_type == 'refund_initiated' or notification.notification_type == 'refund_completed' %}
+                    {% url 'accounts:admin_refunds_management' as notif_url %}
+                {% elif notification.invoice %}
+                    {% url 'payments:invoice_detail' notification.invoice.id as notif_url %}
+                {% elif notification.complaint %}
+                    {% url 'payments:complaint_detail' notification.complaint.id as notif_url %}
+                {% elif notification.refund and notification.refund.status == 'refund_completed' %}
+                    {% url 'payments:refund_receipt' notification.refund.id as notif_url %}
+                {% elif notification.order %}
+                    {% url 'payments:invoice_detail' notification.order.invoice.id as notif_url %}
+                {% else %}
+                    {% url 'accounts:dashboard' as notif_url %}
+                {% endif %}
+
                 <a class="dropdown-item {% if not notification.is_read %}bg-light{% endif %} py-3" 
-                   href="{% if notification.order %}{% url 'payments:invoice_detail' notification.invoice.id %}{% else %}#{% endif %}"
+                   href="{{ notif_url }}"
                    onclick="markAsRead({{ notification.id }})">
                     <div class="d-flex">
                         <div class="flex-shrink-0">
@@ -32,10 +61,30 @@
                                 <i class="fas fa-check-circle text-success"></i>
                             {% elif notification.notification_type == 'payment_rejected' %}
                                 <i class="fas fa-times-circle text-danger"></i>
-                            {% elif notification.notification_type == 'refund_completed' %}
+                            {% elif notification.notification_type == 'payment_submitted' %}
+                                <i class="fas fa-clock text-warning"></i>
+                            {% elif notification.notification_type == 'refund_completed' or notification.notification_type == 'refund_initiated' %}
                                 <i class="fas fa-money-bill-wave text-info"></i>
-                            {% elif notification.notification_type == 'complaint_created' %}
+                            {% elif notification.notification_type == 'complaint_created' or notification.notification_type == 'complaint_updated' %}
                                 <i class="fas fa-exclamation-triangle text-warning"></i>
+                            {% elif notification.notification_type == 'complaint_resolved' %}
+                                <i class="fas fa-check-circle text-success"></i>
+                            {% elif notification.notification_type == 'order_created' %}
+                                <i class="fas fa-shopping-bag text-primary"></i>
+                            {% elif notification.notification_type == 'order_shipped' %}
+                                <i class="fas fa-shipping-fast text-info"></i>
+                            {% elif notification.notification_type == 'order_delivered' %}
+                                <i class="fas fa-box-open text-success"></i>
+                            {% elif notification.notification_type == 'invoice_created' %}
+                                <i class="fas fa-file-invoice text-primary"></i>
+                            {% elif notification.notification_type == 'user_registered' %}
+                                <i class="fas fa-user-plus text-primary"></i>
+                            {% elif notification.notification_type == 'review_submitted' %}
+                                <i class="fas fa-star text-warning"></i>
+                            {% elif notification.notification_type == 'question_submitted' %}
+                                <i class="fas fa-question-circle text-info"></i>
+                            {% elif notification.notification_type == 'contact_message' %}
+                                <i class="fas fa-envelope text-primary"></i>
                             {% else %}
                                 <i class="fas fa-bell text-primary"></i>
                             {% endif %}
@@ -64,11 +113,26 @@
 </div>
 
 <script>
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
 function markAsRead(notificationId) {
     fetch(`/payments/notification/${notificationId}/read/`, {
         method: 'POST',
         headers: {
-            'X-CSRFToken': '{{ csrf_token }}',
+            'X-CSRFToken': getCookie('csrftoken'),
             'Content-Type': 'application/json'
         }
     });
@@ -78,7 +142,7 @@ function markAllAsRead() {
     fetch('/payments/notifications/mark-all-read/', {
         method: 'POST',
         headers: {
-            'X-CSRFToken': '{{ csrf_token }}',
+            'X-CSRFToken': getCookie('csrftoken'),
             'Content-Type': 'application/json'
         }
     }).then(() => {

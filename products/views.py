@@ -3,10 +3,12 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.http import JsonResponse
 from django.core.paginator import Paginator
-from django.db.models import Q, Avg
-import json
-
+from django.db.models import Q, Avg, Count
 from django.urls import reverse
+from django.core.mail import send_mail
+from django.conf import settings
+from django.contrib.auth.models import User
+import json
 
 from .models import Product, Category, Brand, ProductReview, ProductQuestion, Wishlist
 from .forms import ProductReviewForm, ProductQuestionForm
@@ -143,18 +145,45 @@ def product_detail(request, slug):
         id=product.id
     )[:4]
 
-    # Check if user has this product in wishlist
+    # Get variants
+    variants = product.variants.filter(is_active=True)
+
+    # Calculate review statistics
+    review_stats = reviews.aggregate(avg_rating=Avg("rating"), total_count=Count("id"))
+
+    # Get rating distribution
+    rating_distribution = {i: 0 for i in range(1, 6)}
+    for rating in reviews.values("rating").annotate(count=Count("rating")):
+        rating_distribution[rating["rating"]] = rating["count"]
+
+    # Calculate percentages for rating bars
+    total_reviews = review_stats["total_count"] or 0
+    rating_percentages = {}
+    for star in range(1, 6):
+        count = rating_distribution.get(star, 0)
+        rating_percentages[star] = (
+            (count / total_reviews * 100) if total_reviews > 0 else 0
+        )
+
+    # Check wishlist
     in_wishlist = False
+    wishlist_product_ids = []
     if request.user.is_authenticated:
         wishlist, created = Wishlist.objects.get_or_create(user=request.user)
         in_wishlist = wishlist.products.filter(id=product.id).exists()
+        wishlist_product_ids = list(wishlist.products.values_list("id", flat=True))
 
     context = {
         "product": product,
         "reviews": reviews,
         "questions": questions,
         "related_products": related_products,
+        "variants": variants,
         "in_wishlist": in_wishlist,
+        "wishlist_product_ids": wishlist_product_ids,
+        "review_stats": review_stats,
+        "rating_distribution": rating_distribution,
+        "rating_percentages": rating_percentages,
         "review_form": ProductReviewForm(),
         "question_form": ProductQuestionForm(),
     }
@@ -183,6 +212,7 @@ def toggle_wishlist(request):
                 {
                     "success": True,
                     "added": added,
+                    "in_wishlist": added,
                     "message": (
                         "Added to wishlist" if added else "Removed from wishlist"
                     ),
@@ -192,6 +222,24 @@ def toggle_wishlist(request):
             return JsonResponse({"success": False, "message": "Product not found"})
 
     return JsonResponse({"success": False, "message": "Invalid request"})
+
+
+def send_admin_notification(subject, message):
+    """Send email notification to all superusers"""
+    try:
+        admin_emails = list(
+            User.objects.filter(is_superuser=True).values_list("email", flat=True)
+        )
+        if admin_emails:
+            send_mail(
+                subject=subject,
+                message=message,
+                from_email=settings.DEFAULT_FROM_EMAIL,
+                recipient_list=admin_emails,
+                fail_silently=True,
+            )
+    except Exception as e:
+        print(f"Error sending admin notification: {e}")
 
 
 @login_required
@@ -219,6 +267,17 @@ def add_review(request):
                         request, "Your review has been added successfully!"
                     )
 
+                    # Send email to admins
+                    send_admin_notification(
+                        subject=f"New Review: {product.name}",
+                        message=f"User {request.user.username} posted a new review:\n\n"
+                        f"Product: {product.name}\n"
+                        f"Rating: {review.rating} stars\n"
+                        f"Title: {review.title}\n"
+                        f"Comment: {review.comment}\n\n"
+                        f"View product: {request.build_absolute_uri(product.get_absolute_url())}",
+                    )
+
             except Product.DoesNotExist:
                 messages.error(request, "Product not found.")
 
@@ -241,6 +300,15 @@ def ask_question(request):
                 question.save()
                 messages.success(
                     request, "Your question has been submitted successfully!"
+                )
+
+                # Send email to admins
+                send_admin_notification(
+                    subject=f"New Question: {product.name}",
+                    message=f"User {request.user.username} asked a question:\n\n"
+                    f"Product: {product.name}\n"
+                    f"Question: {question.question}\n\n"
+                    f"View product: {request.build_absolute_uri(product.get_absolute_url())}",
                 )
 
             except Product.DoesNotExist:

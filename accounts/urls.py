@@ -30,6 +30,11 @@ urlpatterns = [
         views.wishlist_toggle,
         name="wishlist_toggle",
     ),
+    path(
+        "wishlist/toggle/",
+        views.toggle_wishlist,
+        name="toggle_wishlist",
+    ),
     # Admin Dashboard
     path("admin/dashboard/", views.admin_dashboard, name="admin_dashboard"),
     # User Management
@@ -99,6 +104,43 @@ urlpatterns = [
         "admin/complaint-reason/<int:reason_id>/toggle/",
         views.admin_toggle_complaint_reason,
         name="admin_toggle_complaint_reason",
+    ),
+    # Add to urlpatterns list
+    # Contact Management
+    path("admin/contacts/", views.admin_contacts_list, name="admin_contacts_list"),
+    path(
+        "admin/contact/<int:contact_id>/reply/",
+        views.admin_contact_reply,
+        name="admin_contact_reply",
+    ),
+    path(
+        "admin/contact/<int:contact_id>/delete/",
+        views.admin_contact_delete,
+        name="admin_contact_delete",
+    ),
+    # Questions Management
+    path("admin/questions/", views.admin_questions_list, name="admin_questions_list"),
+    path(
+        "admin/question/<int:question_id>/reply/",
+        views.admin_question_reply,
+        name="admin_question_reply",
+    ),
+    path(
+        "admin/question/<int:question_id>/delete/",
+        views.admin_question_delete,
+        name="admin_question_delete",
+    ),
+    # Reviews Management
+    path("admin/reviews/", views.admin_reviews_list, name="admin_reviews_list"),
+    path(
+        "admin/review/<int:review_id>/reply/",
+        views.admin_review_reply,
+        name="admin_review_reply",
+    ),
+    path(
+        "admin/review/<int:review_id>/delete/",
+        views.admin_review_delete,
+        name="admin_review_delete",
     ),
     # Reports
     path("admin/reports/", views.admin_reports, name="admin_reports"),

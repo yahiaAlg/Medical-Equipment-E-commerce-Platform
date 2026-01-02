@@ -3,6 +3,8 @@ from django.dispatch import receiver
 from django.utils import timezone
 from django.core.mail import send_mail
 from django.conf import settings
+from django.contrib.auth.models import User
+
 from .models import (
     Order,
     Invoice,
@@ -14,6 +16,22 @@ from .models import (
     Complaint,
     Notification,
 )
+
+
+# At the top, add helper function
+def notify_admins(notification_type, title, message, **related_objects):
+    """Notify all active admin users"""
+    from django.contrib.auth.models import User
+
+    admin_users = User.objects.filter(is_staff=True, is_active=True)
+    for admin in admin_users:
+        Notification.objects.create(
+            user=admin,
+            notification_type=notification_type,
+            title=title,
+            message=message,
+            **related_objects,
+        )
 
 
 def send_notification_email(user, title, message, notify_admin=False):
@@ -75,6 +93,13 @@ def create_invoice_on_order(sender, instance, created, **kwargs):
         )
         send_notification_email(instance.user, "Invoice Generated", invoice_msg)
 
+        notify_admins(
+            "order_created",
+            "New Order Received",
+            f"Order {instance.order_id} placed by {instance.user.username} - {instance.total_amount} DZD",
+            order=instance,
+        )
+
 
 @receiver(post_save, sender=PaymentProof)
 def update_invoice_on_payment_proof(sender, instance, created, **kwargs):
@@ -104,6 +129,17 @@ def update_invoice_on_payment_proof(sender, instance, created, **kwargs):
         send_notification_email(
             order.user, "Payment Proof Submitted", msg, notify_admin=True
         )
+
+        admin_users = User.objects.filter(is_staff=True, is_active=True)
+        for admin in admin_users:
+            Notification.objects.create(
+                user=admin,
+                notification_type="payment_submitted",
+                title="New Payment Proof Submitted",
+                message=f"Payment proof for invoice {invoice.invoice_number} needs review.",
+                order=order,
+                invoice=invoice,
+            )
 
 
 @receiver(post_save, sender=PaymentProof)
@@ -207,6 +243,14 @@ def notify_on_complaint(sender, instance, created, **kwargs):
             )
             send_notification_email(instance.user, title, msg)
 
+        notify_admins(
+            "complaint_created",
+            "New Complaint Submitted",
+            f"Complaint {instance.complaint_number} from {instance.user.username} - {instance.reason.name if instance.reason else 'Custom'}",
+            order=instance.order,
+            complaint=instance,
+        )
+
 
 @receiver(post_save, sender=Refund)
 def notify_on_refund(sender, instance, created, **kwargs):
@@ -222,6 +266,14 @@ def notify_on_refund(sender, instance, created, **kwargs):
             refund=instance,
         )
         send_notification_email(instance.order.user, "Refund Initiated", msg)
+        # Notify other admins
+        notify_admins(
+            "refund_initiated",
+            "Refund Approved",
+            f"Refund {instance.refund_number} approved for order {instance.order.order_id} - {instance.amount} DZD",
+            order=instance.order,
+            refund=instance,
+        )
 
 
 @receiver(post_save, sender=RefundProof)

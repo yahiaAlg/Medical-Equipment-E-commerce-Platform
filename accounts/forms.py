@@ -3,6 +3,8 @@ from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Layout, Row, Column, Submit, Fieldset, Div
+
+from products.models import ProductReview
 from .models import UserProfile, PharmacyProfile, ClinicProfile, DoctorProfile
 
 
@@ -225,3 +227,46 @@ class DoctorProfileForm(forms.ModelForm):
 
         for field in self.fields:
             self.fields[field].widget.attrs.update({"class": "form-control"})
+
+
+class ContactReplyForm(forms.Form):
+    subject = forms.CharField(
+        max_length=200, widget=forms.TextInput(attrs={"class": "form-control"})
+    )
+    message = forms.CharField(
+        widget=forms.Textarea(attrs={"class": "form-control", "rows": 6})
+    )
+
+
+class QuestionReplyForm(forms.Form):
+    answer = forms.CharField(
+        widget=forms.Textarea(
+            attrs={
+                "class": "form-control",
+                "rows": 5,
+                "placeholder": "Enter your answer...",
+            }
+        )
+    )
+
+
+class ReviewReplyForm(forms.ModelForm):
+    class Meta:
+        model = ProductReview
+        fields = ["rating", "title", "comment"]
+        widgets = {
+            "rating": forms.Select(
+                choices=[(i, f'{i} Star{"s" if i != 1 else ""}') for i in range(1, 6)],
+                attrs={"class": "form-control"},
+            ),
+            "title": forms.TextInput(
+                attrs={"class": "form-control", "placeholder": "Reply title"}
+            ),
+            "comment": forms.Textarea(
+                attrs={
+                    "class": "form-control",
+                    "rows": 4,
+                    "placeholder": "Your reply...",
+                }
+            ),
+        }

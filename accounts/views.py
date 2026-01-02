@@ -98,6 +98,10 @@ def dashboard(request):
     # Get recent orders
     recent_orders = Order.objects.filter(user=request.user).order_by("-created_at")[:5]
 
+    # Get refunds
+    user_refunds = Refund.objects.filter(order__user=request.user).order_by(
+        "-created_at"
+    )
     # Get cart items count
     try:
         cart = Cart.objects.get(user=request.user)
@@ -170,6 +174,7 @@ def dashboard(request):
 
     context = {
         "user_profile": user_profile,
+        "user_refunds": user_refunds,
         "recent_orders": recent_orders,
         "cart_items_count": cart_items_count,
         "wishlist_items_count": wishlist_items_count,
@@ -321,6 +326,14 @@ def wishlist(request):
         average_rating=Avg("reviews__rating"), review_count=Count("reviews")
     ).select_related("brand", "category")
 
+    # Calculate discount percentage for each product
+    for product in products:
+        if product.bulk_price and product.price > product.bulk_price:
+            discount = ((product.price - product.bulk_price) / product.price) * 100
+            product.discount_percent = round(discount)
+        else:
+            product.discount_percent = None
+
     context = {
         "wishlist": wishlist,
         "products": products,
@@ -400,6 +413,38 @@ def wishlist_toggle(request, product_id):
         )
 
     return redirect(request.META.get("HTTP_REFERER", "products:list"))
+
+
+@login_required
+def toggle_wishlist(request):
+    if request.method == "POST":
+        data = json.loads(request.body)
+        product_id = data.get("product_id")
+
+        try:
+            product = Product.objects.get(id=product_id)
+            wishlist, created = Wishlist.objects.get_or_create(user=request.user)
+
+            if wishlist.products.filter(id=product_id).exists():
+                wishlist.products.remove(product)
+                in_wishlist = False
+            else:
+                wishlist.products.add(product)
+                in_wishlist = True
+
+            return JsonResponse(
+                {
+                    "success": True,
+                    "in_wishlist": in_wishlist,
+                    "message": (
+                        "Added to wishlist" if in_wishlist else "Removed from wishlist"
+                    ),
+                }
+            )
+        except Product.DoesNotExist:
+            return JsonResponse({"success": False, "message": "Product not found"})
+
+    return JsonResponse({"success": False, "message": "Invalid request"})
 
 
 # ========== ADMIN VIEWS ==========
@@ -942,6 +987,263 @@ def admin_toggle_complaint_reason(request, reason_id):
         )
 
     return redirect("accounts:admin_complaint_reasons")
+
+
+from django.core.mail import send_mail
+from django.conf import settings
+
+# ========== CONTACT MANAGEMENT ==========
+
+
+@login_required
+@user_passes_test(is_admin)
+def admin_contacts_list(request):
+    """List all contact messages"""
+    status_filter = request.GET.get("status", "all")
+
+    contacts = ContactMessage.objects.all()
+
+    if status_filter == "pending":
+        contacts = contacts.filter(responded=False)
+    elif status_filter == "responded":
+        contacts = contacts.filter(responded=True)
+
+    contacts = contacts.order_by("-created_at")
+
+    context = {
+        "contacts": contacts,
+        "status_filter": status_filter,
+    }
+
+    return render(request, "accounts/admin/contacts_list.html", context)
+
+
+@login_required
+@user_passes_test(is_admin)
+def admin_contact_reply(request, contact_id):
+    """Reply to a contact message"""
+    contact = get_object_or_404(ContactMessage, id=contact_id)
+
+    if request.method == "POST":
+        from .forms import ContactReplyForm
+
+        form = ContactReplyForm(request.POST)
+
+        if form.is_valid():
+            subject = form.cleaned_data["subject"]
+            message = form.cleaned_data["message"]
+
+            # Send email
+            try:
+                send_mail(
+                    subject=f"Re: {subject}",
+                    message=message,
+                    from_email=settings.DEFAULT_FROM_EMAIL,
+                    recipient_list=[contact.email],
+                    fail_silently=False,
+                )
+
+                contact.responded = True
+                contact.save()
+
+                messages.success(request, f"Reply sent to {contact.email}")
+                return redirect("accounts:admin_contacts_list")
+            except Exception as e:
+                messages.error(request, f"Error sending email: {str(e)}")
+    else:
+        from .forms import ContactReplyForm
+
+        initial_data = {
+            "subject": f"Re: {contact.subject}",
+            "message": f"Dear {contact.name},\n\nThank you for contacting us.\n\n",
+        }
+        form = ContactReplyForm(initial=initial_data)
+
+    context = {
+        "contact": contact,
+        "form": form,
+    }
+
+    return render(request, "accounts/admin/contact_reply.html", context)
+
+
+@login_required
+@user_passes_test(is_admin)
+def admin_contact_delete(request, contact_id):
+    """Delete a contact message"""
+    if request.method == "POST":
+        contact = get_object_or_404(ContactMessage, id=contact_id)
+        contact.delete()
+        messages.success(request, "Contact message deleted")
+
+    return redirect("accounts:admin_contacts_list")
+
+
+# ========== QUESTIONS MANAGEMENT ==========
+
+
+@login_required
+@user_passes_test(is_admin)
+def admin_questions_list(request):
+    """List all product questions"""
+    status_filter = request.GET.get("status", "all")
+
+    questions = ProductQuestion.objects.select_related("user", "product").all()
+
+    if status_filter == "unanswered":
+        questions = questions.filter(answer="")
+    elif status_filter == "answered":
+        questions = questions.exclude(answer="")
+
+    questions = questions.order_by("-created_at")
+
+    context = {
+        "questions": questions,
+        "status_filter": status_filter,
+    }
+
+    return render(request, "accounts/admin/questions_list.html", context)
+
+
+@login_required
+@user_passes_test(is_admin)
+def admin_question_reply(request, question_id):
+    """Reply to a product question"""
+    question = get_object_or_404(ProductQuestion, id=question_id)
+
+    if request.method == "POST":
+        from .forms import QuestionReplyForm
+
+        form = QuestionReplyForm(request.POST)
+
+        if form.is_valid():
+            answer = form.cleaned_data["answer"]
+
+            question.answer = answer
+            question.answered_by = request.user
+            question.answered_at = timezone.now()
+            question.save()
+
+            # Send email notification
+            try:
+                send_mail(
+                    subject=f"Answer to your question about {question.product.name}",
+                    message=f"Hello {question.user.username},\n\nYour question: {question.question}\n\nAnswer: {answer}\n\nView product: {request.build_absolute_uri(question.product.get_absolute_url())}",
+                    from_email=settings.DEFAULT_FROM_EMAIL,
+                    recipient_list=[question.user.email],
+                    fail_silently=True,
+                )
+            except:
+                pass
+
+            messages.success(request, "Question answered successfully")
+            return redirect("accounts:admin_questions_list")
+    else:
+        from .forms import QuestionReplyForm
+
+        form = QuestionReplyForm()
+
+    context = {
+        "question": question,
+        "form": form,
+    }
+
+    return render(request, "accounts/admin/question_reply.html", context)
+
+
+@login_required
+@user_passes_test(is_admin)
+def admin_question_delete(request, question_id):
+    """Delete a product question"""
+    if request.method == "POST":
+        question = get_object_or_404(ProductQuestion, id=question_id)
+        question.delete()
+        messages.success(request, "Question deleted")
+
+    return redirect("accounts:admin_questions_list")
+
+
+# ========== REVIEWS MANAGEMENT ==========
+
+
+@login_required
+@user_passes_test(is_admin)
+def admin_reviews_list(request):
+    """List all product reviews"""
+    rating_filter = request.GET.get("rating", "all")
+
+    reviews = ProductReview.objects.select_related("user", "product").all()
+
+    if rating_filter != "all":
+        reviews = reviews.filter(rating=rating_filter)
+
+    reviews = reviews.order_by("-created_at")
+
+    context = {
+        "reviews": reviews,
+        "rating_filter": rating_filter,
+    }
+
+    return render(request, "accounts/admin/reviews_list.html", context)
+
+
+@login_required
+@user_passes_test(is_admin)
+def admin_review_reply(request, review_id):
+    """Reply to a product review"""
+    review = get_object_or_404(ProductReview, id=review_id)
+
+    if request.method == "POST":
+        from .forms import ReviewReplyForm
+
+        form = ReviewReplyForm(request.POST)
+
+        if form.is_valid():
+            reply = form.save(commit=False)
+            reply.product = review.product
+            reply.user = request.user
+            reply.title = f"@{review.user.username} - {form.cleaned_data['title']}"
+            reply.comment = f"@{review.user.username}\n\n{form.cleaned_data['comment']}"
+            reply.save()
+
+            # Send email notification
+            try:
+                send_mail(
+                    subject=f"Reply to your review on {review.product.name}",
+                    message=f"Hello {review.user.username},\n\n{reply.comment}\n\nView product: {request.build_absolute_uri(review.product.get_absolute_url())}",
+                    from_email=settings.DEFAULT_FROM_EMAIL,
+                    recipient_list=[review.user.email],
+                    fail_silently=True,
+                )
+            except:
+                pass
+
+            messages.success(request, "Reply posted successfully")
+            return redirect("accounts:admin_reviews_list")
+    else:
+        from .forms import ReviewReplyForm
+
+        initial_data = {"rating": 5, "title": "Thank you for your feedback"}
+        form = ReviewReplyForm(initial=initial_data)
+
+    context = {
+        "review": review,
+        "form": form,
+    }
+
+    return render(request, "accounts/admin/review_reply.html", context)
+
+
+@login_required
+@user_passes_test(is_admin)
+def admin_review_delete(request, review_id):
+    """Delete a product review"""
+    if request.method == "POST":
+        review = get_object_or_404(ProductReview, id=review_id)
+        review.delete()
+        messages.success(request, "Review deleted")
+
+    return redirect("accounts:admin_reviews_list")
 
 
 from decimal import Decimal

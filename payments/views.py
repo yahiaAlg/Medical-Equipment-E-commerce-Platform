@@ -38,13 +38,21 @@ def add_to_cart(request):
     try:
         data = json.loads(request.body)
         product_id = data.get("product_id")
+        variant_id = data.get("variant_id")
         quantity = int(data.get("quantity", 1))
 
         product = Product.objects.get(id=product_id)
+        variant = None
+
+        if variant_id:
+            from products.models import ProductVariant
+
+            variant = ProductVariant.objects.get(id=variant_id, product=product)
+
         cart, created = Cart.objects.get_or_create(user=request.user)
 
         cart_item, created = CartItem.objects.get_or_create(
-            cart=cart, product=product, defaults={"quantity": quantity}
+            cart=cart, product=product, variant=variant, defaults={"quantity": quantity}
         )
 
         if not created:

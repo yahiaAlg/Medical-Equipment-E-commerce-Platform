@@ -22,42 +22,52 @@
     <div class="cart-items">
       {% if cart_items %}
         {% for item in cart_items %}
-        <div class="cart-item">
-          <div class="item-image">
-            <img
-              src="{% if item.product.image %}{{ item.product.image.url }}{% else %}{% static 'images/product-placeholder.jpg' %}{% endif %}"
-              alt="{{ item.product.name }}"
-            />
-          </div>
-          <div class="item-details">
-            <h3>{{ item.product.name }}</h3>
-            <p class="item-category">{{ item.product.get_category_display|default:"Medical Equipment" }}</p>
-            <p class="item-description">
-              {{ item.product.short_description|default:item.product.description|truncatewords:15 }}
-            </p>
-          </div>
-          <div class="item-quantity">
-            <button class="qty-btn minus" onclick="updateQuantity({{ item.id }}, {{ item.quantity|add:'-1' }})"
-                    {% if item.quantity <= 1 %}disabled{% endif %}>-</button>
-            <input type="number" value="{{ item.quantity }}" min="1" max="{{ item.product.stock_quantity }}" 
-                   class="qty-input" onchange="updateQuantity({{ item.id }}, this.value)" />
-            <button class="qty-btn plus" onclick="updateQuantity({{ item.id }}, {{ item.quantity|add:'1' }})"
-                    {% if item.quantity >= item.product.stock_quantity %}disabled{% endif %}>+</button>
-          </div>
-          <div class="item-price">
-            <span class="price">
-              {% if item.quantity >= item.product.bulk_quantity and item.product.bulk_price %}
-                ${{ item.product.bulk_price|floatformat:2 }}
-              {% else %}
-                ${{ item.product.price|floatformat:2 }}
+          <div class="cart-item">
+            <div class="item-image">
+              <a href="{{ item.product.get_absolute_url }}">
+                <img
+                  src="{% if item.product.images.first %}{{ item.product.images.first.image.url }}{% else %}{% static 'images/placeholder.png' %}{% endif %}"
+                  alt="{{ item.product.name }}"
+                />
+              </a>
+            </div>
+            <div class="item-details">
+              <a href="{{ item.product.get_absolute_url }}" style="text-decoration: none;">
+                <h3>{{ item.product.name }}</h3>
+              </a>
+              <p class="item-category">{{ item.product.category.name }}</p>
+              {% if item.variant %}
+              <p class="item-variant">
+                <strong>{{ item.variant.variant_title }}:</strong> {{ item.variant.variant_value }}
+              </p>
               {% endif %}
-            </span>
+              <p class="item-description">
+                {{ item.product.short_description|truncatewords:15 }}
+              </p>
+            </div>
+            <div class="item-quantity">
+              <button class="qty-btn minus" onclick="updateQuantity({{ item.id }}, {{ item.quantity|add:'-1' }})"
+                      {% if item.quantity <= 1 %}disabled{% endif %}>-</button>
+              <input type="number" value="{{ item.quantity }}" min="1" 
+                    max="{% if item.variant %}{{ item.variant.stock_quantity }}{% else %}{{ item.product.stock_quantity }}{% endif %}" 
+                    class="qty-input" readonly />
+              <button class="qty-btn plus" onclick="updateQuantity({{ item.id }}, {{ item.quantity|add:'1' }})"
+                      {% if item.variant %}
+                        {% if item.quantity >= item.variant.stock_quantity %}disabled{% endif %}
+                      {% else %}
+                        {% if item.quantity >= item.product.stock_quantity %}disabled{% endif %}
+                      {% endif %}>+</button>
+            </div>
+            <div class="item-price">
+              <span class="price">${{ item.get_unit_price|floatformat:2 }}</span>
+              <span class="item-subtotal">${{ item.get_total_price|floatformat:2 }}</span>
+            </div>
+            <div class="item-actions">
+              <button class="remove-btn" onclick="removeItem({{ item.id }})">
+                <i class="fas fa-trash"></i> Remove
+              </button>
+            </div>
           </div>
-          <div class="item-actions">
-            <button class="remove-btn" onclick="removeItem({{ item.id }})">Remove</button>
-            <button class="save-btn" onclick="saveForLater({{ item.id }})">Save for Later</button>
-          </div>
-        </div>
         {% endfor %}
       {% else %}
         <div style="text-align: center; padding: 3rem;">

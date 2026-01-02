@@ -170,6 +170,25 @@
                             <i class="fas fa-flag me-2"></i>Handle Complaints
                         </a>
                     </div>
+
+                    <!-- Add to dashboard.html after the existing quick action buttons -->
+                    <div class="col-md-3 col-sm-6">
+                        <a href="{% url 'accounts:admin_contacts_list' %}" class="btn btn-outline-info w-100 py-3">
+                            <i class="fas fa-envelope me-2"></i>Manage Contacts
+                        </a>
+                    </div>
+                    <div class="col-md-3 col-sm-6">
+                        <a href="{% url 'accounts:admin_questions_list' %}" class="btn btn-outline-secondary w-100 py-3">
+                            <i class="fas fa-question-circle me-2"></i>Manage Q&amp;A
+                        </a>
+                    </div>
+                    
+                    {% comment %} manage the reviews {% endcomment %}
+                    <div class="col-md-3 col-sm-6">
+                        <a href="{% url 'accounts:admin_reviews_list' %}" class="btn btn-outline-dark w-100 py-3">
+                            <i class="fas fa-star me-2"></i>Manage Reviews
+                        </a>
+                    </div>    
                 </div>
             </div>
         </div>

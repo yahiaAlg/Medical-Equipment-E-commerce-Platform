@@ -3,6 +3,7 @@ from .models import (
     Category,
     Brand,
     Product,
+    ProductVariant,
     ProductImage,
     ProductReview,
     ProductQuestion,
@@ -27,6 +28,20 @@ class BrandAdmin(admin.ModelAdmin):
     search_fields = ("name", "description")
 
     fieldsets = (("Brand Information", {"fields": ("name", "logo", "description")}),)
+
+
+class ProductVariantInline(admin.TabularInline):
+    model = ProductVariant
+    extra = 1
+    fields = (
+        "variant_title",
+        "variant_value",
+        "additional_cost",
+        "stock_quantity",
+        "is_active",
+        "display_order",
+    )
+    ordering = ("display_order", "variant_title")
 
 
 class ProductImageInline(admin.TabularInline):
@@ -82,7 +97,12 @@ class ProductAdmin(admin.ModelAdmin):
     )
     list_editable = ("featured", "trending", "availability_status")
     date_hierarchy = "created_at"
-    inlines = [ProductImageInline, ProductReviewInline, ProductQuestionInline]
+    inlines = [
+        ProductVariantInline,
+        ProductImageInline,
+        ProductReviewInline,
+        ProductQuestionInline,
+    ]
 
     fieldsets = (
         ("Basic Information", {"fields": ("name", "slug", "category", "brand", "sku")}),
@@ -164,7 +184,63 @@ class ProductAdmin(admin.ModelAdmin):
             super()
             .get_queryset(request)
             .select_related("category", "brand")
-            .prefetch_related("images", "reviews")
+            .prefetch_related("images", "reviews", "variants")
+        )
+
+
+@admin.register(ProductVariant)
+class ProductVariantAdmin(admin.ModelAdmin):
+    list_display = (
+        "product",
+        "variant_title",
+        "variant_value",
+        "additional_cost",
+        "stock_quantity",
+        "is_active",
+        "display_order",
+    )
+    list_filter = ("is_active", "variant_title", "product__category")
+    search_fields = ("product__name", "variant_title", "variant_value")
+    list_editable = ("is_active", "display_order", "stock_quantity")
+    ordering = ("product", "display_order", "variant_title")
+
+    fieldsets = (
+        (
+            "Variant Information",
+            {
+                "fields": (
+                    "product",
+                    "variant_title",
+                    "variant_value",
+                    "additional_cost",
+                )
+            },
+        ),
+        (
+            "Inventory & Display",
+            {"fields": ("stock_quantity", "is_active", "display_order")},
+        ),
+    )
+
+    actions = ["activate_variants", "deactivate_variants"]
+
+    def activate_variants(self, request, queryset):
+        updated = queryset.update(is_active=True)
+        self.message_user(request, f"{updated} variant(s) activated.")
+
+    activate_variants.short_description = "Activate selected variants"
+
+    def deactivate_variants(self, request, queryset):
+        updated = queryset.update(is_active=False)
+        self.message_user(request, f"{updated} variant(s) deactivated.")
+
+    deactivate_variants.short_description = "Deactivate selected variants"
+
+    def get_queryset(self, request):
+        return (
+            super()
+            .get_queryset(request)
+            .select_related("product", "product__category", "product__brand")
         )
 
 
