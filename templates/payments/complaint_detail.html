@@ -193,10 +193,14 @@
 {% endblock %}
 
 {% block content %}
+
 <div class="complaint-detail-section">
   <div class="complaint-container">
     <div class="complaint-paper">
       <div class="detail-header">
+        <a href="{% url "accounts:dashboard" %}" class="btn btn-outline-secondary mb-3">
+          <i class="fas fa-arrow-left"></i> Back to Invoices
+        </a>
         <h1>{{ complaint.complaint_number }}</h1>
         <span class="complaint-status status-{{ complaint.status }}">
           {{ complaint.get_status_display }}

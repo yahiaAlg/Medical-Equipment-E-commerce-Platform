@@ -180,6 +180,15 @@
             </td>
             <td>
               <div class="btn-group" role="group">
+                <a href="{% url 'accounts:admin_order_detail' order.order_id %}" class="btn btn-sm btn-outline-info">
+                  <i class="fas fa-eye"></i> View Details
+                </a>
+                
+                {% if order.status == 'pending_confirmation' %}
+                <a href="{% url 'accounts:admin_confirm_order' order.order_id %}" class="btn btn-sm btn-warning">
+                  <i class="fas fa-check-circle"></i> Confirm
+                </a>
+                {% elif order.can_update_status %}
                 <button type="button" class="btn btn-sm btn-outline-primary dropdown-toggle" 
                         data-bs-toggle="dropdown" aria-expanded="false">
                   Actions
@@ -213,6 +222,9 @@
                     </a>
                   </li>
                 </ul>
+                {% else %}
+                <span class="badge bg-secondary">Actions Disabled</span>
+                {% endif %}
               </div>
             </td>
           </tr>

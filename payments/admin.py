@@ -2,8 +2,11 @@ from django.contrib import admin
 from .models import (
     Cart,
     CartItem,
+    ShippingType,
     Order,
     OrderItem,
+    OrderNote,
+    OrderNoteAttachment,
     Invoice,
     PaymentProof,
     PaymentReceipt,
@@ -21,7 +24,7 @@ class CartItemInline(admin.TabularInline):
     model = CartItem
     extra = 0
     readonly_fields = ("added_at", "get_total_price")
-    fields = ("product", "quantity", "added_at", "get_total_price")
+    fields = ("product", "variant", "quantity", "added_at", "get_total_price")
 
     def get_total_price(self, obj):
         if obj.pk:
@@ -65,7 +68,14 @@ class CartAdmin(admin.ModelAdmin):
 
 @admin.register(CartItem)
 class CartItemAdmin(admin.ModelAdmin):
-    list_display = ("cart", "product", "quantity", "display_total_price", "added_at")
+    list_display = (
+        "cart",
+        "product",
+        "variant",
+        "quantity",
+        "display_total_price",
+        "added_at",
+    )
     list_filter = ("added_at",)
     search_fields = ("cart__user__username", "product__name")
     readonly_fields = ("added_at", "display_total_price")
@@ -76,7 +86,19 @@ class CartItemAdmin(admin.ModelAdmin):
     display_total_price.short_description = "Total Price"
 
     def get_queryset(self, request):
-        return super().get_queryset(request).select_related("cart__user", "product")
+        return (
+            super()
+            .get_queryset(request)
+            .select_related("cart__user", "product", "variant")
+        )
+
+
+@admin.register(ShippingType)
+class ShippingTypeAdmin(admin.ModelAdmin):
+    list_display = ("name", "cost", "estimated_days", "is_active", "display_order")
+    list_editable = ("is_active", "display_order")
+    list_filter = ("is_active",)
+    search_fields = ("name",)
 
 
 class OrderItemInline(admin.TabularInline):
@@ -99,16 +121,19 @@ class OrderAdmin(admin.ModelAdmin):
         "order_id",
         "user",
         "status",
+        "shipping_type",
         "display_total_amount",
         "created_at",
         "paid_at",
     )
     list_filter = (
         "status",
+        "shipping_type",
         "created_at",
+        "confirmed_at",
+        "paid_at",
         "shipped_at",
         "delivered_at",
-        "paid_at",
     )
     search_fields = (
         "order_id",
@@ -127,9 +152,10 @@ class OrderAdmin(admin.ModelAdmin):
             {"fields": ("order_id", "user", "status", "tracking_number")},
         ),
         (
-            "Shipping Address",
+            "Shipping",
             {
                 "fields": (
+                    "shipping_type",
                     "shipping_address",
                     "shipping_city",
                     "shipping_state",
@@ -148,6 +174,8 @@ class OrderAdmin(admin.ModelAdmin):
                 "fields": (
                     "created_at",
                     "updated_at",
+                    "confirmed_at",
+                    "rejected_at",
                     "paid_at",
                     "shipped_at",
                     "delivered_at",
@@ -158,6 +186,7 @@ class OrderAdmin(admin.ModelAdmin):
     )
 
     actions = [
+        "mark_as_confirmed",
         "mark_as_paid",
         "mark_as_processing",
         "mark_as_shipped",
@@ -168,6 +197,16 @@ class OrderAdmin(admin.ModelAdmin):
         return f"{obj.total_amount} DZD"
 
     display_total_amount.short_description = "Total Amount"
+
+    def mark_as_confirmed(self, request, queryset):
+        from django.utils import timezone
+
+        updated = queryset.filter(status="pending_confirmation").update(
+            status="confirmed", confirmed_at=timezone.now()
+        )
+        self.message_user(request, f"{updated} order(s) confirmed.")
+
+    mark_as_confirmed.short_description = "Confirm orders"
 
     def mark_as_paid(self, request, queryset):
         from django.utils import timezone
@@ -203,7 +242,7 @@ class OrderAdmin(admin.ModelAdmin):
         return (
             super()
             .get_queryset(request)
-            .select_related("user")
+            .select_related("user", "shipping_type")
             .prefetch_related("items__product")
         )
 
@@ -221,6 +260,28 @@ class OrderItemAdmin(admin.ModelAdmin):
 
     def get_queryset(self, request):
         return super().get_queryset(request).select_related("order", "product")
+
+
+class OrderNoteAttachmentInline(admin.TabularInline):
+    model = OrderNoteAttachment
+    extra = 0
+    readonly_fields = ("uploaded_at",)
+
+
+@admin.register(OrderNote)
+class OrderNoteAdmin(admin.ModelAdmin):
+    list_display = ("order", "created_by", "created_at", "updated_at")
+    search_fields = ("order__order_id", "content")
+    readonly_fields = ("created_at", "updated_at")
+    list_filter = ("created_at",)
+    inlines = [OrderNoteAttachmentInline]
+
+
+@admin.register(OrderNoteAttachment)
+class OrderNoteAttachmentAdmin(admin.ModelAdmin):
+    list_display = ("order_note", "file_name", "file_type", "uploaded_at")
+    search_fields = ("order_note__order__order_id", "file_name")
+    readonly_fields = ("uploaded_at",)
 
 
 @admin.register(Invoice)
@@ -265,7 +326,6 @@ class PaymentProofAdmin(admin.ModelAdmin):
     approve_payments.short_description = "Approve selected payments"
 
     def reject_payments(self, request, queryset):
-        # This should be done through a form to add rejection reason
         self.message_user(
             request,
             "Please reject payments individually with a reason.",

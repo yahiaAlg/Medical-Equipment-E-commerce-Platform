@@ -21,24 +21,24 @@
   border-radius: 0.625rem;
   padding: 2.5rem;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  border: 2px solid #ff9800;
+  border: 2px solid var(--primary-blue);
 }
 
 .refund-header {
   text-align: center;
   margin-bottom: 2rem;
   padding-bottom: 1.5rem;
-  border-bottom: 2px solid #ff9800;
+  border-bottom: 2px solid var(--primary-blue);
 }
 
 .refund-icon {
   font-size: 4rem;
-  color: #ff9800;
+  color: var(--primary-blue);
   margin-bottom: 1rem;
 }
 
 .refund-header h1 {
-  color: #1a3e75;
+  color: var(--brand-blue);
   font-size: 2rem;
   margin-bottom: 0.5rem;
 }
@@ -77,7 +77,7 @@
 }
 
 .amount-refunded-section {
-  background: linear-gradient(135deg, #ff9800, #f57c00);
+  background: linear-gradient(135deg, var(--primary-blue), var(--primary-blue-dark));
   color: white;
   padding: 2rem;
   border-radius: 0.625rem;
@@ -121,23 +121,56 @@
 }
 
 .refund-reason-box {
-  background-color: #fff3cd;
-  border-left: 4px solid #ffc107;
+  background-color: #e3f2fd;
+  border-left: 4px solid var(--accent-blue);
   padding: 1.25rem;
   margin: 2rem 0;
   border-radius: 0.625rem;
 }
 
 .refund-reason-box h3 {
-  color: #856404;
+  color: var(--brand-blue);
   font-size: 1rem;
   margin-bottom: 0.5rem;
 }
 
 .refund-reason-box p {
-  color: #856404;
+  color: #424242;
   margin: 0;
   line-height: 1.6;
+}
+
+.refund-proof-box {
+  background-color: #f8f9fa;
+  border: 2px dashed var(--primary-blue);
+  padding: 1.5rem;
+  margin: 2rem 0;
+  border-radius: 0.625rem;
+  text-align: center;
+}
+
+.refund-proof-box h3 {
+  color: var(--brand-blue);
+  font-size: 1rem;
+  margin-bottom: 1rem;
+}
+
+.proof-file-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background-color: var(--primary-blue);
+  color: white;
+  padding: 0.75rem 1.5rem;
+  border-radius: 0.5rem;
+  text-decoration: none;
+  font-weight: 600;
+  transition: background-color 0.3s;
+}
+
+.proof-file-link:hover {
+  background-color: var(--primary-blue-dark);
+  color: white;
 }
 
 .refund-footer {
@@ -158,7 +191,7 @@
 }
 
 .btn-print {
-  background-color: #34588f;
+  background-color: var(--primary-blue);
   color: white;
   padding: 0.938rem 1.875rem;
   border-radius: 1.563rem;
@@ -170,7 +203,7 @@
 }
 
 .btn-print:hover {
-  background-color: #1a3e75;
+  background-color: var(--primary-blue-dark);
 }
 
 .btn-back {
@@ -189,7 +222,7 @@
 }
 
 @media print {
-  .action-buttons, nav, footer { display: none; }
+  .action-buttons, nav, footer, .refund-proof-box { display: none; }
   .refund-paper { box-shadow: none; border: none; }
 }
 </style>
@@ -200,6 +233,9 @@
   <div class="refund-container">
     <div class="refund-paper">
       <div class="refund-header">
+        <a href="{% url "accounts:dashboard" %}" class="btn btn-outline-secondary mb-3">
+            <i class="fas fa-arrow-left"></i> Back to Invoices
+        </a>
         <div class="refund-icon">
           <i class="fas fa-undo-alt"></i>
         </div>
@@ -235,6 +271,21 @@
         <h3><i class="fas fa-info-circle"></i> Refund Reason</h3>
         <p>{{ refund.reason }}</p>
       </div>
+
+      {% if receipt.refund_proof.proof_file %}
+      <div class="refund-proof-box">
+        <h3><i class="fas fa-file-invoice-dollar"></i> Refund Proof Document</h3>
+        <a href="{{ receipt.refund_proof.proof_file.url }}" target="_blank" class="proof-file-link">
+          <i class="fas fa-download"></i>
+          View Refund Proof
+        </a>
+        {% if receipt.refund_proof.transaction_reference %}
+        <p class="mt-3 mb-0 text-muted">
+          <small>Transaction Reference: {{ receipt.refund_proof.transaction_reference }}</small>
+        </p>
+        {% endif %}
+      </div>
+      {% endif %}
 
       <div class="refund-details">
         <div class="detail-row">

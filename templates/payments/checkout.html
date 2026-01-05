@@ -5,6 +5,24 @@
 
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'css/checkOut.css' %}">
+<style>
+  .checkbox-group {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 15px 0;
+  }
+  .checkbox-group input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+  }
+  .checkbox-label {
+    margin: 0;
+    cursor: pointer;
+    user-select: none;
+  }
+</style>
 {% endblock %}
 
 {% block content %}
@@ -32,7 +50,7 @@
 <!-- Checkout Content -->
 <div class="checkout-section">
   <div class="checkout-container">
-    <form method="post" class="checkout-form" id="checkout-form">
+    <form method="post" enctype="multipart/form-data" class="checkout-form" id="checkout-form">
       {% csrf_token %}
       
       <div class="form-section">
@@ -79,7 +97,6 @@
           <div class="checkbox-group">
             {{ form.billing_same }}
             <label for="{{ form.billing_same.id_for_label }}" class="checkbox-label">
-              <span class="checkbox-custom"></span>
               {{ form.billing_same.label }}
             </label>
           </div>
@@ -89,24 +106,43 @@
       <div class="form-section">
         <h2>Shipping Method</h2>
         <div class="shipping-options">
-          <div class="shipping-option selected">
-            <div class="shipping-option-content">
+          {% for shipping_type in shipping_types %}
+          <div class="shipping-option">
+            <label class="shipping-option-content">
+              <input type="radio" name="shipping_type" value="{{ shipping_type.id }}" 
+                    {% if forloop.first %}checked{% endif %}
+                    data-cost="{{ shipping_type.cost }}"
+                    data-days="{{ shipping_type.estimated_days }}"
+                    class="shipping-radio">
               <div class="option-info">
-                <span class="option-name">Standard Shipping (Algeria)</span>
-                <span class="option-time">5-7 business days</span>
+                <span class="option-name">{{ shipping_type.name }}</span>
+                <span class="option-time">{{ shipping_type.estimated_days }} business days</span>
+                {% if shipping_type.description %}
+                <span class="option-desc">{{ shipping_type.description }}</span>
+                {% endif %}
               </div>
-              <span class="option-price">500.00 DZD</span>
-            </div>
+              <span class="option-price">{{ shipping_type.cost }} DZD</span>
+            </label>
           </div>
+          {% endfor %}
         </div>
-        <p class="info-text">
-          <svg class="info-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <circle cx="12" cy="12" r="10"></circle>
-            <line x1="12" y1="16" x2="12" y2="12"></line>
-            <line x1="12" y1="8" x2="12.01" y2="8"></line>
-          </svg>
-          Shipping cost is fixed for all orders within Algeria
-        </p>
+      </div>
+
+      <div class="form-section">
+        <h2>Order Notes &amp; Attachments</h2>
+        <div class="form-group">
+          <label for="{{ form.order_note.id_for_label }}">{{ form.order_note.label }}</label>
+          {{ form.order_note }}
+          <small class="text-muted">Add any special instructions or requirements for this order</small>
+        </div>
+        
+        <div class="form-group mt-3">
+          <label for="note_attachments">Attachments (Optional)</label>
+          <input type="file" name="note_attachments" id="note_attachments" 
+                class="form-control" multiple
+                accept="image/*,application/pdf,.doc,.docx">
+          <small class="text-muted">Upload prescriptions, medical reports, or other relevant documents (max 10MB each)</small>
+        </div>
       </div>
 
       <div class="form-section">
@@ -169,7 +205,7 @@
         <div class="order-items">
           {% for item in cart.items.all %}
           <div class="order-item">
-            <img src="{% if item.product.image %}{{ item.product.image.url }}{% else %}{% static 'images/product-placeholder.jpg' %}{% endif %}"
+            <img src="{% if item.product.images.first %}{{ item.product.images.first.image.url }}{% else %}{% static 'images/product-placeholder.jpg' %}{% endif %}"
                  alt="{{ item.product.name }}" />
             <div class="item-details">
               <h4>{{ item.product.name }}</h4>
@@ -187,23 +223,22 @@
         <div class="summary-calculations">
           <div class="summary-row">
             <span>Subtotal</span>
-            <span id="subtotal">{{ cart.get_total_price|floatformat:2 }} DZD</span>
+            <span id="subtotal" data-value="{{ cart.get_total_price }}">{{ cart.get_total_price|floatformat:2 }} DZD</span>
           </div>
           <div class="summary-row">
             <span>Shipping</span>
-            <span id="shipping-cost">500.00 DZD</span>
+            <span id="shipping-cost" data-value="{% if shipping_types.first %}{{ shipping_types.first.cost }}{% else %}500.00{% endif %}">
+              {% if shipping_types.first %}{{ shipping_types.first.cost|floatformat:2 }}{% else %}500.00{% endif %} DZD
+            </span>
           </div>
           <div class="summary-row">
             <span>Tax (19%)</span>
-            <span id="tax">{% widthratio cart.get_total_price 1 0.19 as tax_amount %}{{ tax_amount|floatformat:2 }} DZD</span>
+            <span id="tax" data-rate="0.19"></span>
           </div>
           <div class="summary-divider"></div>
           <div class="summary-row total">
             <span>Total</span>
-            <span id="total-amount">
-              {% widthratio cart.get_total_price 1 1.19 as total_with_tax %}
-              {{ total_with_tax|add:500|floatformat:2 }} DZD
-            </span>
+            <span id="total-amount"></span>
           </div>
         </div>
 
@@ -231,6 +266,38 @@
 
 {% block extra_js %}
 <script>
+// Calculate and update totals
+function updateTotals() {
+    const subtotalEl = document.getElementById('subtotal');
+    const shippingEl = document.getElementById('shipping-cost');
+    const taxEl = document.getElementById('tax');
+    const totalEl = document.getElementById('total-amount');
+    
+    const subtotal = parseFloat(subtotalEl.dataset.value || 0);
+    const shipping = parseFloat(shippingEl.dataset.value || 0);
+    const taxRate = parseFloat(taxEl.dataset.rate || 0);
+    
+    const tax = subtotal * taxRate;
+    const total = subtotal + shipping + tax;
+    
+    taxEl.textContent = tax.toFixed(2) + ' DZD';
+    totalEl.textContent = total.toFixed(2) + ' DZD';
+}
+
+// Update shipping cost when selection changes
+document.querySelectorAll('.shipping-radio').forEach(radio => {
+    radio.addEventListener('change', function() {
+        const shippingEl = document.getElementById('shipping-cost');
+        const cost = parseFloat(this.dataset.cost || 0);
+        shippingEl.dataset.value = cost;
+        shippingEl.textContent = cost.toFixed(2) + ' DZD';
+        updateTotals();
+    });
+});
+
+// Initial calculation
+updateTotals();
+
 // Form validation
 document.querySelector('.checkout-form').addEventListener('submit', function(e) {
     const form = this;
@@ -246,6 +313,13 @@ document.querySelector('.checkout-form').addEventListener('submit', function(e) 
             field.classList.remove('error');
         }
     });
+    
+    // Check shipping type is selected
+    const shippingSelected = form.querySelector('input[name="shipping_type"]:checked');
+    if (!shippingSelected) {
+        isValid = false;
+        alert('Please select a shipping method');
+    }
     
     if (!isValid) {
         e.preventDefault();

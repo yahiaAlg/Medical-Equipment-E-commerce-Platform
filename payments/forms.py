@@ -5,10 +5,19 @@ from .models import (
     ComplaintAttachment,
     RefundProof,
     ComplaintReason,
+    ShippingType,
 )
 
 
 class CheckoutForm(forms.Form):
+    # Shipping Type
+    shipping_type = forms.ModelChoiceField(
+        queryset=ShippingType.objects.filter(is_active=True),
+        widget=forms.RadioSelect,
+        empty_label=None,
+        label="Shipping Method",
+    )
+
     # Shipping Information
     shipping_address = forms.CharField(
         widget=forms.Textarea(attrs={"rows": 3, "class": "form-control"}),
@@ -34,8 +43,21 @@ class CheckoutForm(forms.Form):
     billing_same = forms.BooleanField(
         required=False,
         initial=True,
+        label="Billing address is the same as shipping address",
         widget=forms.CheckboxInput(attrs={"class": "form-check-input"}),
-        label="Billing address same as shipping",
+    )
+
+    # Order Notes
+    order_note = forms.CharField(
+        required=False,
+        widget=forms.Textarea(
+            attrs={
+                "rows": 4,
+                "class": "form-control",
+                "placeholder": "Special delivery instructions, medical requirements, etc.",
+            }
+        ),
+        label="Order Notes (Optional)",
     )
 
 
@@ -272,3 +294,126 @@ class RefundProofUploadForm(forms.ModelForm):
             if file.content_type not in allowed_types:
                 raise forms.ValidationError("Only JPG, PNG, and PDF files are allowed.")
         return file
+
+
+# Add to payments/forms.py
+
+from .models import OrderNote, OrderNoteAttachment, ShippingType
+
+
+class OrderNoteForm(forms.ModelForm):
+    class Meta:
+        model = OrderNote
+        fields = ["content"]
+        widgets = {
+            "content": forms.Textarea(
+                attrs={
+                    "class": "form-control",
+                    "rows": 5,
+                    "placeholder": "Add notes about this order...",
+                }
+            )
+        }
+        labels = {"content": "Order Notes"}
+
+
+class OrderNoteAttachmentForm(forms.ModelForm):
+    class Meta:
+        model = OrderNoteAttachment
+        fields = ["file"]
+        widgets = {
+            "file": forms.FileInput(
+                attrs={
+                    "class": "form-control",
+                    "accept": "image/*,application/pdf,.doc,.docx",
+                    # "multiple": True,
+                }
+            )
+        }
+
+    def clean_file(self):
+        file = self.cleaned_data.get("file")
+        if file:
+            # Max 10MB per file
+            if file.size > 10 * 1024 * 1024:
+                raise forms.ValidationError("File size must be under 10MB.")
+
+            allowed_types = [
+                "image/jpeg",
+                "image/png",
+                "image/jpg",
+                "image/gif",
+                "application/pdf",
+                "application/msword",
+                "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+            ]
+            if file.content_type not in allowed_types:
+                raise forms.ValidationError(
+                    "Only images, PDF, and Word documents are allowed."
+                )
+        return file
+
+
+class OrderConfirmationForm(forms.Form):
+    ACTION_CHOICES = [("confirm", "Confirm Order"), ("reject", "Reject Order")]
+
+    action = forms.ChoiceField(
+        choices=ACTION_CHOICES,
+        widget=forms.RadioSelect(attrs={"class": "form-check-input"}),
+        label="Action",
+    )
+    note = forms.CharField(
+        required=False,
+        widget=forms.Textarea(
+            attrs={
+                "class": "form-control",
+                "rows": 4,
+                "placeholder": "Add confirmation/rejection notes...",
+            }
+        ),
+        label="Notes",
+    )
+    rejection_reason = forms.CharField(
+        required=False,
+        widget=forms.Textarea(
+            attrs={
+                "class": "form-control",
+                "rows": 3,
+                "placeholder": "Required if rejecting order",
+            }
+        ),
+        label="Rejection Reason",
+    )
+
+    def clean(self):
+        cleaned_data = super().clean()
+        action = cleaned_data.get("action")
+        rejection_reason = cleaned_data.get("rejection_reason")
+
+        if action == "reject" and not rejection_reason:
+            raise forms.ValidationError(
+                "Rejection reason is required when rejecting an order."
+            )
+
+        return cleaned_data
+
+
+class ShippingTypeForm(forms.ModelForm):
+    class Meta:
+        model = ShippingType
+        fields = [
+            "name",
+            "description",
+            "estimated_days",
+            "cost",
+            "is_active",
+            "display_order",
+        ]
+        widgets = {
+            "name": forms.TextInput(attrs={"class": "form-control"}),
+            "description": forms.Textarea(attrs={"class": "form-control", "rows": 3}),
+            "estimated_days": forms.NumberInput(attrs={"class": "form-control"}),
+            "cost": forms.NumberInput(attrs={"class": "form-control", "step": "0.01"}),
+            "is_active": forms.CheckboxInput(attrs={"class": "form-check-input"}),
+            "display_order": forms.NumberInput(attrs={"class": "form-control"}),
+        }

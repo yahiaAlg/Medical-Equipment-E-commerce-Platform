@@ -1,0 +1,190 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Shipping Types - Admin{% endblock %}
+
+{% block extra_css %}
+<style>
+.admin-header {
+  background: linear-gradient(135deg, var(--primary-blue) 0%, var(--primary-blue-dark) 100%);
+  color: white;
+  padding: 2rem 0;
+  margin-bottom: 2rem;
+}
+
+.content-card {
+  background: white;
+  border-radius: 10px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  margin-bottom: 1.5rem;
+}
+
+.shipping-type-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem;
+  border: 1px solid #dee2e6;
+  border-radius: 5px;
+  margin-bottom: 0.5rem;
+  transition: background 0.2s;
+}
+
+.shipping-type-item:hover {
+  background: #f8f9fa;
+}
+
+.shipping-type-info h5 {
+  margin: 0 0 0.5rem 0;
+  color: var(--brand-blue);
+}
+
+.shipping-type-details {
+  display: flex;
+  gap: 1rem;
+  font-size: 0.9rem;
+  color: #666;
+}
+
+.status-badge {
+  padding: 0.25rem 0.75rem;
+  border-radius: 15px;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.status-active { background: #d4edda; color: #155724; }
+.status-inactive { background: #f8d7da; color: #721c24; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="admin-header">
+  <div class="container">
+    <h1><i class="fas fa-truck me-2"></i>Shipping Types Management</h1>
+    <p class="mb-0">Manage available shipping methods</p>
+  </div>
+</div>
+
+<div class="container mb-5">
+  <div class="mb-3">
+    <a href="{% url 'accounts:admin_dashboard' %}" class="btn btn-outline-secondary">
+      <i class="fas fa-arrow-left me-2"></i>Back to Dashboard
+    </a>
+  </div>
+
+  <div class="row">
+    <!-- Add New Shipping Type -->
+    <div class="col-md-4">
+      <div class="content-card">
+        <h3 class="mb-3">Add Shipping Type</h3>
+        <form method="post">
+          {% csrf_token %}
+          
+          <div class="mb-3">
+            <label class="form-label">{{ form.name.label }}</label>
+            {{ form.name }}
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">{{ form.description.label }}</label>
+            {{ form.description }}
+          </div>
+
+          <div class="row">
+            <div class="col-6 mb-3">
+              <label class="form-label">{{ form.estimated_days.label }}</label>
+              {{ form.estimated_days }}
+            </div>
+            <div class="col-6 mb-3">
+              <label class="form-label">{{ form.cost.label }}</label>
+              {{ form.cost }}
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">{{ form.display_order.label }}</label>
+            {{ form.display_order }}
+          </div>
+
+          <div class="form-check mb-3">
+            {{ form.is_active }}
+            <label class="form-check-label" for="{{ form.is_active.id_for_label }}">
+              {{ form.is_active.label }}
+            </label>
+          </div>
+
+          <button type="submit" class="btn btn-primary w-100">
+            <i class="fas fa-plus me-2"></i>Add Shipping Type
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <!-- Shipping Types List -->
+    <div class="col-md-8">
+      <div class="content-card">
+        <h3 class="mb-3">Shipping Types ({{ shipping_types.count }})</h3>
+        
+        {% if shipping_types %}
+        {% for shipping_type in shipping_types %}
+        <div class="shipping-type-item">
+          <div class="shipping-type-info">
+            <h5>{{ shipping_type.name }}</h5>
+            <div class="shipping-type-details">
+              <span><i class="fas fa-money-bill-wave me-1"></i>{{ shipping_type.cost }} DZD</span>
+              <span><i class="fas fa-clock me-1"></i>{{ shipping_type.estimated_days }} days</span>
+              <span><i class="fas fa-sort me-1"></i>Order: {{ shipping_type.display_order }}</span>
+            </div>
+            {% if shipping_type.description %}
+            <p class="text-muted mb-0 mt-2">{{ shipping_type.description }}</p>
+            {% endif %}
+          </div>
+          
+          <div class="d-flex gap-2 align-items-center">
+            <span class="status-badge status-{% if shipping_type.is_active %}active{% else %}inactive{% endif %}">
+              {% if shipping_type.is_active %}Active{% else %}Inactive{% endif %}
+            </span>
+            
+            <div class="btn-group">
+              <button type="button" class="btn btn-sm btn-outline-secondary dropdown-toggle" 
+                      data-bs-toggle="dropdown">
+                Actions
+              </button>
+              <ul class="dropdown-menu">
+                <li>
+                  <form method="post" action="{% url 'accounts:admin_toggle_shipping_type' shipping_type.id %}" class="d-inline">
+                    {% csrf_token %}
+                    <button type="submit" class="dropdown-item">
+                      <i class="fas fa-toggle-{% if shipping_type.is_active %}off{% else %}on{% endif %} me-2"></i>
+                      {% if shipping_type.is_active %}Deactivate{% else %}Activate{% endif %}
+                    </button>
+                  </form>
+                </li>
+                <li><hr class="dropdown-divider"></li>
+                <li>
+                  <form method="post" action="{% url 'accounts:admin_delete_shipping_type' shipping_type.id %}" 
+                        onsubmit="return confirm('Delete this shipping type?')">
+                    {% csrf_token %}
+                    <button type="submit" class="dropdown-item text-danger">
+                      <i class="fas fa-trash me-2"></i>Delete
+                    </button>
+                  </form>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+        {% endfor %}
+        {% else %}
+        <div class="text-center text-muted py-4">
+          <i class="fas fa-inbox fa-3x mb-3"></i>
+          <p>No shipping types defined yet</p>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

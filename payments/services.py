@@ -15,17 +15,21 @@ class OrderService:
     @staticmethod
     def create_order_from_cart(user, cart, shipping_data):
         """Create order from cart items"""
+        # Get shipping type
+        shipping_type = shipping_data.get("shipping_type")
+        shipping_cost = shipping_type.cost if shipping_type else Decimal("500.00")
+
         # Calculate totals
         subtotal = cart.get_total_price()
         tax_rate = Decimal("0.19")  # 19% tax
         tax_amount = subtotal * tax_rate
-        shipping_cost = Decimal("500.00")  # Fixed shipping for Algeria
         total = subtotal + tax_amount + shipping_cost
 
         # Create order
         order = Order.objects.create(
             user=user,
-            status="awaiting_payment",
+            status="pending_confirmation",  # Changed from awaiting_payment
+            shipping_type=shipping_type,
             shipping_address=shipping_data["shipping_address"],
             shipping_city=shipping_data["shipping_city"],
             shipping_state=shipping_data["shipping_state"],

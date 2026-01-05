@@ -18,13 +18,11 @@ from .models import (
 )
 
 
-# At the top, add helper function
 def notify_admins(notification_type, title, message, **related_objects):
-    """Notify all active admin users"""
-    from django.contrib.auth.models import User
-
+    """Notify all active admin users via database notification AND email"""
     admin_users = User.objects.filter(is_staff=True, is_active=True)
     for admin in admin_users:
+        # Create database notification
         Notification.objects.create(
             user=admin,
             notification_type=notification_type,
@@ -32,24 +30,18 @@ def notify_admins(notification_type, title, message, **related_objects):
             message=message,
             **related_objects,
         )
+        # Send email notification
+        send_notification_email(admin, title, message)
 
 
-def send_notification_email(user, title, message, notify_admin=False):
+def send_notification_email(user, title, message):
     """Helper function to send notification emails"""
     try:
-        from pages.models import SiteInformation
-
-        site_info = SiteInformation.get_instance()
-
-        recipient_list = [user.email]
-        if notify_admin and site_info.email:
-            recipient_list.append(site_info.email)
-
         send_mail(
             subject=title,
             message=message,
             from_email=settings.DEFAULT_FROM_EMAIL,
-            recipient_list=recipient_list,
+            recipient_list=[user.email],
             fail_silently=True,
         )
     except Exception:
@@ -57,19 +49,11 @@ def send_notification_email(user, title, message, notify_admin=False):
 
 
 @receiver(post_save, sender=Order)
-def create_invoice_on_order(sender, instance, created, **kwargs):
-    """Auto-generate invoice when order is created"""
+def handle_order_creation_and_status(sender, instance, created, **kwargs):
+    """Handle order creation and status changes"""
     if created:
-        Invoice.objects.create(
-            order=instance,
-            subtotal=instance.subtotal,
-            tax_amount=instance.tax_amount,
-            total_amount=instance.total_amount,
-            status="unpaid",
-        )
-
-        # Create notification for user
-        order_msg = f"Your order {instance.order_id} has been placed. Invoice has been generated."
+        # Notify user about order creation
+        order_msg = f"Your order {instance.order_id} has been placed and is awaiting confirmation."
         Notification.objects.create(
             user=instance.user,
             notification_type="order_created",
@@ -77,28 +61,60 @@ def create_invoice_on_order(sender, instance, created, **kwargs):
             message=order_msg,
             order=instance,
         )
-        send_notification_email(
-            instance.user, "Order Placed Successfully", order_msg, notify_admin=True
-        )
+        send_notification_email(instance.user, "Order Placed Successfully", order_msg)
 
-        # Create notification for invoice
-        invoice_msg = f"Invoice {instance.invoice.invoice_number} is now available. Please make payment and upload proof."
-        Notification.objects.create(
-            user=instance.user,
-            notification_type="invoice_created",
-            title="Invoice Generated",
-            message=invoice_msg,
-            order=instance,
-            invoice=instance.invoice,
-        )
-        send_notification_email(instance.user, "Invoice Generated", invoice_msg)
-
+        # Notify all admins
         notify_admins(
             "order_created",
             "New Order Received",
-            f"Order {instance.order_id} placed by {instance.user.username} - {instance.total_amount} DZD",
+            f"Order {instance.order_id} placed by {instance.user.username} - {instance.total_amount} DZD. Needs confirmation.",
             order=instance,
         )
+
+    else:
+        # Handle status changes
+        if instance.status == "confirmed" and instance.confirmed_at:
+            # Move to awaiting payment and create invoice
+            if not hasattr(instance, "invoice"):
+                Order.objects.filter(pk=instance.pk).update(status="awaiting_payment")
+                instance.refresh_from_db()
+
+                # Create invoice
+                Invoice.objects.create(
+                    order=instance,
+                    subtotal=instance.subtotal,
+                    tax_amount=instance.tax_amount,
+                    total_amount=instance.total_amount,
+                    status="unpaid",
+                )
+
+                # Notify user about confirmation and invoice
+                msg = f"Your order {instance.order_id} has been confirmed! Invoice {instance.invoice.invoice_number} is available. Please proceed with payment."
+                Notification.objects.create(
+                    user=instance.user,
+                    notification_type="order_confirmed",
+                    title="Order Confirmed",
+                    message=msg,
+                    order=instance,
+                    invoice=instance.invoice,
+                )
+                send_notification_email(instance.user, "Order Confirmed", msg)
+
+        elif instance.status == "rejected" and instance.rejected_at:
+            # Handle rejection
+            rejection_note = ""
+            if hasattr(instance, "note"):
+                rejection_note = f"\n\nReason: {instance.note.content}"
+
+            msg = f"Your order {instance.order_id} has been rejected.{rejection_note}"
+            Notification.objects.create(
+                user=instance.user,
+                notification_type="order_rejected",
+                title="Order Rejected",
+                message=msg,
+                order=instance,
+            )
+            send_notification_email(instance.user, "Order Rejected", msg)
 
 
 @receiver(post_save, sender=PaymentProof)
@@ -126,20 +142,16 @@ def update_invoice_on_payment_proof(sender, instance, created, **kwargs):
             order=order,
             invoice=invoice,
         )
-        send_notification_email(
-            order.user, "Payment Proof Submitted", msg, notify_admin=True
-        )
+        send_notification_email(order.user, "Payment Proof Submitted", msg)
 
-        admin_users = User.objects.filter(is_staff=True, is_active=True)
-        for admin in admin_users:
-            Notification.objects.create(
-                user=admin,
-                notification_type="payment_submitted",
-                title="New Payment Proof Submitted",
-                message=f"Payment proof for invoice {invoice.invoice_number} needs review.",
-                order=order,
-                invoice=invoice,
-            )
+        # Notify all admins
+        notify_admins(
+            "payment_submitted",
+            "New Payment Proof Submitted",
+            f"Payment proof for invoice {invoice.invoice_number} needs review from {order.user.username}.",
+            order=order,
+            invoice=invoice,
+        )
 
 
 @receiver(post_save, sender=PaymentProof)
@@ -213,8 +225,15 @@ def notify_on_complaint(sender, instance, created, **kwargs):
             order=instance.order,
             complaint=instance,
         )
-        send_notification_email(
-            instance.user, "Complaint Submitted", msg, notify_admin=True
+        send_notification_email(instance.user, "Complaint Submitted", msg)
+
+        # Notify admins
+        notify_admins(
+            "complaint_created",
+            "New Complaint Submitted",
+            f"Complaint {instance.complaint_number} from {instance.user.username} - {instance.reason.name if instance.reason else 'Custom'}",
+            order=instance.order,
+            complaint=instance,
         )
     else:
         # Status changed
@@ -243,14 +262,6 @@ def notify_on_complaint(sender, instance, created, **kwargs):
             )
             send_notification_email(instance.user, title, msg)
 
-        notify_admins(
-            "complaint_created",
-            "New Complaint Submitted",
-            f"Complaint {instance.complaint_number} from {instance.user.username} - {instance.reason.name if instance.reason else 'Custom'}",
-            order=instance.order,
-            complaint=instance,
-        )
-
 
 @receiver(post_save, sender=Refund)
 def notify_on_refund(sender, instance, created, **kwargs):
@@ -266,6 +277,7 @@ def notify_on_refund(sender, instance, created, **kwargs):
             refund=instance,
         )
         send_notification_email(instance.order.user, "Refund Initiated", msg)
+
         # Notify other admins
         notify_admins(
             "refund_initiated",

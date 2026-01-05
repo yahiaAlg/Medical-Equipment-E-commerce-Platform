@@ -1,0 +1,222 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Confirm Order {{ order.order_id }} - Admin{% endblock %}
+
+{% block extra_css %}
+<style>
+.admin-header {
+  background: linear-gradient(135deg, var(--primary-blue) 0%, var(--primary-blue-dark) 100%);
+  color: white;
+  padding: 2rem 0;
+  margin-bottom: 2rem;
+}
+
+.confirm-container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
+.confirm-card {
+  background: white;
+  border-radius: 10px;
+  padding: 2rem;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.order-summary {
+  background: #f8f9fa;
+  padding: 1rem;
+  border-radius: 5px;
+  margin-bottom: 1.5rem;
+}
+
+.customer-notes-section {
+  background: #fff3cd;
+  border: 1px solid #ffc107;
+  border-radius: 5px;
+  padding: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.note-content {
+  background: white;
+  padding: 1rem;
+  border-radius: 5px;
+  margin-top: 0.5rem;
+  white-space: pre-wrap;
+}
+
+.attachments-list {
+  list-style: none;
+  padding: 0;
+  margin-top: 0.5rem;
+}
+
+.attachment-item {
+  display: flex;
+  align-items: center;
+  padding: 0.75rem;
+  background: white;
+  border-radius: 5px;
+  margin-bottom: 0.5rem;
+}
+
+.attachment-item i {
+  color: var(--primary-blue);
+  margin-right: 0.5rem;
+}
+
+.form-section {
+  margin-bottom: 1.5rem;
+}
+
+.form-section h4 {
+  color: var(--brand-blue);
+  margin-bottom: 1rem;
+}
+
+.action-radio {
+  display: flex;
+  gap: 2rem;
+  margin-bottom: 1rem;
+}
+
+.action-radio label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+}
+
+.rejection-fields {
+  display: none;
+  animation: fadeIn 0.3s;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="admin-header">
+  <div class="container">
+    <h1><i class="fas fa-check-circle me-2"></i>Confirm Order</h1>
+    <p class="mb-0">Review and confirm or reject order {{ order.order_id }}</p>
+  </div>
+</div>
+
+<div class="confirm-container mb-5">
+  <div class="mb-3">
+    <a href="{% url 'accounts:admin_order_detail' order.order_id %}" class="btn btn-outline-secondary">
+      <i class="fas fa-arrow-left me-2"></i>Back to Order Details
+    </a>
+  </div>
+
+  <div class="confirm-card">
+    <!-- Order Summary -->
+    <div class="order-summary">
+      <h4><i class="fas fa-info-circle me-2"></i>Order Summary</h4>
+      <p><strong>Order ID:</strong> {{ order.order_id }}</p>
+      <p><strong>Customer:</strong> {{ order.user.get_full_name|default:order.user.username }}</p>
+      <p><strong>Total Amount:</strong> {{ order.total_amount }} DZD</p>
+      <p><strong>Items:</strong> {{ order.items.count }}</p>
+      <p class="mb-0"><strong>Created:</strong> {{ order.created_at|date:"M d, Y H:i" }}</p>
+    </div>
+
+    <!-- Customer Notes (Read-only) -->
+    {% if order_note %}
+    <div class="customer-notes-section">
+      <h4><i class="fas fa-comment me-2"></i>Customer Notes</h4>
+      <div class="note-content">{{ order_note.content }}</div>
+      <p class="text-muted mt-2 mb-0">
+        <small>Added by customer on {{ order_note.created_at|date:"M d, Y H:i" }}</small>
+      </p>
+      
+      {% if order_note.attachments.exists %}
+      <hr>
+      <h5 class="mt-3">Customer Attachments</h5>
+      <ul class="attachments-list">
+        {% for attachment in order_note.attachments.all %}
+        <li class="attachment-item">
+          <i class="fas fa-file"></i>
+          <a href="{{ attachment.file.url }}" target="_blank">{{ attachment.file_name }}</a>
+          <small class="text-muted ms-2">({{ attachment.uploaded_at|date:"M d, Y" }})</small>
+        </li>
+        {% endfor %}
+      </ul>
+      {% endif %}
+    </div>
+    {% else %}
+    <div class="alert alert-info">
+      <i class="fas fa-info-circle me-2"></i>
+      No customer notes provided for this order.
+    </div>
+    {% endif %}
+
+    <!-- Confirmation Form -->
+    <form method="post">
+      {% csrf_token %}
+
+      <!-- Action Selection -->
+      <div class="form-section">
+        <h4>Action</h4>
+        <div class="action-radio">
+          {% for choice in form.action %}
+          <label>
+            {{ choice.tag }}
+            <span>{{ choice.choice_label }}</span>
+          </label>
+          {% endfor %}
+        </div>
+      </div>
+
+      <!-- Rejection Reason (conditional) -->
+      <div class="form-section rejection-fields" id="rejection-fields">
+        <label class="form-label">{{ form.rejection_reason.label }} *</label>
+        {{ form.rejection_reason }}
+        {% if form.rejection_reason.errors %}
+        <div class="text-danger mt-1">{{ form.rejection_reason.errors }}</div>
+        {% endif %}
+        <small class="text-muted">This reason will be sent to the customer</small>
+      </div>
+
+      {% if form.non_field_errors %}
+      <div class="alert alert-danger">{{ form.non_field_errors }}</div>
+      {% endif %}
+
+      <!-- Submit Button -->
+      <div class="d-flex gap-2">
+        <button type="submit" class="btn btn-primary">
+          <i class="fas fa-check me-2"></i>Submit Decision
+        </button>
+        <a href="{% url 'accounts:admin_order_detail' order.order_id %}" class="btn btn-secondary">Cancel</a>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+// Show/hide rejection fields based on action selection
+document.querySelectorAll('input[name="action"]').forEach(radio => {
+  radio.addEventListener('change', function() {
+    const rejectionFields = document.getElementById('rejection-fields');
+    if (this.value === 'reject') {
+      rejectionFields.style.display = 'block';
+    } else {
+      rejectionFields.style.display = 'none';
+    }
+  });
+});
+
+// Initialize on load
+const rejectedRadio = document.querySelector('input[name="action"][value="reject"]');
+if (rejectedRadio && rejectedRadio.checked) {
+  document.getElementById('rejection-fields').style.display = 'block';
+}
+</script>
+{% endblock %}

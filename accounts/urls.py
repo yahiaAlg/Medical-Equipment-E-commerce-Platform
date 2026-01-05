@@ -82,6 +82,32 @@ urlpatterns = [
         views.admin_update_order_status,
         name="admin_update_order_status",
     ),
+    # Add these to accounts/urls.py urlpatterns
+    # Order Detail & Confirmation
+    path(
+        "admin/order/<str:order_id>/",
+        views.admin_order_detail,
+        name="admin_order_detail",
+    ),
+    path(
+        "admin/order/<str:order_id>/confirm/",
+        views.admin_confirm_order,
+        name="admin_confirm_order",
+    ),
+    # Shipping Types Management
+    path(
+        "admin/shipping-types/", views.admin_shipping_types, name="admin_shipping_types"
+    ),
+    path(
+        "admin/shipping-type/<int:shipping_type_id>/toggle/",
+        views.admin_toggle_shipping_type,
+        name="admin_toggle_shipping_type",
+    ),
+    path(
+        "admin/shipping-type/<int:shipping_type_id>/delete/",
+        views.admin_delete_shipping_type,
+        name="admin_delete_shipping_type",
+    ),
     # Payments Management
     path("admin/payments/", views.admin_payments_list, name="admin_payments_list"),
     path(

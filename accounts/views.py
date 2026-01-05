@@ -1672,3 +1672,158 @@ def admin_reports(request):
     }
 
     return render(request, "accounts/admin/reports.html", context)
+
+
+# Add these views to accounts/views.py
+
+
+@login_required
+@user_passes_test(is_admin)
+def admin_order_detail(request, order_id):
+    """View order details with notes and attachments"""
+    order = get_object_or_404(Order, order_id=order_id)
+
+    # Get or create note
+    try:
+        order_note = order.note
+    except OrderNote.DoesNotExist:
+        order_note = None
+
+    context = {
+        "order": order,
+        "order_note": order_note,
+        "items": order.items.all(),
+    }
+
+    return render(request, "accounts/admin/order_detail.html", context)
+
+
+@login_required
+@user_passes_test(is_admin)
+def admin_confirm_order(request, order_id):
+    """Confirm or reject an order"""
+    order = get_object_or_404(Order, order_id=order_id)
+
+    if order.status != "pending_confirmation":
+        messages.warning(request, "This order has already been processed.")
+        return redirect("accounts:admin_order_detail", order_id=order.order_id)
+
+    # Get existing customer note (if any)
+    try:
+        order_note = order.note
+    except OrderNote.DoesNotExist:
+        order_note = None
+
+    if request.method == "POST":
+        from payments.forms import OrderConfirmationForm
+
+        form = OrderConfirmationForm(request.POST)
+
+        if form.is_valid():
+            action = form.cleaned_data["action"]
+
+            # Update order status
+            if action == "confirm":
+                order.status = "confirmed"
+                order.confirmed_at = timezone.now()
+                order.save()
+                messages.success(
+                    request, f"Order {order.order_id} confirmed successfully!"
+                )
+            else:
+                # If rejecting, store rejection reason in order note
+                rejection_reason = form.cleaned_data.get("rejection_reason", "")
+
+                # Create or update note with rejection reason (by admin)
+                order_note, created = OrderNote.objects.get_or_create(
+                    order=order,
+                    defaults={
+                        "content": f"[ADMIN REJECTION]\n{rejection_reason}",
+                        "created_by": request.user,
+                    },
+                )
+                if not created:
+                    # Append rejection reason to existing customer note
+                    order_note.content = (
+                        f"{order_note.content}\n\n[ADMIN REJECTION]\n{rejection_reason}"
+                    )
+                    order_note.save()
+
+                order.status = "rejected"
+                order.rejected_at = timezone.now()
+                order.save()
+                messages.warning(request, f"Order {order.order_id} rejected.")
+
+            return redirect("accounts:admin_order_detail", order_id=order.order_id)
+    else:
+        from payments.forms import OrderConfirmationForm
+
+        form = OrderConfirmationForm()
+
+    context = {
+        "order": order,
+        "order_note": order_note,
+        "form": form,
+    }
+
+    return render(request, "accounts/admin/order_confirm.html", context)
+
+
+@login_required
+@user_passes_test(is_admin)
+def admin_shipping_types(request):
+    """Manage shipping types"""
+    from payments.forms import ShippingTypeForm
+    from payments.models import ShippingType
+
+    if request.method == "POST":
+        form = ShippingTypeForm(request.POST)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Shipping type added successfully!")
+            return redirect("accounts:admin_shipping_types")
+    else:
+        form = ShippingTypeForm()
+
+    shipping_types = ShippingType.objects.all().order_by("display_order", "name")
+
+    context = {
+        "shipping_types": shipping_types,
+        "form": form,
+    }
+
+    return render(request, "accounts/admin/shipping_types.html", context)
+
+
+@login_required
+@user_passes_test(is_admin)
+def admin_toggle_shipping_type(request, shipping_type_id):
+    """Toggle shipping type active status"""
+    if request.method == "POST":
+        from payments.models import ShippingType
+
+        shipping_type = get_object_or_404(ShippingType, id=shipping_type_id)
+        shipping_type.is_active = not shipping_type.is_active
+        shipping_type.save()
+
+        status = "activated" if shipping_type.is_active else "deactivated"
+        messages.success(
+            request, f'Shipping type "{shipping_type.name}" has been {status}.'
+        )
+
+    return redirect("accounts:admin_shipping_types")
+
+
+@login_required
+@user_passes_test(is_admin)
+def admin_delete_shipping_type(request, shipping_type_id):
+    """Delete a shipping type"""
+    if request.method == "POST":
+        from payments.models import ShippingType
+
+        shipping_type = get_object_or_404(ShippingType, id=shipping_type_id)
+        name = shipping_type.name
+        shipping_type.delete()
+        messages.success(request, f'Shipping type "{name}" deleted.')
+
+    return redirect("accounts:admin_shipping_types")

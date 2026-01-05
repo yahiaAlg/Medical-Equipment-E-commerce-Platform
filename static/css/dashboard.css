@@ -127,6 +127,11 @@
   background-color: #ffc107;
   color: #000;
 }
+
+.badge.status-pending_confirmation {
+  background-color: #34588f;
+  color: white;
+}
 /* Card Styling - Matching Home Page */
 .card {
   background-color: white;

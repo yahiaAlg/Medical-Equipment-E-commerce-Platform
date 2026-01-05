@@ -131,12 +131,44 @@ def checkout(request):
 
     if request.method == "POST":
         form = CheckoutForm(request.POST)
+        files = request.FILES.getlist("note_attachments")
+
         if form.is_valid():
+            # Prepare shipping data
+            shipping_data = {
+                "shipping_type": form.cleaned_data["shipping_type"],
+                "shipping_address": form.cleaned_data["shipping_address"],
+                "shipping_city": form.cleaned_data["shipping_city"],
+                "shipping_state": form.cleaned_data["shipping_state"],
+                "shipping_zip": form.cleaned_data["shipping_zip"],
+            }
+
             order = OrderService.create_order_from_cart(
-                user=request.user, cart=cart, shipping_data=form.cleaned_data
+                user=request.user, cart=cart, shipping_data=shipping_data
             )
-            messages.success(request, f"Order {order.order_id} placed successfully!")
-            return redirect("payments:invoice_detail", invoice_id=order.invoice.id)
+
+            # Handle order note if provided
+            note_content = form.cleaned_data.get("order_note")
+            if note_content:
+                order_note = OrderNote.objects.create(
+                    order=order, content=note_content, created_by=request.user
+                )
+
+                # Handle attachments
+                for file in files:
+                    OrderNoteAttachment.objects.create(
+                        order_note=order_note,
+                        file=file,
+                        file_name=file.name,
+                        file_type=file.content_type,
+                    )
+
+            messages.success(
+                request,
+                f"Order {order.order_id} placed successfully! Awaiting admin confirmation.",
+            )
+            return redirect("accounts:dashboard")
+
     else:
         # Pre-fill with user profile data
         initial = {}
@@ -147,10 +179,20 @@ def checkout(request):
                 "shipping_city": profile.city,
                 "shipping_state": profile.state,
                 "shipping_zip": profile.zip_code,
+                "billing_same": True,
             }
         form = CheckoutForm(initial=initial)
 
-    return render(request, "payments/checkout.html", {"form": form, "cart": cart})
+    # Get active shipping types for display
+    shipping_types = ShippingType.objects.filter(is_active=True).order_by(
+        "display_order"
+    )
+
+    return render(
+        request,
+        "payments/checkout.html",
+        {"form": form, "cart": cart, "shipping_types": shipping_types},
+    )
 
 
 @login_required

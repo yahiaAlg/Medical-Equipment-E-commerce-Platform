@@ -51,8 +51,28 @@ class CartItem(models.Model):
         return self.quantity * self.get_unit_price()
 
 
+# Add these models to payments/models.py
+class ShippingType(models.Model):
+    name = models.CharField(max_length=100)
+    description = models.TextField(blank=True)
+    estimated_days = models.PositiveIntegerField(help_text="Estimated delivery days")
+    cost = models.DecimalField(max_digits=10, decimal_places=2)
+    is_active = models.BooleanField(default=True)
+    display_order = models.PositiveIntegerField(default=0)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["display_order", "name"]
+
+    def __str__(self):
+        return f"{self.name} - {self.cost} DZD ({self.estimated_days} days)"
+
+
 class Order(models.Model):
     STATUS_CHOICES = [
+        ("pending_confirmation", "Pending Confirmation"),
+        ("confirmed", "Confirmed"),
+        ("rejected", "Rejected"),
         ("awaiting_payment", "Awaiting Payment"),
         ("payment_under_review", "Payment Under Review"),
         ("paid", "Paid"),
@@ -67,10 +87,13 @@ class Order(models.Model):
     order_id = models.CharField(max_length=50, unique=True, editable=False)
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="orders")
     status = models.CharField(
-        max_length=30, choices=STATUS_CHOICES, default="awaiting_payment"
+        max_length=30, choices=STATUS_CHOICES, default="pending_confirmation"
     )
 
     # Shipping information
+    shipping_type = models.ForeignKey(
+        ShippingType, on_delete=models.SET_NULL, null=True, blank=True
+    )
     shipping_address = models.TextField()
     shipping_city = models.CharField(max_length=100)
     shipping_state = models.CharField(max_length=100)
@@ -86,6 +109,8 @@ class Order(models.Model):
     # Timestamps
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    confirmed_at = models.DateTimeField(blank=True, null=True)
+    rejected_at = models.DateTimeField(blank=True, null=True)
     paid_at = models.DateTimeField(blank=True, null=True)
     shipped_at = models.DateTimeField(blank=True, null=True)
     delivered_at = models.DateTimeField(blank=True, null=True)
@@ -104,6 +129,10 @@ class Order(models.Model):
             self.order_id = f"ORD-{uuid.uuid4().hex[:12].upper()}"
         super().save(*args, **kwargs)
 
+    def can_update_status(self):
+        """Check if order status can be updated (must be confirmed first)"""
+        return self.status not in ["pending_confirmation", "rejected"]
+
 
 class OrderItem(models.Model):
     order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name="items")
@@ -116,6 +145,30 @@ class OrderItem(models.Model):
 
     def get_total_price(self):
         return self.quantity * self.price
+
+
+class OrderNote(models.Model):
+    order = models.OneToOneField(Order, on_delete=models.CASCADE, related_name="note")
+    content = models.TextField()
+    created_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"Note for {self.order.order_id}"
+
+
+class OrderNoteAttachment(models.Model):
+    order_note = models.ForeignKey(
+        OrderNote, on_delete=models.CASCADE, related_name="attachments"
+    )
+    file = models.FileField(upload_to="order_notes/%Y/%m/")
+    file_name = models.CharField(max_length=255)
+    file_type = models.CharField(max_length=50)
+    uploaded_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Attachment for {self.order_note.order.order_id}"
 
 
 class Invoice(models.Model):
@@ -439,6 +492,8 @@ class Notification(models.Model):
         ("refund_completed", "Refund Completed"),
         ("order_shipped", "Order Shipped"),
         ("order_delivered", "Order Delivered"),
+        ("order_confirmed", "Order Confirmed"),
+        ("order_rejected", "Order Rejected"),
         # New notification types
         ("user_registered", "New User Registered"),
         ("review_submitted", "New Review Submitted"),

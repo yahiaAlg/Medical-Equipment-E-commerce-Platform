@@ -184,13 +184,19 @@
               </span>
             </td>
             <td>
-              <a href="{{ payment.proof_file.url }}" target="_blank">
-                {% if payment.proof_file.url|slice:"-4:" == ".pdf" %}
-                  <i class="fas fa-file-pdf text-danger fa-2x"></i>
-                {% else %}
-                  <img src="{{ payment.proof_file.url }}" alt="Payment Proof" class="payment-proof-thumb">
-                {% endif %}
-              </a>
+              {% if payment.proof_file %}
+                <a href="{{ payment.proof_file.url }}" target="_blank">
+                  {% if payment.proof_file.url|slice:"-4:" == ".pdf" %}
+                    <i class="fas fa-file-pdf text-danger fa-2x"></i>
+                  {% else %}
+                    <img src="{{ payment.proof_file.url }}" alt="Payment Proof" class="payment-proof-thumb">
+                  {% endif %}
+                </a>
+              {% else %}
+                <span class="text-muted">
+                  <i class="fas fa-file-exclamation"></i> No file
+                </span>
+              {% endif %}
             </td>
             <td>{{ payment.uploaded_at|timesince }} ago</td>
             <td>

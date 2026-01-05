@@ -252,11 +252,18 @@
                                             <td><strong>${{ order.total_amount }}</strong></td>
                                             <td>
                                                 <div class="btn-group" role="group">
-                                                    <a href="{% url 'payments:invoice_detail' order.invoice.id %}" 
-                                                       class="btn btn-sm btn-outline-primary" 
-                                                       title="View Details">
-                                                        <i class="fas fa-eye"></i>
-                                                    </a>
+                                                    {% if order.invoice %}
+                                                        <a href="{% url 'payments:invoice_detail' order.invoice.id %}" 
+                                                        class="btn btn-sm btn-outline-primary" 
+                                                        title="View Details">
+                                                            <i class="fas fa-eye"></i>
+                                                        </a>
+                                                    {% else %}
+                                                        <span class="btn btn-sm btn-outline-secondary disabled" 
+                                                            title="Awaiting confirmation">
+                                                            <i class="fas fa-clock"></i>
+                                                        </span>
+                                                    {% endif %}
                                                     {% if order.status in 'delivered,shipped,paid' and not order.complaints.exists %}
                                                     <a href="{% url 'payments:complaint_create' order.id %}" 
                                                        class="btn btn-sm btn-outline-warning" 
