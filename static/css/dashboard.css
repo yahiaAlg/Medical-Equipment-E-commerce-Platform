@@ -123,6 +123,10 @@
   background-color: #dc3545;
   color: white;
 }
+.badge.status-awaiting_payment {
+  background-color: #ffc107;
+  color: #000;
+}
 /* Card Styling - Matching Home Page */
 .card {
   background-color: white;

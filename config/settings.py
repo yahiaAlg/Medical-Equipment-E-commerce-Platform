@@ -3,7 +3,9 @@ from pathlib import Path
 from dotenv import load_dotenv
 
 # Load environment variables from .env file
-load_dotenv()
+load_dotenv(
+    override=True,
+)
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -134,12 +136,12 @@ EMAIL_BACKEND = os.environ.get(
 
 # For production with real SMTP (like Gmail)
 EMAIL_HOST = os.environ.get("EMAIL_HOST", "smtp.gmail.com")
-EMAIL_PORT = int(os.environ.get("EMAIL_PORT", 587))
-EMAIL_USE_TLS = os.environ.get("EMAIL_USE_TLS", "True") == "True"
+EMAIL_PORT = int(os.environ.get("EMAIL_PORT", 465))
+EMAIL_USE_SSL = os.environ.get("EMAIL_USE_TLS", "True") == "True"
 EMAIL_HOST_USER = os.environ.get("EMAIL_HOST_USER", "")
 EMAIL_HOST_PASSWORD = os.environ.get("EMAIL_HOST_PASSWORD", "")
 DEFAULT_FROM_EMAIL = os.environ.get("DEFAULT_FROM_EMAIL", "noreply@example.com")
-
+SERVER_EMAIL = DEFAULT_FROM_EMAIL
 # Add this for password reset
 PASSWORD_RESET_TIMEOUT = 86400  # 24 hours in seconds
 
