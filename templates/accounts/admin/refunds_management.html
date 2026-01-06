@@ -4,68 +4,7 @@
 {% block title %}Refunds Management - Admin{% endblock %}
 
 {% block extra_css %}
-<style>
-.admin-header {
-  background: linear-gradient(135deg, #34588f 0%, #1a3e75 100%);
-  color: white;
-  padding: 2rem 0;
-  margin-bottom: 2rem;
-}
-
-.stat-row {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 1rem;
-  margin-bottom: 1.5rem;
-}
-
-.mini-stat {
-  background: white;
-  padding: 1rem;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-  text-align: center;
-}
-
-.mini-stat .number {
-  font-size: 1.5rem;
-  font-weight: bold;
-  color: #34588f;
-}
-
-.mini-stat .label {
-  font-size: 0.85rem;
-  color: #666;
-}
-
-.filter-bar {
-  background: white;
-  padding: 1.5rem;
-  border-radius: 10px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-  margin-bottom: 1.5rem;
-}
-
-.table-container {
-  background: white;
-  border-radius: 10px;
-  padding: 1.5rem;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-}
-
-.status-badge {
-  padding: 0.4rem 0.8rem;
-  border-radius: 20px;
-  font-size: 0.85rem;
-  font-weight: 600;
-}
-
-.status-refund_pending { background: #fff3cd; color: #856404; }
-.status-refund_approved { background: #d1ecf1; color: #0c5460; }
-.status-refund_processing { background: #cfe2ff; color: #084298; }
-.status-refund_completed { background: #d4edda; color: #155724; }
-.status-refund_rejected { background: #f8d7da; color: #721c24; }
-</style>
+  <link rel="stylesheet" href="{% static 'css/admin/refunds_management.css' %}">
 {% endblock %}
 
 {% block content %}

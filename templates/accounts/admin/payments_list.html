@@ -4,77 +4,7 @@
 {% block title %}Payments Management - Fennec Med{% endblock %}
 
 {% block extra_css %}
-<style>
-.admin-header {
-  background: linear-gradient(135deg, #34588f 0%, #1a3e75 100%);
-  color: white;
-  padding: 2rem 0;
-  margin-bottom: 2rem;
-}
-
-.stat-card {
-  background: white;
-  border-radius: 10px;
-  padding: 1.5rem;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-  transition: transform 0.3s;
-}
-
-.stat-card:hover {
-  transform: translateY(-5px);
-}
-
-.stat-card .icon {
-  font-size: 2rem;
-  margin-bottom: 0.5rem;
-}
-
-.stat-card .number {
-  font-size: 1.8rem;
-  font-weight: bold;
-  color: #34588f;
-}
-
-.stat-card .label {
-  color: #666;
-  font-size: 0.9rem;
-  text-transform: uppercase;
-}
-
-.table-container {
-  background: white;
-  border-radius: 10px;
-  padding: 1.5rem;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-}
-
-.status-badge {
-  padding: 0.4rem 0.8rem;
-  border-radius: 20px;
-  font-size: 0.85rem;
-  font-weight: 600;
-}
-
-.status-pending { background: #fff3cd; color: #856404; }
-.status-verified { background: #d4edda; color: #155724; }
-.status-rejected { background: #f8d7da; color: #721c24; }
-
-.filter-section {
-  background: white;
-  padding: 1.5rem;
-  border-radius: 10px;
-  margin-bottom: 1.5rem;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-}
-
-.payment-proof-thumb {
-  width: 60px;
-  height: 60px;
-  object-fit: cover;
-  border-radius: 5px;
-  cursor: pointer;
-}
-</style>
+<link rel="stylesheet" href="{% static 'css/admin/payments_list.css' %}">
 {% endblock %}
 
 {% block content %}

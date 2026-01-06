@@ -1,0 +1,55 @@
+.admin-header {
+  background: linear-gradient(135deg, #34588f 0%, #1a3e75 100%);
+  color: white;
+  padding: 2rem 0;
+  margin-bottom: 2rem;
+}
+
+.card-custom {
+  background: white;
+  border-radius: 10px;
+  padding: 2rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  margin-bottom: 1.5rem;
+}
+
+.info-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.75rem 0;
+  border-bottom: 1px solid #e9ecef;
+}
+
+.info-row:last-child {
+  border-bottom: none;
+}
+
+.info-label {
+  font-weight: 600;
+  color: #666;
+}
+
+.info-value {
+  color: #333;
+  font-weight: 500;
+}
+
+.upload-area {
+  background: #f8f9fa;
+  border: 2px dashed #dee2e6;
+  border-radius: 8px;
+  padding: 2rem;
+  text-align: center;
+  transition: all 0.3s;
+}
+
+.upload-area:hover {
+  border-color: #34588f;
+  background: #f0f4f8;
+}
+
+.upload-icon {
+  font-size: 3rem;
+  color: #34588f;
+  margin-bottom: 1rem;
+}

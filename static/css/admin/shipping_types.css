@@ -1,0 +1,61 @@
+.admin-header {
+  background: linear-gradient(
+    135deg,
+    var(--primary-blue) 0%,
+    var(--primary-blue-dark) 100%
+  );
+  color: white;
+  padding: 2rem 0;
+  margin-bottom: 2rem;
+}
+
+.content-card {
+  background: white;
+  border-radius: 10px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  margin-bottom: 1.5rem;
+}
+
+.shipping-type-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem;
+  border: 1px solid #dee2e6;
+  border-radius: 5px;
+  margin-bottom: 0.5rem;
+  transition: background 0.2s;
+}
+
+.shipping-type-item:hover {
+  background: #f8f9fa;
+}
+
+.shipping-type-info h5 {
+  margin: 0 0 0.5rem 0;
+  color: var(--brand-blue);
+}
+
+.shipping-type-details {
+  display: flex;
+  gap: 1rem;
+  font-size: 0.9rem;
+  color: #666;
+}
+
+.status-badge {
+  padding: 0.25rem 0.75rem;
+  border-radius: 15px;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.status-active {
+  background: #d4edda;
+  color: #155724;
+}
+.status-inactive {
+  background: #f8d7da;
+  color: #721c24;
+}

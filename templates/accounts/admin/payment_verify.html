@@ -4,63 +4,7 @@
 {% block title %}Verify Payment - Fennec Med{% endblock %}
 
 {% block extra_css %}
-<style>
-.admin-header {
-  background: linear-gradient(135deg, #34588f 0%, #1a3e75 100%);
-  color: white;
-  padding: 2rem 0;
-  margin-bottom: 2rem;
-}
-
-.card-custom {
-  background: white;
-  border-radius: 10px;
-  padding: 2rem;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-  margin-bottom: 1.5rem;
-}
-
-.proof-viewer {
-  background: #f8f9fa;
-  border-radius: 10px;
-  padding: 1rem;
-  text-align: center;
-}
-
-.proof-viewer img {
-  max-width: 100%;
-  max-height: 500px;
-  border-radius: 5px;
-}
-
-.info-row {
-  display: flex;
-  justify-content: space-between;
-  padding: 0.75rem 0;
-  border-bottom: 1px solid #e9ecef;
-}
-
-.info-row:last-child {
-  border-bottom: none;
-}
-
-.info-label {
-  font-weight: 600;
-  color: #666;
-}
-
-.info-value {
-  color: #333;
-  font-weight: 500;
-}
-
-.status-badge {
-  padding: 0.5rem 1rem;
-  border-radius: 20px;
-  font-size: 0.9rem;
-  font-weight: 600;
-}
-</style>
+<link rel="stylesheet" href="{% static 'css/admin/payment_verify.css' %}">
 {% endblock %}
 
 {% block content %}

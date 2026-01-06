@@ -1,0 +1,102 @@
+.admin-header {
+  background: linear-gradient(
+    135deg,
+    var(--primary-blue) 0%,
+    var(--primary-blue-dark) 100%
+  );
+  color: white;
+  padding: 2rem 0;
+  margin-bottom: 2rem;
+}
+
+.confirm-container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
+.confirm-card {
+  background: white;
+  border-radius: 10px;
+  padding: 2rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.order-summary {
+  background: #f8f9fa;
+  padding: 1rem;
+  border-radius: 5px;
+  margin-bottom: 1.5rem;
+}
+
+.customer-notes-section {
+  background: #fff3cd;
+  border: 1px solid #ffc107;
+  border-radius: 5px;
+  padding: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.note-content {
+  background: white;
+  padding: 1rem;
+  border-radius: 5px;
+  margin-top: 0.5rem;
+  white-space: pre-wrap;
+}
+
+.attachments-list {
+  list-style: none;
+  padding: 0;
+  margin-top: 0.5rem;
+}
+
+.attachment-item {
+  display: flex;
+  align-items: center;
+  padding: 0.75rem;
+  background: white;
+  border-radius: 5px;
+  margin-bottom: 0.5rem;
+}
+
+.attachment-item i {
+  color: var(--primary-blue);
+  margin-right: 0.5rem;
+}
+
+.form-section {
+  margin-bottom: 1.5rem;
+}
+
+.form-section h4 {
+  color: var(--brand-blue);
+  margin-bottom: 1rem;
+}
+
+.action-radio {
+  display: flex;
+  gap: 2rem;
+  margin-bottom: 1rem;
+}
+
+.action-radio label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+}
+
+.rejection-fields {
+  display: none;
+  animation: fadeIn 0.3s;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}

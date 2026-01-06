@@ -1,0 +1,56 @@
+.admin-header {
+  background: linear-gradient(135deg, #34588f 0%, #1a3e75 100%);
+  color: white;
+  padding: 2rem 0;
+  margin-bottom: 2rem;
+}
+
+.card-custom {
+  background: white;
+  border-radius: 10px;
+  padding: 2rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  margin-bottom: 1.5rem;
+}
+
+.reason-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem;
+  border: 1px solid #e9ecef;
+  border-radius: 8px;
+  margin-bottom: 0.75rem;
+  transition: all 0.3s;
+}
+
+.reason-item:hover {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.reason-info {
+  flex: 1;
+}
+
+.reason-badge {
+  padding: 0.3rem 0.7rem;
+  border-radius: 15px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  margin-left: 0.5rem;
+}
+
+.reason-badge.active {
+  background: #d4edda;
+  color: #155724;
+}
+
+.reason-badge.inactive {
+  background: #f8d7da;
+  color: #721c24;
+}
+
+.reason-actions {
+  display: flex;
+  gap: 0.5rem;
+}
