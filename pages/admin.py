@@ -47,7 +47,7 @@ class SiteInformationAdmin(admin.ModelAdmin):
     fieldsets = (
         (
             "Basic Information",
-            {"fields": ("site_name", "tagline", "description", "logo")},
+            {"fields": ("site_name", "tagline", "description", "logo", "tva_rate")},
         ),
         ("Contact Information", {"fields": ("phone", "fax", "email", "address")}),
         (

@@ -12,7 +12,7 @@ def index(request):
     featured_products = Product.objects.filter(featured=True)[:8]
     trending_products = Product.objects.filter(trending=True)[:6]
     testimonials = Testimonial.objects.filter(is_featured=True)[:6]
-    categories = Category.objects.all()[:10]
+    categories = Category.objects.all()
     print(f"settings.EMAIL_HOST_USER: {settings.EMAIL_HOST_USER}")
     print(f"settings.EMAIL_HOST_PASSWORD: {settings.EMAIL_HOST_PASSWORD}")
     context = {

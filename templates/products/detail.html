@@ -54,18 +54,15 @@
       </div>
 
       <div class="price-section">
-        <span class="current-price" id="displayPrice">${{ product.price }}</span>
+        <span class="current-price" id="displayPrice">DZD {{ product.price }}</span>
         {% if product.bulk_price %}
-        <span class="original-price">${{ product.bulk_price }}</span>
+        <span class="original-price">DZD {{ product.bulk_price }}</span>
         <span class="discount-badge">17% OFF</span>
         {% endif %}
       </div>
 
-      <p class="unit-info">Unit: 2 lbs bag | Price per lb: $2.5</p>
-
       <div class="stock-status {% if product.availability_status != 'in_stock' %}out{% endif %}">
         ✓ {{ product.get_availability_status_display }}
-        {% if product.stock_quantity %}- {{ product.stock_quantity }} units{% endif %}
       </div>
 
       <div class="key-features">
@@ -79,10 +76,6 @@
       </div>
 
       <div class="product-meta">
-        <div class="meta-item">
-          <strong>SKU:</strong>
-          <span>{{ product.sku }}</span>
-        </div>
         <div class="meta-item">
           <strong>Categories:</strong>
           <span>
@@ -105,9 +98,6 @@
               {% for variant in group.list %}
               <button class="size-btn" data-variant-id="{{ variant.id }}" data-price="{{ variant.additional_cost }}">
                 {{ variant.variant_value }}
-                {% if variant.additional_cost > 0 %}
-                  (+${{ variant.additional_cost }})
-                {% endif %}
               </button>
               {% endfor %}
             </div>
@@ -134,11 +124,6 @@
             {% if in_wishlist %}Remove from Wishlist{% else %}Add to Wishlist{% endif %}
           </span>
         </button>
-      </div>
-
-      <div class="delivery-info">
-        <p>⏱ Delivery within 2-4 hours</p>
-        <p>↩ Easy returns within 24 hours</p>
       </div>
     </div>
   </div>
@@ -252,12 +237,11 @@
           <span class="verified-badge">✓ Verified Purchase</span>
           {% endif %}
         </div>
-        <h4 class="review-title">{{ review.title }}</h4>
-        <p class="review-text">{{ review.comment }}</p>
-        <div class="review-actions">
-          <span class="review-action">👍 Helpful (12)</span>
-          <span class="review-action">Report</span>
+        <div class="border rounded-2 mb-2 px-3 py-2" >
+          <h4 class="review-title">{{ review.title }}</h4>
+          <p class="review-comment">{{ review.comment|linebreaks }}</p>
         </div>
+
       </div>
       {% endfor %}
 
@@ -347,8 +331,7 @@
               <span>({{ related.get_review_count }})</span>
             </div>
             <div class="product-card-price">
-              <span class="price">${{ related.price }}</span>
-              <span class="old-price">$6.99</span>
+              <span class="price">DZD {{ related.price }}</span>
             </div>
             <button class="btn-add" onclick="event.preventDefault(); quickAddToCart({{ related.id }})">+ Add</button>
           </div>
@@ -426,7 +409,7 @@
         // Update price display
         const additionalCost = parseFloat(this.dataset.price);
         const totalPrice = basePrice + additionalCost;
-        document.getElementById('displayPrice').textContent = '$' + totalPrice.toFixed(2);
+        document.getElementById('displayPrice').textContent = 'DZD ' + totalPrice.toFixed(2);
       });
     });
 

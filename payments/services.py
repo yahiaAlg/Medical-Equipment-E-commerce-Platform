@@ -1,5 +1,6 @@
 from django.utils import timezone
 from decimal import Decimal
+from pages.models import SiteInformation
 from .models import (
     Order,
     OrderItem,
@@ -13,22 +14,28 @@ class OrderService:
     """Service for order creation and management"""
 
     @staticmethod
-    def create_order_from_cart(user, cart, shipping_data):
+    def create_order_from_cart(user, cart, shipping_data, tva_rate=None):
         """Create order from cart items"""
+        # Import here to avoid circular dependency
+
+        # Get TVA rate from site settings if not provided
+        if tva_rate is None:
+            site_info = SiteInformation.get_instance()
+            tva_rate = site_info.tva_rate
+
         # Get shipping type
         shipping_type = shipping_data.get("shipping_type")
         shipping_cost = shipping_type.cost if shipping_type else Decimal("500.00")
 
         # Calculate totals
         subtotal = cart.get_total_price()
-        tax_rate = Decimal("0.19")  # 19% tax
-        tax_amount = subtotal * tax_rate
+        tax_amount = subtotal * tva_rate
         total = subtotal + tax_amount + shipping_cost
 
         # Create order
         order = Order.objects.create(
             user=user,
-            status="pending_confirmation",  # Changed from awaiting_payment
+            status="pending_confirmation",
             shipping_type=shipping_type,
             shipping_address=shipping_data["shipping_address"],
             shipping_city=shipping_data["shipping_city"],

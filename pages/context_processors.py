@@ -6,4 +6,5 @@ def site_info(request):
     site_info = SiteInformation.get_instance()
     return {
         "site_info": site_info,
+        "tva_rate": site_info.tva_rate,
     }

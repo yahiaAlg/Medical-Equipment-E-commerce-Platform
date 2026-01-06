@@ -94,6 +94,14 @@ class SiteInformation(models.Model):
     about_story_title = models.CharField(max_length=200, default="Our Story")
     about_story_content = models.TextField(blank=True)
 
+    # Tax Configuration
+    tva_rate = models.DecimalField(
+        max_digits=5,
+        decimal_places=4,
+        default=0.05,
+        help_text="TVA/Tax rate as decimal (e.g., 0.19 for 19%)",
+    )
+
     # Map
     map_embed_url = models.URLField(blank=True, help_text="Google Maps embed URL")
 

@@ -11,6 +11,7 @@ class Command(BaseCommand):
         # Create or update Site Information
         site_info = SiteInformation.get_instance()
         site_info.company_name = "Fennec Med"
+        site_info.tva_rate = 0.05
         site_info.tagline = "Providing quality medical materials to families across the region since 2022"
         site_info.phone = "03 9591 5378"
         site_info.fax = "03 7068 5073"

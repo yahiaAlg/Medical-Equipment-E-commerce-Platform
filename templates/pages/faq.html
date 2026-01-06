@@ -1,6 +1,9 @@
 {% extends 'base.html' %}
 {% load static %}
+{% block extra_css %}
 
+    <link rel="stylesheet" href="{% static 'css/faq.css' %}">
+{% endblock %}
 {% block title %}FAQ - MedEquip Pro{% endblock %}
 
 {% block content %}
@@ -214,36 +217,6 @@
         </div>
     </div>
 </section>
-{% endblock %}
-
-{% block extra_css %}
-<style>
-.topic-card:hover {
-    transform: translateY(-5px);
-    transition: transform 0.3s ease;
-}
-
-.faq-category {
-    scroll-margin-top: 100px;
-}
-
-.accordion-button:not(.collapsed) {
-    background-color: var(--bs-primary);
-    color: white;
-}
-
-.accordion-button:focus {
-    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
-}
-
-.list-group-item-action:hover {
-    background-color: rgba(13, 110, 253, 0.1);
-}
-
-.category-icon {
-    min-width: 60px;
-}
-</style>
 {% endblock %}
 
 {% block extra_js %}

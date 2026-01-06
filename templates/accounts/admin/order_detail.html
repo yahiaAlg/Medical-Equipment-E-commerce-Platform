@@ -257,7 +257,7 @@
           <td><strong>{{ order.subtotal }} DZD</strong></td>
         </tr>
         <tr>
-          <td colspan="3">Tax (19%)</td>
+          <td colspan="3">Tax ({% widthratio tva_rate 1 100 as tax_percentage %}{{ tax_percentage|floatformat:0 }}%)</td>
           <td>{{ order.tax_amount }} DZD</td>
         </tr>
         <tr>

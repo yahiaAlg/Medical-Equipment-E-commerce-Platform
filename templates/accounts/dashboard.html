@@ -95,7 +95,7 @@
                     <div class="card-body">
                         <div class="d-flex align-items-center justify-content-between mb-3">
                             <div>
-                                <h3 class="fw-bold mb-1">${{ total_spent|floatformat:0 }}</h3>
+                                <h3 class="fw-bold mb-1">DZD {{ total_spent|floatformat:0 }}</h3>
                                 <small class="text-muted">Total Spent</small>
                             </div>
                             <i class="fas fa-dollar-sign stat-icon text-success"></i>
@@ -249,7 +249,7 @@
                                                     {{ order.get_status_display }}
                                                 </span>
                                             </td>
-                                            <td><strong>${{ order.total_amount }}</strong></td>
+                                            <td><strong>DZD {{ order.total_amount }}</strong></td>
                                             <td>
                                                 <div class="btn-group" role="group">
                                                     {% if order.invoice %}
@@ -350,7 +350,7 @@
                                         <tr>
                                             <td><strong>{{ refund.refund_number }}</strong></td>
                                             <td>{{ refund.order.order_id }}</td>
-                                            <td><strong>${{ refund.amount }}</strong></td>
+                                            <td><strong>DZD {{ refund.amount }}</strong></td>
                                             <td>
                                                 <span class="badge status-{{ refund.status }}">
                                                     {{ refund.get_status_display }}
@@ -456,7 +456,7 @@
                             </div>
                             <div>
                                 <strong class="d-block mb-1">Budget Limit</strong>
-                                <span class="text-muted">${{ role_specific_data.budget_limit|default:"Not set" }}</span>
+                                <span class="text-muted">DZD {{ role_specific_data.budget_limit|default:"Not set" }}</span>
                             </div>
                         {% elif user_profile.user_type == 'doctor' %}
                             <div class="mb-3 pb-3 border-bottom">

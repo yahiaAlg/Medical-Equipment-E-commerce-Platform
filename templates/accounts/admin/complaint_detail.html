@@ -285,7 +285,7 @@
             <i class="fas fa-undo me-2"></i>Initiate Refund
           </a>
           
-          <a href="{% url 'payments:invoice_detail' complaint.invoice.id %}" class="btn btn-outline-primary" target="_blank">
+          <a href="{% url 'accounts:admin_order_detail' complaint.order.order_id %}" class="btn btn-outline-primary" target="_blank">
             <i class="fas fa-file-invoice me-2"></i>View Invoice
           </a>
           

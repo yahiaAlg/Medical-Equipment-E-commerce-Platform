@@ -232,8 +232,8 @@
             </span>
           </div>
           <div class="summary-row">
-            <span>Tax (19%)</span>
-            <span id="tax" data-rate="0.19"></span>
+            <span>Tax ({% widthratio tva_rate 1 100 as tax_percentage %}{{ tax_percentage|floatformat:0 }}%)</span>
+            <span id="tax" data-rate="{{ tva_rate }}"></span>
           </div>
           <div class="summary-divider"></div>
           <div class="summary-row total">

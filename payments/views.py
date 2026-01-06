@@ -24,9 +24,19 @@ def cart(request):
         cart = Cart.objects.create(user=request.user)
         cart_items = []
 
+    # Calculate tax
+    from pages.models import SiteInformation
+
+    site_info = SiteInformation.get_instance()
+    subtotal = cart.get_total_price()
+    tax_amount = subtotal * site_info.tva_rate
+    total = subtotal + tax_amount
+
     context = {
         "cart": cart,
         "cart_items": cart_items,
+        "tax_amount": tax_amount,
+        "cart_total": total,
     }
 
     return render(request, "payments/cart.html", context)

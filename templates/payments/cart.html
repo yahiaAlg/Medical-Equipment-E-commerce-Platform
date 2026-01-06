@@ -59,8 +59,8 @@
                       {% endif %}>+</button>
             </div>
             <div class="item-price">
-              <span class="price">${{ item.get_unit_price|floatformat:2 }}</span>
-              <span class="item-subtotal">${{ item.get_total_price|floatformat:2 }}</span>
+              <span class="price">DZD {{ item.get_unit_price|floatformat:2 }}</span>
+              <span class="item-subtotal">DZD {{ item.get_total_price|floatformat:2 }}</span>
             </div>
             <div class="item-actions">
               <button class="remove-btn" onclick="removeItem({{ item.id }})">
@@ -83,28 +83,19 @@
         <h3>Order Summary</h3>
         <div class="summary-row">
           <span>Subtotal ({{ cart.get_total_items }} item{{ cart.get_total_items|pluralize }})</span>
-          <span>${{ cart.get_total_price|floatformat:2 }}</span>
+          <span>DZD {{ cart.get_total_price|floatformat:2 }}</span>
         </div>
+
         <div class="summary-row">
-          <span>Shipping</span>
-          <span>{% if cart.get_total_price >= 500 %}FREE{% else %}$9.99{% endif %}</span>
-        </div>
-        <div class="summary-row">
-          <span>Tax</span>
-          <span>${{ cart.get_total_price|floatformat:2|add:"*0.08"|floatformat:2 }}</span>
+          <span>Tax ({% widthratio tva_rate 1 100 as tax_percentage %}{{ tax_percentage|floatformat:0 }}%)</span>
+          <span>DZD {{ tax_amount|floatformat:2 }}</span>
         </div>
         <div class="summary-divider"></div>
         <div class="summary-row total">
           <span>Total</span>
-          <span>
-            {% widthratio cart.get_total_price 1 1.08 as total_with_tax %}
-            {% if cart.get_total_price >= 500 %}
-              ${{ total_with_tax|floatformat:2 }}
-            {% else %}
-              ${{ total_with_tax|add:9.99|floatformat:2 }}
-            {% endif %}
-          </span>
+          <span>DZD {{ cart_total|floatformat:2 }}</span>
         </div>
+
         <button class="checkout-btn" onclick="location.href='{% url 'payments:checkout' %}'">
           Proceed to Checkout
         </button>
