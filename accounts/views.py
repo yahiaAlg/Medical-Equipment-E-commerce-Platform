@@ -433,7 +433,7 @@ def wishlist(request):
     # Get all products with additional data
     products = wishlist.products.annotate(
         average_rating=Avg("reviews__rating"), review_count=Count("reviews")
-    ).select_related("brand", "category")
+    ).select_related("brand")
 
     # Calculate discount percentage for each product
     for product in products:
