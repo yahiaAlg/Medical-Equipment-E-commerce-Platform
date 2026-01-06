@@ -41,7 +41,7 @@
   <aside class="sidebar">
     <div class="filter-section">
       <h3>Filter By</h3>
-      
+
       <div class="filter-group">
         <h4>Categories</h4>
         <div class="filter-options">
@@ -82,7 +82,32 @@
 
       <div class="filter-group">
         <h4>Price Range</h4>
-        <div class="price-slider"></div>
+        <div class="price-range-container">
+          <div class="price-inputs">
+            <input type="number" id="price-min" class="price-input" 
+                  value="{{ current_filters.price_min|default:min_price_all }}" 
+                  min="{{ min_price_all }}" 
+                  max="{{ max_price_all }}"
+                  step="{{ price_step }}">
+            <span>-</span>
+            <input type="number" id="price-max" class="price-input" 
+                  value="{{ current_filters.price_max|default:max_price_all }}" 
+                  min="{{ min_price_all }}" 
+                  max="{{ max_price_all }}"
+                  step="{{ price_step }}">
+          </div>
+          <input type="range" id="price-range-min" class="price-slider" 
+                min="{{ min_price_all }}" 
+                max="{{ max_price_all }}" 
+                value="{{ current_filters.price_min|default:min_price_all }}"
+                step="{{ price_step }}">
+          <input type="range" id="price-range-max" class="price-slider" 
+                min="{{ min_price_all }}" 
+                max="{{ max_price_all }}" 
+                value="{{ current_filters.price_max|default:max_price_all }}"
+                step="{{ price_step }}">
+          <button class="apply-price-filter">Apply</button>
+        </div>
       </div>
 
       <button class="apply-filters" onclick="location.href='{% url 'products:list' %}'">Clear Filters</button>
@@ -109,7 +134,7 @@
             <div class="wishlist-container">
                 {% include 'partials/wishlist_button.html' with product=product %}
             </div>
-            
+
             <!-- Product Image -->
             <div class="product-image">
               {% comment %} making the image a link to its product slug {% endcomment %}
@@ -121,23 +146,35 @@
                 {% endif %}
               </a>
             </div>
-            
+
             <!-- Product Info -->
             <div class="product-info">
               <a href="{% url 'products:detail' product.slug %}">
                 <h3>{{ product.name }}</h3>
               </a>
-                <p class="product-desc">{{ product.short_description|truncatewords:10 }}</p>
-                <p class="product-price">${{ product.price }}</p>
-                <div class="product-rating">
-                    ★★★★☆ ({{ product.get_average_rating|floatformat:1 }})
-                </div>
-                {% comment %} add to cart button link {% endcomment %}
-                <form class="add-to-cart-form">
-                  {% csrf_token %}
-                  <input type="hidden" name="product_id" value="{{ product.id }}">
-                  <button type="submit" class="add-to-cart">Add to Cart</button>
-                </form>
+              <p class="product-desc">
+                {{ product.short_description|truncatewords:10 }}
+              </p>
+              
+              <!-- Category Tags -->
+              <div class="product-categories">
+                {% for category in product.categories.all %}
+                  <a href="{% url 'products:list' %}?category={{ category.slug }}" class="category-tag">
+                    {{ category.name }}
+                  </a>
+                {% endfor %}
+              </div>
+              
+              <p class="product-price">${{ product.price }}</p>
+              <div class="product-rating">
+                  ★ ({{ product.get_average_rating|floatformat:1 }})
+              </div>
+              
+              <form class="add-to-cart-form">
+                {% csrf_token %}
+                <input type="hidden" name="product_id" value="{{ product.id }}">
+                <button type="submit" class="add-to-cart">Add to Cart</button>
+              </form>
             </div>
         </div>
       {% empty %}
@@ -152,42 +189,31 @@
 </div>
 {% endblock %}
 
-
 {% block extra_js %}
 <script src="{% static 'js/price_slider.js' %}"></script>
 <script>
-  // Initialize price slider
-  document.addEventListener('DOMContentLoaded', function() {
-    initPriceSlider('.price-slider', function(min, max) {
-      const urlParams = new URLSearchParams(window.location.search);
-      urlParams.set('price_min', min);
-      urlParams.set('price_max', max);
-      window.location.search = urlParams.toString();
-    });
-  });
-  // ajax to send the product id to add to cart view with the following json loads data = json.loads(request.body) product_id = data.get("product_id")
-
+  // AJAX to send the product id to add to cart view
   document.addEventListener('DOMContentLoaded', function() {
       const addToCartForms = document.querySelectorAll('.add-to-cart-form');
-      
+
       addToCartForms.forEach(function(form) {
           form.addEventListener('submit', function(e) {
               e.preventDefault();
-              
+
               const productId = this.querySelector('input[name="product_id"]').value;
               const button = this.querySelector('.add-to-cart');
               const originalText = button.innerText;
-              
+
               // Get CSRF token
               const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
-              
+
               fetch("{% url 'payments:add_to_cart' %}", {
                   method: 'POST',
                   headers: {
                       'Content-Type': 'application/json',
                       'X-CSRFToken': csrfToken
                   },
-                  body: JSON.stringify({ 
+                  body: JSON.stringify({
                       product_id: productId,
                       quantity: 1
                   })
@@ -197,13 +223,13 @@
                   if (data.success) {
                       button.innerText = 'Added!';
                       button.style.backgroundColor = '#28a745';
-                      
+
                       // Update cart count in navbar if element exists
                       const cartCount = document.querySelector('.cart-count');
                       if (cartCount && data.cart_count) {
                           cartCount.innerText = data.cart_count;
                       }
-                      
+
                       setTimeout(() => {
                           button.innerText = originalText;
                           button.style.backgroundColor = '';
@@ -229,7 +255,5 @@
           });
       });
   });
-
-
 </script>
 {% endblock %}

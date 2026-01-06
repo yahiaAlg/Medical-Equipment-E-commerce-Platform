@@ -3,7 +3,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.http import JsonResponse
 from django.core.paginator import Paginator
-from django.db.models import Q, Avg, Count
+from django.db.models import Q, Avg, Count, Min, Max
 from django.urls import reverse
 from django.core.mail import send_mail
 from django.conf import settings
@@ -14,16 +14,34 @@ from .models import Product, Category, Brand, ProductReview, ProductQuestion, Wi
 from .forms import ProductReviewForm, ProductQuestionForm
 
 
+from django.db.models import Avg
+from django.core.paginator import Paginator
+
+
 def product_list(request):
+    # Base queryset with optimized related data fetching
     products = (
         Product.objects.all()
-        .select_related("brand", "category")
-        .prefetch_related("images")
+        .select_related("brand")
+        .prefetch_related("images", "categories")
     )
+
+    # Fetch all categories and brands for context
     categories = Category.objects.all()
     brands = Brand.objects.all()
 
-    # Filtering
+    # Calculate price range from all products
+    price_stats = Product.objects.aggregate(
+        min_price=Min("price"), max_price=Max("price")
+    )
+    min_price_all = price_stats["min_price"] or 0
+    max_price_all = price_stats["max_price"] or 1000
+
+    # Calculate dynamic step (1% of range, minimum 1)
+    price_range = max_price_all - min_price_all
+    price_step = max(1, round(price_range / 100))
+
+    # Get filter and sort parameters from request
     category_filter = request.GET.get("category")
     brand_filter = request.GET.get("brand")
     specialty_filter = request.GET.get("specialty")
@@ -32,25 +50,21 @@ def product_list(request):
     availability = request.GET.get("availability")
     sort_by = request.GET.get("sort", "name")
 
+    # Apply filters
     if category_filter:
-        products = products.filter(category__slug=category_filter)
-
+        products = products.filter(categories__slug=category_filter)
     if brand_filter:
         products = products.filter(brand_id=brand_filter)
-
     if specialty_filter:
         products = products.filter(specialty=specialty_filter)
-
     if price_min:
         products = products.filter(price__gte=price_min)
-
     if price_max:
         products = products.filter(price__lte=price_max)
-
     if availability:
         products = products.filter(availability_status=availability)
 
-    # Sorting
+    # Apply sorting
     if sort_by == "price_low":
         products = products.order_by("price")
     elif sort_by == "price_high":
@@ -69,6 +83,7 @@ def product_list(request):
     page_number = request.GET.get("page")
     page_obj = paginator.get_page(page_number)
 
+    # Context for template
     context = {
         "page_obj": page_obj,
         "categories": categories,
@@ -84,6 +99,9 @@ def product_list(request):
         },
         "specialties": Product.SPECIALTIES,
         "availability_choices": Product.AVAILABILITY_STATUS,
+        "min_price_all": min_price_all,
+        "max_price_all": max_price_all,
+        "price_step": price_step,
     }
 
     return render(request, "products/list.html", context)
@@ -111,12 +129,14 @@ def search(request):
                 | Q(description__icontains=query)
                 | Q(short_description__icontains=query)
                 | Q(brand__name__icontains=query)
-                | Q(category__name__icontains=query)
+                | Q(categories__name__icontains=query)  # Supports multiple categories
             )
-            .select_related("brand", "category")
-            .prefetch_related("images")
+            .select_related("brand")
+            .prefetch_related("images", "categories")
+            .distinct()
         )
 
+    # Pagination
     paginator = Paginator(products, 12)
     page_number = request.GET.get("page")
     page_obj = paginator.get_page(page_number)
@@ -136,16 +156,25 @@ def category_detail(request, slug):
 
 
 def product_detail(request, slug):
-    product = get_object_or_404(Product, slug=slug)
+    # Fetch the product with prefetched categories
+    product = get_object_or_404(
+        Product.objects.prefetch_related("categories", "variants"), slug=slug
+    )
+
+    # Fetch related products (matching any of the product's categories)
+    related_products = (
+        Product.objects.filter(categories__in=product.categories.all())
+        .exclude(id=product.id)
+        .distinct()[:4]
+    )
+
+    # Fetch reviews and questions with optimized queries
     reviews = ProductReview.objects.filter(product=product).select_related("user")
     questions = ProductQuestion.objects.filter(product=product).select_related(
         "user", "answered_by"
     )
-    related_products = Product.objects.filter(category=product.category).exclude(
-        id=product.id
-    )[:4]
 
-    # Get variants
+    # Get active variants
     variants = product.variants.filter(is_active=True)
 
     # Calculate review statistics
@@ -158,21 +187,20 @@ def product_detail(request, slug):
 
     # Calculate percentages for rating bars
     total_reviews = review_stats["total_count"] or 0
-    rating_percentages = {}
-    for star in range(1, 6):
-        count = rating_distribution.get(star, 0)
-        rating_percentages[star] = (
-            (count / total_reviews * 100) if total_reviews > 0 else 0
-        )
+    rating_percentages = {
+        star: (count / total_reviews * 100) if total_reviews > 0 else 0
+        for star, count in rating_distribution.items()
+    }
 
-    # Check wishlist
+    # Check wishlist status
     in_wishlist = False
     wishlist_product_ids = []
     if request.user.is_authenticated:
-        wishlist, created = Wishlist.objects.get_or_create(user=request.user)
+        wishlist, _ = Wishlist.objects.get_or_create(user=request.user)
         in_wishlist = wishlist.products.filter(id=product.id).exists()
         wishlist_product_ids = list(wishlist.products.values_list("id", flat=True))
 
+    # Prepare context for template
     context = {
         "product": product,
         "reviews": reviews,

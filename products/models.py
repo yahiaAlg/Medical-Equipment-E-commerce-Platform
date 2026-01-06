@@ -52,9 +52,8 @@ class Product(models.Model):
 
     name = models.CharField(max_length=200)
     slug = models.SlugField(unique=True, blank=True)
-    category = models.ForeignKey(
-        Category, on_delete=models.CASCADE, related_name="products"
-    )
+    # Change from ForeignKey to ManyToManyField
+    categories = models.ManyToManyField(Category, related_name="products", blank=True)
     brand = models.ForeignKey(Brand, on_delete=models.CASCADE, related_name="products")
     description = models.TextField()
     short_description = models.CharField(max_length=500)

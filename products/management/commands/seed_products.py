@@ -116,7 +116,7 @@ class Command(BaseCommand):
             # Cardiology Products
             {
                 "name": "ECG Electrodes",
-                "category": "Cardiology",
+                "categories": ["Cardiology"],  # Changed to list
                 "price": 2600,
                 "specialty": "cardiology",
                 "description": "Disposable, pre-gelled electrodes for cardiac monitoring",
@@ -128,7 +128,7 @@ class Command(BaseCommand):
             },
             {
                 "name": "Blood Lancets",
-                "category": "Cardiology",
+                "categories": ["Cardiology", "Laboratory"],  # Can have multiple
                 "price": 4000,
                 "specialty": "cardiology",
                 "description": "Sterile, single-use lancets for blood sampling",
@@ -141,7 +141,7 @@ class Command(BaseCommand):
             },
             {
                 "name": "CardioAspirine",
-                "category": "Cardiology",
+                "categories": ["Cardiology"],
                 "price": 200,
                 "specialty": "cardiology",
                 "description": "Low-dose aspirin for cardiovascular protection and blood thinning",
@@ -155,7 +155,7 @@ class Command(BaseCommand):
             # Dentistry Products
             {
                 "name": "Ledermix",
-                "category": "Dentistry",
+                "categories": ["Dentistry"],
                 "price": 2000,
                 "specialty": "general",
                 "description": "Prescription dental paste containing triamcinolone acetonide and chlortetracycline HCl",
@@ -166,7 +166,7 @@ class Command(BaseCommand):
             },
             {
                 "name": "Oraqix",
-                "category": "Dentistry",
+                "categories": ["Dentistry"],
                 "price": 4000,
                 "specialty": "general",
                 "description": "Periodontal gel containing lidocaine and prilocaine for local anesthesia",
@@ -178,7 +178,7 @@ class Command(BaseCommand):
             },
             {
                 "name": "Dental Scalers",
-                "category": "Dentistry",
+                "categories": ["Dentistry", "Surgery"],
                 "price": 3000,
                 "specialty": "general",
                 "description": "Set of dental instruments for removing plaque and tartar from teeth",
@@ -199,7 +199,7 @@ class Command(BaseCommand):
             # Dermatology Products
             {
                 "name": "Canestene DERM",
-                "category": "Dermatology",
+                "categories": ["Dermatology"],
                 "price": 1150,
                 "specialty": "dermatology",
                 "description": "Antifungal cream for treating skin infections like athlete's foot, ringworm, and fungal skin irritations",
@@ -211,7 +211,7 @@ class Command(BaseCommand):
             },
             {
                 "name": "Dermo Cuivre",
-                "category": "Dermatology",
+                "categories": ["Dermatology"],
                 "price": 1400,
                 "specialty": "dermatology",
                 "description": "Skin repair ointment for treating minor wounds, burns, and skin irritations",
@@ -222,7 +222,7 @@ class Command(BaseCommand):
             },
             {
                 "name": "Biafine",
-                "category": "Dermatology",
+                "categories": ["Dermatology"],
                 "price": 1700,
                 "specialty": "dermatology",
                 "description": "Soothing and protective skin care cream for irritated or damaged skin",
@@ -234,7 +234,7 @@ class Command(BaseCommand):
             # Gastroenterology Products
             {
                 "name": "Spascol LP",
-                "category": "Gastroenterology",
+                "categories": ["Gastroenterology"],
                 "price": 1150,
                 "specialty": "general",
                 "description": "Muscle relaxant medication for treating muscle spasms and pain",
@@ -245,7 +245,7 @@ class Command(BaseCommand):
             },
             {
                 "name": "Gastricalm",
-                "category": "Gastroenterology",
+                "categories": ["Gastroenterology"],
                 "price": 850,
                 "specialty": "general",
                 "description": "Medication for treating stomach acid and heartburn",
@@ -256,7 +256,7 @@ class Command(BaseCommand):
             },
             {
                 "name": "Anatomical Stomach Model",
-                "category": "Gastroenterology",
+                "categories": ["Gastroenterology"],
                 "price": 4500,
                 "specialty": "general",
                 "description": "Educational model of the human stomach",
@@ -268,7 +268,7 @@ class Command(BaseCommand):
             # Gynecology Products
             {
                 "name": "Femaferrin",
-                "category": "Gynecology",
+                "categories": ["Gynecology"],
                 "price": 2000,
                 "specialty": "general",
                 "description": "Iron supplement tablets for treating iron deficiency",
@@ -280,7 +280,7 @@ class Command(BaseCommand):
             },
             {
                 "name": "Quality Suction Handle with Bottle",
-                "category": "Gynecology",
+                "categories": ["Gynecology", "Surgery"],
                 "price": 3000,
                 "specialty": "general",
                 "description": "Manual suction device with collection bottle",
@@ -291,7 +291,7 @@ class Command(BaseCommand):
             },
             {
                 "name": "Anatomical Model (Female Reproductive System)",
-                "category": "Gynecology",
+                "categories": ["Gynecology"],
                 "price": 4500,
                 "specialty": "general",
                 "description": "Educational model of female reproductive anatomy",
@@ -307,7 +307,7 @@ class Command(BaseCommand):
             # Laboratory Products
             {
                 "name": "Microcentrifuge Tubes (1.5 ml)",
-                "category": "Laboratory",
+                "categories": ["Laboratory"],
                 "price": 3000,
                 "specialty": "general",
                 "description": "Rack of 96 blue-capped microcentrifuge tubes",
@@ -321,7 +321,7 @@ class Command(BaseCommand):
             },
             {
                 "name": "Laboratory Glassware Set",
-                "category": "Laboratory",
+                "categories": ["Laboratory"],
                 "price": 2250,
                 "specialty": "general",
                 "description": "Set including beaker, graduated cylinder, and Erlenmeyer flask",
@@ -333,7 +333,7 @@ class Command(BaseCommand):
             },
             {
                 "name": "Wash Bottle (500 ml)",
-                "category": "Laboratory",
+                "categories": ["Laboratory"],
                 "price": 550,
                 "specialty": "general",
                 "description": "Plastic wash bottle with squeezer top",
@@ -346,7 +346,7 @@ class Command(BaseCommand):
             # Neurology Products
             {
                 "name": "Reflex Hammer",
-                "category": "Neurology",
+                "categories": ["Neurology"],
                 "price": 2000,
                 "specialty": "neurology",
                 "description": "Tool for testing patient reflexes",
@@ -358,7 +358,7 @@ class Command(BaseCommand):
             },
             {
                 "name": "Lumbar Puncture Tray",
-                "category": "Neurology",
+                "categories": ["Neurology", "Surgery"],
                 "price": 20000,
                 "specialty": "neurology",
                 "description": "Sterile kit for performing spinal taps and cerebrospinal fluid analysis",
@@ -370,7 +370,7 @@ class Command(BaseCommand):
             },
             {
                 "name": "Neurobion Forte",
-                "category": "Neurology",
+                "categories": ["Neurology"],
                 "price": 1500,
                 "specialty": "neurology",
                 "description": "Vitamin B complex supplement that helps relieve tingling, numbness, and weakness",
@@ -382,7 +382,7 @@ class Command(BaseCommand):
             # Ophthalmology Products
             {
                 "name": "Vibac",
-                "category": "Ophthalmology",
+                "categories": ["Ophthalmology", "Surgery"],
                 "price": 750,
                 "specialty": "ophthalmology",
                 "description": "Antiseptic solution for skin disinfection",
@@ -394,7 +394,7 @@ class Command(BaseCommand):
             },
             {
                 "name": "Vabysmo",
-                "category": "Ophthalmology",
+                "categories": ["Ophthalmology"],
                 "price": 20000,
                 "specialty": "ophthalmology",
                 "description": "Injection solution containing 120 mg of active ingredient",
@@ -405,7 +405,7 @@ class Command(BaseCommand):
             },
             {
                 "name": "Ophthavet",
-                "category": "Ophthalmology",
+                "categories": ["Ophthalmology"],
                 "price": 2250,
                 "specialty": "ophthalmology",
                 "description": "Ophthalmic solution for eye care",
@@ -417,7 +417,7 @@ class Command(BaseCommand):
             # Orthopedics Products
             {
                 "name": "Alvityl Chondroflex",
-                "category": "Orthopedics",
+                "categories": ["Orthopedics"],
                 "price": 3250,
                 "specialty": "orthopedics",
                 "description": "Joint health supplement with chondroitin and glucosamine for maintaining cartilage and joint function",
@@ -429,7 +429,7 @@ class Command(BaseCommand):
             },
             {
                 "name": "Structoflex",
-                "category": "Orthopedics",
+                "categories": ["Orthopedics"],
                 "price": 4000,
                 "specialty": "orthopedics",
                 "description": "Joint supplement containing chondroitin sulfate for supporting joint mobility and cartilage health",
@@ -442,7 +442,7 @@ class Command(BaseCommand):
             },
             {
                 "name": "Salusan Ortho",
-                "category": "Orthopedics",
+                "categories": ["Orthopedics"],
                 "price": 2750,
                 "specialty": "orthopedics",
                 "description": "Orthopedic health supplement with collagen and vitamins to support bones and joints",
@@ -454,7 +454,7 @@ class Command(BaseCommand):
             # Pediatrics Products
             {
                 "name": "EfferalganMed Pédiatrique (Paracétamol 30 mg/ml)",
-                "category": "Pediatrics",
+                "categories": ["Pediatrics"],
                 "price": 550,
                 "specialty": "pediatrics",
                 "description": "Pediatric paracetamol solution for pain and fever relief in children aged 4 to 32 kg",
@@ -465,7 +465,7 @@ class Command(BaseCommand):
             },
             {
                 "name": "Melilax",
-                "category": "Pediatrics",
+                "categories": ["Pediatrics"],
                 "price": 1600,
                 "specialty": "pediatrics",
                 "description": "Herbal laxative supplement for gentle relief of occasional constipation",
@@ -484,7 +484,7 @@ class Command(BaseCommand):
             },
             {
                 "name": "Doliprane (Paracetamol)",
-                "category": "Pediatrics",
+                "categories": ["Pediatrics"],
                 "price": 1000,
                 "specialty": "pediatrics",
                 "description": "Pain reliever and fever reducer containing paracetamol (acetaminophen)",
@@ -497,7 +497,7 @@ class Command(BaseCommand):
             # Pneumology Products
             {
                 "name": "Deslor (Desloratadine 5 mg)",
-                "category": "Pneumology",
+                "categories": ["Pneumology"],
                 "price": 1500,
                 "specialty": "general",
                 "description": "Antihistamine tablets for allergy relief",
@@ -509,7 +509,7 @@ class Command(BaseCommand):
             },
             {
                 "name": "Peak Flow Meter",
-                "category": "Pneumology",
+                "categories": ["Pneumology"],
                 "price": 2250,
                 "specialty": "general",
                 "description": "Device for measuring respiratory flow rate",
@@ -520,7 +520,7 @@ class Command(BaseCommand):
             },
             {
                 "name": "Nebulizer",
-                "category": "Pneumology",
+                "categories": ["Pneumology", "Pediatrics"],
                 "price": 4500,
                 "specialty": "general",
                 "description": "Electronic device for administering medication in mist form",
@@ -533,7 +533,7 @@ class Command(BaseCommand):
             # Surgery Products
             {
                 "name": "Surgical Instrument Set",
-                "category": "Surgery",
+                "categories": ["Surgery"],
                 "price": 7500,
                 "specialty": "general",
                 "description": "Basic set of surgical instruments including forceps, scissors, and scalpel handles",
@@ -545,7 +545,7 @@ class Command(BaseCommand):
             },
             {
                 "name": "Disposable Surgical Gloves",
-                "category": "Surgery",
+                "categories": ["Surgery", "Laboratory"],
                 "price": 1750,
                 "specialty": "general",
                 "description": "Box of sterile latex or nitrile examination gloves",
@@ -560,7 +560,7 @@ class Command(BaseCommand):
             },
             {
                 "name": "Medical Tape",
-                "category": "Surgery",
+                "categories": ["Surgery"],
                 "price": 350,
                 "specialty": "general",
                 "description": "Roll of hypoallergenic medical tape",
@@ -576,7 +576,6 @@ class Command(BaseCommand):
             product, created = Product.objects.get_or_create(
                 name=prod_data["name"],
                 defaults={
-                    "category": categories[prod_data["category"]],
                     "brand": random.choice(brands),
                     "price": Decimal(str(prod_data["price"])),
                     "bulk_price": Decimal(str(prod_data["price"] * 0.85)),
@@ -597,9 +596,16 @@ class Command(BaseCommand):
             if created:
                 self.stdout.write(f"Created product: {product.name}")
 
+                # Add categories (M2M relationship)
+                for cat_name in prod_data["categories"]:
+                    product.categories.add(categories[cat_name])
+                self.stdout.write(
+                    f"  Added categories: {', '.join(prod_data['categories'])}"
+                )
+
                 # Add placeholder images
                 for img_num in range(3):
-                    image_url = f"https://source.unsplash.com/800x600/?medical,{prod_data['category'].lower()}&sig={idx}{img_num}"
+                    image_url = f"https://source.unsplash.com/800x600/?medical,{prod_data['categories'][0].lower()}&sig={idx}{img_num}"
 
                     image_content = self.download_image(image_url)
                     if image_content:

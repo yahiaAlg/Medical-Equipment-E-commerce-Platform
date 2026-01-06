@@ -189,7 +189,7 @@ class Command(BaseCommand):
                     )
 
                 # Tax and shipping
-                tax_rate = Decimal("0.19")
+                tax_rate = Decimal("0.00")
                 tax_amount = subtotal * tax_rate
                 shipping_type = random.choice(shipping_types)
                 shipping_cost = shipping_type.cost

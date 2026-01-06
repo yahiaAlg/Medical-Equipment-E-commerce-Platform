@@ -69,7 +69,7 @@ class ProductQuestionInline(admin.TabularInline):
 class ProductAdmin(admin.ModelAdmin):
     list_display = (
         "name",
-        "category",
+        "get_categories",  # Updated
         "brand",
         "price",
         "bulk_price",
@@ -79,7 +79,7 @@ class ProductAdmin(admin.ModelAdmin):
         "trending",
     )
     list_filter = (
-        "category",
+        "categories",  # Updated
         "brand",
         "specialty",
         "availability_status",
@@ -103,9 +103,13 @@ class ProductAdmin(admin.ModelAdmin):
         ProductReviewInline,
         ProductQuestionInline,
     ]
+    filter_horizontal = ("categories",)  # Added
 
     fieldsets = (
-        ("Basic Information", {"fields": ("name", "slug", "category", "brand", "sku")}),
+        (
+            "Basic Information",
+            {"fields": ("name", "slug", "categories", "brand", "sku")},
+        ),  # Updated
         (
             "Description",
             {
@@ -179,12 +183,17 @@ class ProductAdmin(admin.ModelAdmin):
 
     mark_out_of_stock.short_description = "Mark as Out of Stock"
 
+    def get_categories(self, obj):
+        return ", ".join([c.name for c in obj.categories.all()])
+
+    get_categories.short_description = "Categories"
+
     def get_queryset(self, request):
         return (
             super()
             .get_queryset(request)
-            .select_related("category", "brand")
-            .prefetch_related("images", "reviews", "variants")
+            .prefetch_related("categories", "images", "reviews", "variants")
+            .select_related("brand")
         )
 
 
@@ -199,7 +208,7 @@ class ProductVariantAdmin(admin.ModelAdmin):
         "is_active",
         "display_order",
     )
-    list_filter = ("is_active", "variant_title", "product__category")
+    list_filter = ("is_active", "variant_title", "product__categories")  # Changed here
     search_fields = ("product__name", "variant_title", "variant_value")
     list_editable = ("is_active", "display_order", "stock_quantity")
     ordering = ("product", "display_order", "variant_title")
@@ -240,7 +249,8 @@ class ProductVariantAdmin(admin.ModelAdmin):
         return (
             super()
             .get_queryset(request)
-            .select_related("product", "product__category", "product__brand")
+            .select_related("product", "product__brand")
+            .prefetch_related("product__categories")  # Changed here too
         )
 
 
