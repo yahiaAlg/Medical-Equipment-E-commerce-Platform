@@ -114,6 +114,36 @@ class SiteInformation(models.Model):
     youtube_url = models.URLField(blank=True, verbose_name="URL YouTube")
     linkedin_url = models.URLField(blank=True, verbose_name="URL LinkedIn")
 
+    # Home Page Content
+    hero_title = models.CharField(
+        max_length=200,
+        default="Bienvenue chez Fennec Med",
+        verbose_name="Titre Hero (Page d'accueil)",
+    )
+    hero_subtitle = models.TextField(
+        default="Fournisseur de matériaux médicaux de qualité aux familles de la région depuis 2022.",
+        verbose_name="Sous-titre Hero (Page d'accueil)",
+    )
+    about_section_title = models.CharField(
+        max_length=200,
+        default="À Propos de Notre Cabinet Basé à Brighton",
+        verbose_name="Titre section À propos (Page d'accueil)",
+    )
+    find_us_content = models.TextField(
+        blank=True,
+        verbose_name="Contenu 'Où Nous Trouver' (Page d'accueil)",
+        help_text="Texte pour la section 'Où Nous Trouver' sur la page d'accueil",
+    )
+    cta_title = models.CharField(
+        max_length=200,
+        default="Prêt à Franchir la Prochaine Étape ?",
+        verbose_name="Titre CTA (Page d'accueil)",
+    )
+    cta_description = models.TextField(
+        default="Contactez-nous aujourd'hui pour en savoir plus sur nos matériaux médicaux et services.",
+        verbose_name="Description CTA (Page d'accueil)",
+    )
+
     # About Page Content
     about_hero_title = models.CharField(
         max_length=200,
@@ -128,6 +158,27 @@ class SiteInformation(models.Model):
     )
     about_story_content = models.TextField(
         blank=True, verbose_name="Contenu de l'histoire"
+    )
+
+    # Contact Page Content
+    contact_intro_title = models.CharField(
+        max_length=200,
+        default="Contactez l'Équipe",
+        verbose_name="Titre intro (Page contact)",
+    )
+    contact_intro_text = models.TextField(
+        blank=True,
+        verbose_name="Texte intro (Page contact)",
+        help_text="Texte d'introduction sur la page de contact",
+    )
+    contact_form_title = models.CharField(
+        max_length=200,
+        default="Demande de Renseignements",
+        verbose_name="Titre formulaire (Page contact)",
+    )
+    contact_form_description = models.TextField(
+        default="Si vous préférez nous contacter par email, veuillez remplir vos coordonnées et nous vous répondrons bientôt.",
+        verbose_name="Description formulaire (Page contact)",
     )
 
     # Tax Configuration

@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}Fennec Med - Équipement Médical Premium{% endblock %}
+{% block title %}{{ site_info.site_name }} - Équipement Médical Premium{% endblock %}
 
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'css/index.css' %}">
@@ -14,11 +14,8 @@
 {% block content %}
 <!-- Hero Section -->
 <section class="hero">
-  <h1>Bienvenue chez Fennec Med</h1>
-  <p>
-    Fournisseur de matériaux médicaux de qualité aux familles de la région depuis 
-    2022.
-  </p>
+  <h1>{{ site_info.hero_title }}</h1>
+  <p>{{ site_info.hero_subtitle }}</p>
   <div class="hero-buttons">
     <a href="{% url 'pages:contact' %}" class="btn btn-call">Appelez-nous</a>
     {% if user.is_authenticated %}
@@ -33,19 +30,19 @@
 <section class="about-us-section">
   <div class="about-us-container">
     <div class="about-us-image">
-      <img src="{% static 'images/aboutUs-section.png' %}" alt="Fennec Med" />
+      <img src="{% static 'images/aboutUs-section.png' %}" alt="{{ site_info.site_name }}" />
     </div>
     <div class="about-us-content">
-      <h2>À Propos de Notre Cabinet Basé à Brighton</h2>
+      <h2>{{ site_info.about_section_title }}</h2>
       {% if site_info.about_hero_description %}
-        {{ site_info.about_hero_description }}
+        {{ site_info.about_hero_description|safe }}
       {% else %}
         <p>
-          Nous savons que consulter un médecin peut sembler un peu intimidant. Chez 
-          Newbay Medical Clinic, nous avons façonné notre cabinet pour que chaque visite 
-          soit sûre, calme et confortable. Nous gardons notre espace propre et accueillant, 
-          et nous respectons votre temps—afin que vous puissiez vous concentrer sur le fait 
-          d'être bien soigné, et non stressé.
+          Fennec Med est votre partenaire de confiance pour l'acquisition d'équipements médicaux 
+          de qualité en Algérie. Basés à Sétif, nous proposons une large gamme de produits 
+          certifiés aux professionnels de santé et aux particuliers. Notre équipe expérimentée 
+          vous accompagne dans le choix des meilleures solutions adaptées à vos besoins, avec 
+          un service après-vente exceptionnel et des prix compétitifs.
         </p>
       {% endif %}
       <a href="{% url 'pages:about' %}" class="btn btn-learn-more">En Savoir Plus Sur Nous</a>
@@ -151,24 +148,18 @@
 {% endif %}
 
 <!-- Find Us Section -->
+{% if site_info.find_us_content %}
 <section class="find-us-section">
   <h2>Où Nous Trouver</h2>
-  <p>
-    Vous recherchez votre nouveau cabinet Fennec Med de confiance à Brighton et Bayside ?
-    Newbay Medical est basé dans la région de Brighton, offrant des soins à tous ceux qui 
-    se trouvent à Brighton et dans les environs ; y compris <a href="#">Caulfield South</a>,
-    <a href="#">Elwood</a>, <a href="#">Bentleigh</a>,
-    <a href="#">Gardenvale</a>, <a href="#">Hampton</a>,
-    <a href="#">Sandringham</a>. Si vous êtes de la région de Brighton et que vous souhaitez 
-    un cabinet médical local en qui vous pouvez avoir confiance lorsque les choses deviennent 
-    difficiles, nous sommes prêts à prendre votre appel.
-  </p>
+  {{ site_info.find_us_content|safe }}
 </section>
+{% endif %}
 
+{% if site_info.map_embed_url %}
 <section class="map-section">
   <div class="map-container">
     <iframe
-      src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3151.83512499764!2d145.000000!3d-37.900000!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMzfCsDU2JzI4LjQiTiAxNjXCsDMwJzQ5LjYiUyA!5e0!3m2!1sen!2sau!4v1234567890123"
+      src="{{ site_info.map_embed_url }}"
       width="100%"
       height="450"
       style="border: 0"
@@ -177,13 +168,12 @@
     ></iframe>
   </div>
 </section>
+{% endif %}
 
 <!-- CTA Section -->
 <section class="cta-section">
-  <h2>Prêt à Franchir la Prochaine Étape ?</h2>
-  <p>
-    Contactez-nous aujourd'hui pour en savoir plus sur nos matériaux médicaux et services.
-  </p>
+  <h2>{{ site_info.cta_title }}</h2>
+  <p>{{ site_info.cta_description }}</p>
   {% if user.is_authenticated %}
     <a href="{% url 'products:list' %}" class="btn btn-cta">Parcourir les Produits</a>
   {% else %}

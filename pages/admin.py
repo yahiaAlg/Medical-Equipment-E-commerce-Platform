@@ -63,7 +63,20 @@ class SiteInformationAdmin(admin.ModelAdmin):
             },
         ),
         (
-            "Contenu de la page À propos",
+            "Contenu page d'accueil",
+            {
+                "fields": (
+                    "hero_title",
+                    "hero_subtitle",
+                    "about_section_title",
+                    "find_us_content",
+                    "cta_title",
+                    "cta_description",
+                )
+            },
+        ),
+        (
+            "Contenu page À propos",
             {
                 "fields": (
                     "about_hero_title",
@@ -72,6 +85,17 @@ class SiteInformationAdmin(admin.ModelAdmin):
                     "about_story_content",
                     "about_image_1",
                     "about_image_2",
+                )
+            },
+        ),
+        (
+            "Contenu page Contact",
+            {
+                "fields": (
+                    "contact_intro_title",
+                    "contact_intro_text",
+                    "contact_form_title",
+                    "contact_form_description",
                 )
             },
         ),

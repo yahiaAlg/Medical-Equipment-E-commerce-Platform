@@ -16,15 +16,19 @@
 <div class="conatct-section">
   <div class="contact-container">
     <div class="contact-info">
-      <h2>Contactez l'Équipe {{ site_info.site_name }}</h2>
-      <p>
-        Si vous recherchez un cabinet médical avec un personnel attentionné, amical, hautement qualifié 
-        et expérimenté, <strong>{{ site_info.site_name }}</strong> est l'endroit à appeler (ou à contacter en ligne !). 
-        Nous comprenons que la gestion des préoccupations de santé peut être un processus accablant et peu familier, 
-        et nous visons à faire tout notre possible pour vous aider à vous sentir à l'aise. Que vous souhaitiez 
-        prendre rendez-vous immédiatement ou discuter de tout problème avec nous avant de réserver, nous sommes 
-        là pour vous écouter et répondre à toutes vos questions.
-      </p>
+      <h2>{{ site_info.contact_intro_title }} {{ site_info.site_name }}</h2>
+      {% if site_info.contact_intro_text %}
+        {{ site_info.contact_intro_text|safe }}
+      {% else %}
+        <p>
+          <strong>{{ site_info.site_name }}</strong> est votre partenaire privilégié pour tous vos besoins 
+          en équipements médicaux. Notre équipe de professionnels expérimentés est à votre disposition pour 
+          vous conseiller et vous accompagner dans le choix des solutions les mieux adaptées à votre activité. 
+          Que vous soyez médecin, dentiste, pharmacien, ou responsable d'établissement de santé, nous sommes 
+          là pour répondre à toutes vos questions et vous proposer les meilleurs produits aux prix les plus 
+          compétitifs du marché algérien.
+        </p>
+      {% endif %}
       <div class="contact-details">
         <div class="contact-detail">
           <img src="{% static 'images/phone.png' %}" alt="Icône Téléphone" class="icon-image">
@@ -60,8 +64,8 @@
     </div>
     
     <div class="enquiry-form">
-      <h2>Demande de Renseignements</h2>
-      <p>Si vous préférez nous contacter par email, veuillez remplir vos coordonnées et nous vous répondrons bientôt.</p>
+      <h2>{{ site_info.contact_form_title }}</h2>
+      <p>{{ site_info.contact_form_description }}</p>
       <form method="post" id="contactForm">
         {% csrf_token %}
         

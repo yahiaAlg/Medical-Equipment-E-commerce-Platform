@@ -12,21 +12,71 @@ class Command(BaseCommand):
 
         # Create or update Site Information
         site_info = SiteInformation.get_instance()
-        site_info.company_name = "Fennec Med"
-        site_info.tva_rate = 0.05
-        site_info.tagline = "Fournisseur de matériel médical de qualité aux familles de la région depuis 2022"
-        site_info.phone = "03 9591 5378"
-        site_info.fax = "03 7068 5073"
-        site_info.email = "admin@newbaymedical.com.au"
-        site_info.address = "59 Bay St, Brighton VIC 3186"
-        site_info.facebook_url = "#"
-        site_info.instagram_url = "#"
-        site_info.whatsapp_url = "#"
-        site_info.youtube_url = "#"
-        site_info.about_text = """Nous croyons que l'obtention de fournitures médicales doit être à la fois simple et fiable. 
-        Dès que vous nous contactez, vous bénéficiez d'un processus fluide avec une équipe chaleureuse et attentionnée. 
-        Notre engagement envers l'excellence signifie que nous évoluons constamment, afin de vous garantir les meilleurs produits 
-        et le meilleur service possible."""
+        site_info.site_name = "Fennec Med"
+        site_info.tagline = (
+            "Votre partenaire de confiance en équipements médicaux en Algérie"
+        )
+        site_info.description = "Fennec Med est votre fournisseur de confiance en équipements et fournitures médicales de haute qualité à Sétif et dans toute l'Algérie."
+        site_info.tva_rate = 0.19
+        site_info.phone = "+213 36 72 45 89"
+        site_info.fax = "+213 36 72 45 90"
+        site_info.email = "contact@fennecmed.dz"
+        site_info.address = "Boulevard de l'ALN, Cité El Hidhab, Sétif 19000, Algérie"
+
+        # Home page content
+        site_info.hero_title = "Bienvenue chez Fennec Med"
+        site_info.hero_subtitle = "Fournisseur d'équipements médicaux de qualité supérieure aux professionnels de santé et aux particuliers depuis 2022."
+        site_info.about_section_title = "À Propos de Fennec Med Sétif"
+        site_info.find_us_content = """<p>
+            Vous recherchez un fournisseur fiable d'équipements médicaux à Sétif ? Fennec Med est situé 
+            au cœur de la ville, desservant les professionnels de santé et les particuliers dans toute 
+            la région des Hauts Plateaux. Nous offrons nos services à Sétif, Batna, Bordj Bou Arreridj, 
+            M'Sila, et toute la région Est de l'Algérie. Notre engagement est de fournir des équipements 
+            médicaux certifiés aux meilleurs prix avec un service après-vente exceptionnel.
+        </p>"""
+        site_info.cta_title = "Prêt à Équiper Votre Cabinet ?"
+        site_info.cta_description = "Contactez-nous dès aujourd'hui pour découvrir notre large gamme d'équipements médicaux certifiés et nos solutions personnalisées."
+
+        # About page content
+        site_info.about_hero_title = (
+            "Équipements Médicaux de Qualité en Qui Vous Pouvez Avoir Confiance"
+        )
+        site_info.about_hero_description = """<p>
+            Chez Fennec Med, nous comprenons l'importance d'équipements médicaux fiables et performants 
+            pour la qualité des soins. Depuis notre établissement en 2022, nous nous sommes engagés à 
+            fournir aux professionnels de santé algériens des équipements de classe mondiale, certifiés 
+            CE et conformes aux normes internationales. Notre équipe d'experts est là pour vous conseiller 
+            et vous accompagner dans le choix des meilleures solutions pour vos besoins.
+        </p>"""
+        site_info.about_story_title = "Notre Histoire"
+        site_info.about_story_content = """<p>
+            Fennec Med a été fondée en 2022 avec une vision claire : démocratiser l'accès aux équipements 
+            médicaux de qualité en Algérie. Basés à Sétif, nous avons rapidement étendu notre réseau de 
+            distribution pour couvrir toute la région Est du pays. Notre catalogue comprend plus de 500 
+            produits soigneusement sélectionnés auprès des meilleurs fabricants internationaux.
+        </p>
+        <p>
+            Aujourd'hui, nous sommes fiers de servir des centaines de cliniques, cabinets médicaux, 
+            pharmacies et hôpitaux à travers l'Algérie. Notre engagement envers l'excellence nous pousse 
+            à constamment élargir notre gamme de produits et améliorer nos services pour mieux répondre 
+            aux besoins évolutifs du secteur médical algérien.
+        </p>"""
+
+        # Contact page content
+        site_info.contact_intro_title = "Contactez l'Équipe"
+        site_info.contact_intro_text = """<p>
+            Vous recherchez un fournisseur d'équipements médicaux avec un personnel professionnel, 
+            compétent et à l'écoute ? <strong>Fennec Med</strong> est là pour vous servir. Nous 
+            comprenons que l'acquisition d'équipements médicaux est un investissement important, et 
+            nous nous engageons à vous accompagner à chaque étape. Que vous souhaitiez obtenir un devis, 
+            planifier une démonstration de produit, ou simplement poser des questions, notre équipe est 
+            disponible pour vous aider.
+        </p>"""
+        site_info.contact_form_title = "Demande de Renseignements"
+        site_info.contact_form_description = "Remplissez le formulaire ci-dessous et notre équipe vous contactera dans les plus brefs délais."
+
+        site_info.map_embed_url = "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d102893.08771533203!2d5.331841!3d36.19!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x128775c4d3e73515%3A0x8c4e5bb93c6cd3e4!2zU8OpdGlmLCBBbGfDqXJpZQ!5e0!3m2!1sfr!2sdz!4v1704067200000!5m2!1sfr!2sdz"
+
         site_info.save()
         self.stdout.write("Informations du site créées/mises à jour")
 
@@ -34,62 +84,62 @@ class Command(BaseCommand):
         faqs_data = [
             {
                 "category": "ordering",
-                "question": "Comment passer une commande en gros ?",
-                "answer": "Vous pouvez passer des commandes en gros directement via notre site web. Ajoutez des produits au panier et les quantités de 10+ bénéficient automatiquement de remises sur les prix en gros. Pour les commandes supérieures à 10 000 $, contactez notre équipe commerciale pour des remises supplémentaires.",
+                "question": "Comment passer une commande ?",
+                "answer": "Vous pouvez passer commande directement sur notre site web après inscription. Pour les commandes importantes ou personnalisées, contactez notre équipe commerciale pour un devis adapté.",
                 "order": 1,
             },
             {
                 "category": "ordering",
-                "question": "Proposez-vous des options de location ?",
-                "answer": "Oui, nous proposons des options de location flexibles pour l'achat d'équipements. Contactez notre service de financement pour discuter des conditions et des exigences.",
+                "question": "Quels sont les moyens de paiement acceptés ?",
+                "answer": "Nous acceptons les paiements par virement bancaire, chèque certifié, et paiement à la livraison pour les clients réguliers. Le paiement en ligne sera disponible prochainement.",
                 "order": 2,
             },
             {
                 "category": "shipping",
                 "question": "Quels sont vos délais de livraison ?",
-                "answer": "La livraison standard prend 5 à 7 jours ouvrables. La livraison express (2-3 jours) et la livraison le lendemain sont disponibles pour les commandes urgentes.",
+                "answer": "Pour Sétif et environs : 24-48h. Pour les autres wilayas : 3-5 jours ouvrables. Livraison express disponible sur demande.",
                 "order": 1,
             },
             {
                 "category": "shipping",
-                "question": "Livrez-vous à l'international ?",
-                "answer": "Oui, nous livrons dans la plupart des pays du monde. Les délais de livraison internationale varient selon la destination, généralement 10 à 15 jours ouvrables.",
+                "question": "Livrez-vous dans toute l'Algérie ?",
+                "answer": "Oui, nous livrons dans les 58 wilayas d'Algérie via notre réseau de partenaires logistiques fiables.",
                 "order": 2,
             },
             {
                 "category": "technical",
-                "question": "Vos produits sont-ils livrés avec un support d'installation ?",
-                "answer": "Tous les équipements majeurs incluent des guides d'installation. Des services d'installation professionnelle sont disponibles moyennant des frais supplémentaires.",
+                "question": "Proposez-vous une formation sur les équipements ?",
+                "answer": "Oui, nous offrons des formations gratuites sur l'utilisation et l'entretien des équipements pour tous les achats importants.",
                 "order": 1,
             },
             {
                 "category": "technical",
-                "question": "Quel type de formation proposez-vous ?",
-                "answer": "Nous proposons des programmes de formation complets incluant des tutoriels en ligne, des formations en présentiel et un support technique continu.",
+                "question": "Assurez-vous le service après-vente ?",
+                "answer": "Absolument. Nous disposons d'une équipe technique qualifiée pour l'installation, la maintenance et les réparations de tous nos équipements.",
                 "order": 2,
             },
             {
                 "category": "warranty",
-                "question": "Que couvre la garantie ?",
-                "answer": "Notre garantie couvre les défauts de fabrication et les pannes d'équipement dans des conditions d'utilisation normale. Des options de garantie étendue sont disponibles.",
+                "question": "Quelle est la durée de garantie ?",
+                "answer": "Tous nos produits sont couverts par une garantie constructeur de 1 à 3 ans selon les équipements. Extensions de garantie disponibles.",
                 "order": 1,
             },
             {
                 "category": "warranty",
                 "question": "Comment faire valoir la garantie ?",
-                "answer": "Contactez notre équipe d'assistance avec votre numéro de commande et la description du problème. Nous organiserons une réparation ou un remplacement selon le cas.",
+                "answer": "Contactez notre service client avec votre facture et la description du problème. Nous interviendrons dans les 48h pour les équipements critiques.",
                 "order": 2,
             },
             {
                 "category": "returns",
-                "question": "Quelle est votre politique de retour ?",
-                "answer": "Politique de retour de 30 jours sur la plupart des articles. L'équipement doit être inutilisé et dans son emballage d'origine. Les commandes personnalisées ne sont pas remboursables.",
+                "question": "Puis-je retourner un produit ?",
+                "answer": "Oui, retours acceptés sous 14 jours pour les produits non ouverts et en état neuf. Les équipements défectueux sont remplacés immédiatement.",
                 "order": 1,
             },
             {
                 "category": "returns",
-                "question": "Comment initier un retour ?",
-                "answer": "Contactez le service client pour recevoir un numéro d'autorisation de retour. Renvoyez l'article avec tout l'emballage et la documentation d'origine.",
+                "question": "Quelles sont les conditions d'échange ?",
+                "answer": "Les échanges sont possibles sous 30 jours avec présentation de la facture d'origine. Le produit doit être dans son emballage d'origine.",
                 "order": 2,
             },
         ]
@@ -102,42 +152,42 @@ class Command(BaseCommand):
         # Create Testimonials
         testimonials_data = [
             {
-                "name": "Jean Dupont",
-                "position": "Client",
-                "company": "",
-                "content": "Les produits sont de grande qualité et le service est excellent. Je recommande vivement !",
+                "name": "Dr Amina Benali",
+                "position": "Médecin généraliste",
+                "company": "Cabinet Médical El Amel",
+                "content": "Excellents produits et service impeccable. L'équipe de Fennec Med m'a aidé à équiper mon cabinet avec du matériel de qualité à des prix compétitifs.",
                 "rating": 5,
                 "is_featured": True,
             },
             {
-                "name": "Marie Dubois",
-                "position": "Cliente",
-                "company": "",
-                "content": "Excellente expérience avec Fennec Med. Le personnel est très compétent et serviable.",
+                "name": "Karim Messaoudi",
+                "position": "Pharmacien",
+                "company": "Pharmacie Centrale Sétif",
+                "content": "Fournisseur sérieux et fiable. Livraison rapide et produits conformes aux normes. Je recommande vivement !",
                 "rating": 5,
                 "is_featured": True,
             },
             {
-                "name": "Pierre Martin",
-                "position": "Client",
-                "company": "",
-                "content": "J'utilise leurs fournitures médicales depuis des années et j'ai toujours été satisfait.",
+                "name": "Dr Rachid Boukhalfa",
+                "position": "Chirurgien-dentiste",
+                "company": "Cabinet Dentaire Sourire",
+                "content": "Service après-vente exceptionnel. L'équipe technique est très compétente et toujours disponible. Très satisfait de mon équipement.",
                 "rating": 5,
                 "is_featured": True,
             },
             {
-                "name": "Dr Robert Martinez",
-                "position": "Chef de cardiologie",
-                "company": "Hôpital général métropolitain",
-                "content": "Équipement de qualité exceptionnelle et service client exceptionnel. Les outils de diagnostic ont considérablement amélioré nos capacités de soins aux patients.",
+                "name": "Fatima Zerrouki",
+                "position": "Directrice",
+                "company": "Clinique des Hauts Plateaux",
+                "content": "Partenaire de confiance pour notre clinique. Large choix d'équipements et conseils professionnels. Une vraie valeur ajoutée.",
                 "rating": 5,
                 "is_featured": False,
             },
             {
-                "name": "Lisa Thompson",
-                "position": "Responsable de pharmacie",
-                "company": "Chaîne de pharmacies HealthPlus",
-                "content": "Nous commandons auprès de ce fournisseur depuis plus de 3 ans. Fiable, prix compétitifs et livraison rapide à chaque fois.",
+                "name": "Dr Mohamed Yahiaoui",
+                "position": "Cardiologue",
+                "company": "Hôpital Régional Sétif",
+                "content": "Matériel de diagnostic de haute qualité. Les prix sont raisonnables et le service client est réactif. Excellent partenaire.",
                 "rating": 5,
                 "is_featured": False,
             },
@@ -153,27 +203,27 @@ class Command(BaseCommand):
         # Create sample contact messages
         messages_data = [
             {
-                "name": "Jean Bertrand",
-                "email": "jean.bertrand@hopital.com",
-                "phone": "+33 1 55 01 01 01",
+                "name": "Dr Salim Boumediene",
+                "email": "s.boumediene@clinique.dz",
+                "phone": "+213 555 123 456",
                 "inquiry_type": "general",
-                "subject": "Intéressé par les tarifs en gros",
-                "message": "Nous cherchons à acheter des équipements de diagnostic pour notre nouvelle aile. Pourriez-vous fournir des informations sur les remises en gros ?",
+                "subject": "Demande de devis pour équipement radiologique",
+                "message": "Bonjour, nous souhaitons équiper notre nouvelle clinique d'un appareil de radiologie numérique. Pourriez-vous nous envoyer un devis détaillé ?",
             },
             {
-                "name": "Sophie Leroy",
-                "email": "sophie.l@clinique.com",
-                "phone": "+33 1 55 01 01 02",
+                "name": "Leila Cherif",
+                "email": "l.cherif@pharmacie.dz",
+                "phone": "+213 770 234 567",
                 "inquiry_type": "technical",
-                "subject": "Question sur l'installation d'équipement",
-                "message": "Proposez-vous des services d'installation pour les appareils d'échographie ? Quelles sont les exigences ?",
+                "subject": "Formation sur tensiomètre digital",
+                "message": "J'ai acheté plusieurs tensiomètres digitaux. Proposez-vous une formation pour le personnel de ma pharmacie ?",
             },
             {
-                "name": "David Moreau",
-                "email": "dmoreau@pharmacie.com",
+                "name": "Ahmed Tahar",
+                "email": "a.tahar@labo.dz",
                 "inquiry_type": "partnership",
-                "subject": "Opportunité de partenariat",
-                "message": "Notre chaîne de pharmacies est intéressée par l'établissement d'un partenariat à long terme. Veuillez nous contacter pour en discuter.",
+                "subject": "Partenariat laboratoire d'analyses",
+                "message": "Notre laboratoire cherche un fournisseur régulier pour nos consommables. Serait-il possible de discuter d'un partenariat à long terme ?",
             },
         ]
 
