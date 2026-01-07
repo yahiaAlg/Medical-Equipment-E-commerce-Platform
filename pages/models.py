@@ -195,6 +195,7 @@ class SiteInformation(models.Model):
         blank=True,
         help_text="URL d'intégration Google Maps",
         verbose_name="URL de la carte",
+        max_length=1000,
     )
 
     # Images
