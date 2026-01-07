@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}Admin Dashboard - Fennec Med{% endblock %}
+{% block title %}Tableau de bord Admin - Fennec Med{% endblock %}
 
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
@@ -42,8 +42,8 @@
                         <i class="fas fa-user-shield fa-2x"></i>
                     </div>
                     <div>
-                        <h1 class="h2 mb-2">Admin Dashboard</h1>
-                        <p class="mb-0 opacity-90">Manage your medical equipment platform</p>
+                        <h1 class="h2 mb-2">Tableau de bord administrateur</h1>
+                        <p class="mb-0 opacity-90">Gérez votre plateforme d'équipements médicaux</p>
                     </div>
                 </div>
             </div>
@@ -54,7 +54,7 @@
                         {% include 'partials/notifications_dropdown.html' %}
                     </div>
                     <a href="{% url 'accounts:admin_reports' %}" class="btn btn-light">
-                        <i class="fas fa-chart-bar me-2"></i>View Reports
+                        <i class="fas fa-chart-bar me-2"></i>Voir les rapports
                     </a>
                 </div>
             </div>
@@ -72,14 +72,14 @@
                         <div class="d-flex align-items-center justify-content-between mb-3">
                             <div>
                                 <h3 class="fw-bold mb-1">{{ stats.total_users }}</h3>
-                                <small class="text-muted">Total Users</small>
+                                <small class="text-muted">Total des utilisateurs</small>
                             </div>
                             <i class="fas fa-users stat-icon text-primary"></i>
                         </div>
                         <div class="progress">
                             <div class="progress-bar bg-primary" style="width: 75%"></div>
                         </div>
-                        <small class="text-muted d-block mt-2">{{ stats.active_users }} active</small>
+                        <small class="text-muted d-block mt-2">{{ stats.active_users }} actifs</small>
                     </div>
                 </div>
             </div>
@@ -90,7 +90,7 @@
                         <div class="d-flex align-items-center justify-content-between mb-3">
                             <div>
                                 <h3 class="fw-bold mb-1">{{ stats.total_orders }}</h3>
-                                <small class="text-muted">Total Orders</small>
+                                <small class="text-muted">Total des commandes</small>
                             </div>
                             <i class="fas fa-shopping-bag stat-icon text-success"></i>
                         </div>
@@ -107,7 +107,7 @@
                         <div class="d-flex align-items-center justify-content-between mb-3">
                             <div>
                                 <h3 class="fw-bold mb-1">{{ stats.pending_payments }}</h3>
-                                <small class="text-muted">Pending Payments</small>
+                                <small class="text-muted">Paiements en attente</small>
                             </div>
                             <i class="fas fa-credit-card stat-icon text-warning"></i>
                         </div>
@@ -124,7 +124,7 @@
                         <div class="d-flex align-items-center justify-content-between mb-3">
                             <div>
                                 <h3 class="fw-bold mb-1">{{ stats.open_complaints }}</h3>
-                                <small class="text-muted">Open Complaints</small>
+                                <small class="text-muted">Réclamations ouvertes</small>
                             </div>
                             <i class="fas fa-exclamation-circle stat-icon text-danger"></i>
                         </div>
@@ -145,55 +145,55 @@
         <div class="card mb-4">
             <div class="card-header">
                 <h5 class="mb-0">
-                    <i class="fas fa-bolt me-2"></i>Quick Actions
+                    <i class="fas fa-bolt me-2"></i>Actions rapides
                 </h5>
             </div>
             <div class="card-body">
                 <div class="row g-3">
                     <div class="col-md-3 col-sm-6">
                         <a href="{% url 'accounts:admin_users_management' %}" class="btn btn-outline-primary w-100 py-3">
-                            <i class="fas fa-users me-2"></i>Manage Users
+                            <i class="fas fa-users me-2"></i>Gérer les utilisateurs
                         </a>
                     </div>
                     <div class="col-md-3 col-sm-6">
                         <a href="{% url 'accounts:admin_orders_management' %}" class="btn btn-outline-success w-100 py-3">
-                            <i class="fas fa-shopping-bag me-2"></i>Manage Orders
+                            <i class="fas fa-shopping-bag me-2"></i>Gérer les commandes
                         </a>
                     </div>
                     <div class="col-md-3 col-sm-6">
                         <a href="{% url 'accounts:admin_refunds_management' %}" class="btn btn-outline-warning w-100 py-3">
-                            <i class="fas fa-undo me-2"></i>Manage Refunds
+                            <i class="fas fa-undo me-2"></i>Gérer les remboursements
                         </a>
                     </div>
                     <div class="col-md-3 col-sm-6">
                         <a href="{% url 'accounts:admin_complaints_management' %}" class="btn btn-outline-danger w-100 py-3">
-                            <i class="fas fa-flag me-2"></i>Handle Complaints
+                            <i class="fas fa-flag me-2"></i>Traiter les réclamations
                         </a>
                     </div>
 
                     <!-- Add to dashboard.html after the existing quick action buttons -->
                     <div class="col-md-3 col-sm-6">
                         <a href="{% url 'accounts:admin_contacts_list' %}" class="btn btn-outline-info w-100 py-3">
-                            <i class="fas fa-envelope me-2"></i>Manage Contacts
+                            <i class="fas fa-envelope me-2"></i>Gérer les contacts
                         </a>
                     </div>
                     <div class="col-md-3 col-sm-6">
                         <a href="{% url 'accounts:admin_questions_list' %}" class="btn btn-outline-secondary w-100 py-3">
-                            <i class="fas fa-question-circle me-2"></i>Manage Q&amp;A
+                            <i class="fas fa-question-circle me-2"></i>Gérer Q&amp;R
                         </a>
                     </div>
                     
                     {% comment %} manage the reviews {% endcomment %}
                     <div class="col-md-3 col-sm-6">
                         <a href="{% url 'accounts:admin_reviews_list' %}" class="btn btn-outline-dark w-100 py-3">
-                            <i class="fas fa-star me-2"></i>Manage Reviews
+                            <i class="fas fa-star me-2"></i>Gérer les avis
                         </a>
                     </div>
                     {% comment %} url to the admininistration site {% endcomment %}
 
                     <div class="col-md-3 col-sm-6">
                         <a href="{% url "admin:index" %}" class="btn btn-outline-success w-100 py-3">
-                            <i class="fas fa-credit-card me-2"></i>Administration Site
+                            <i class="fas fa-credit-card me-2"></i>Site d'administration
                         </a>
                     </div>
                 </div>
@@ -206,9 +206,9 @@
                 <div class="card">
                     <div class="card-header d-flex justify-content-between align-items-center">
                         <h5 class="mb-0">
-                            <i class="fas fa-shopping-cart me-2"></i>Recent Orders
+                            <i class="fas fa-shopping-cart me-2"></i>Commandes récentes
                         </h5>
-                        <a href="{% url 'accounts:admin_orders_management' %}" class="btn btn-outline-primary btn-sm">View All</a>
+                        <a href="{% url 'accounts:admin_orders_management' %}" class="btn btn-outline-primary btn-sm">Voir tout</a>
                     </div>
                     <div class="card-body">
                         {% if recent_orders %}
@@ -216,10 +216,10 @@
                                 <table class="table table-hover">
                                     <thead>
                                         <tr>
-                                            <th>Order ID</th>
-                                            <th>User</th>
-                                            <th>Amount</th>
-                                            <th>Status</th>
+                                            <th>ID commande</th>
+                                            <th>Utilisateur</th>
+                                            <th>Montant</th>
+                                            <th>Statut</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -241,7 +241,7 @@
                         {% else %}
                             <div class="text-center py-5">
                                 <i class="fas fa-shopping-bag fa-4x mb-3" style="color: #617da8; opacity: 0.3;"></i>
-                                <p class="text-muted">No recent orders</p>
+                                <p class="text-muted">Aucune commande récente</p>
                             </div>
                         {% endif %}
                     </div>
@@ -253,9 +253,9 @@
                 <div class="card">
                     <div class="card-header d-flex justify-content-between align-items-center">
                         <h5 class="mb-0">
-                            <i class="fas fa-users me-2"></i>Recent Users
+                            <i class="fas fa-users me-2"></i>Utilisateurs récents
                         </h5>
-                        <a href="{% url 'accounts:admin_users_management' %}" class="btn btn-outline-primary btn-sm">View All</a>
+                        <a href="{% url 'accounts:admin_users_management' %}" class="btn btn-outline-primary btn-sm">Voir tout</a>
                     </div>
                     <div class="card-body">
                         {% if recent_users %}
@@ -263,9 +263,9 @@
                                 <table class="table table-hover">
                                     <thead>
                                         <tr>
-                                            <th>Username</th>
+                                            <th>Nom d'utilisateur</th>
                                             <th>Type</th>
-                                            <th>Status</th>
+                                            <th>Statut</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -275,7 +275,7 @@
                                             <td>{{ user.profile.get_user_type_display }}</td>
                                             <td>
                                                 <span class="badge {% if user.is_active %}status-delivered{% else %}status-cancelled{% endif %}">
-                                                    {% if user.is_active %}Active{% else %}Inactive{% endif %}
+                                                    {% if user.is_active %}Actif{% else %}Inactif{% endif %}
                                                 </span>
                                             </td>
                                         </tr>
@@ -286,7 +286,7 @@
                         {% else %}
                             <div class="text-center py-5">
                                 <i class="fas fa-users fa-4x mb-3" style="color: #617da8; opacity: 0.3;"></i>
-                                <p class="text-muted">No recent users</p>
+                                <p class="text-muted">Aucun utilisateur récent</p>
                             </div>
                         {% endif %}
                     </div>
@@ -298,9 +298,9 @@
                 <div class="card">
                     <div class="card-header d-flex justify-content-between align-items-center">
                         <h5 class="mb-0">
-                            <i class="fas fa-clock me-2"></i>Pending Payment Verifications
+                            <i class="fas fa-clock me-2"></i>Vérifications de paiement en attente
                         </h5>
-                        <a href="{% url 'accounts:admin_payments_list' %}" class="btn btn-outline-primary btn-sm">View All</a>
+                        <a href="{% url 'accounts:admin_payments_list' %}" class="btn btn-outline-primary btn-sm">Voir tout</a>
                     </div>
                     <div class="card-body">
                         {% if pending_payments %}
@@ -308,11 +308,11 @@
                                 <table class="table table-hover">
                                     <thead>
                                         <tr>
-                                            <th>Invoice</th>
-                                            <th>User</th>
-                                            <th>Amount</th>
-                                            <th>Method</th>
-                                            <th>Uploaded</th>
+                                            <th>Facture</th>
+                                            <th>Utilisateur</th>
+                                            <th>Montant</th>
+                                            <th>Méthode</th>
+                                            <th>Téléchargé</th>
                                             <th>Actions</th>
                                         </tr>
                                     </thead>
@@ -323,10 +323,10 @@
                                             <td>{{ payment.invoice.order.user.username }}</td>
                                             <td><strong>{{ payment.invoice.total_amount }} DZD</strong></td>
                                             <td>{{ payment.get_payment_method_display }}</td>
-                                            <td>{{ payment.uploaded_at|timesince }} ago</td>
+                                            <td>Il y a {{ payment.uploaded_at|timesince }}</td>
                                             <td>
                                                 <a href="{% url 'accounts:admin_verify_payment' payment.id %}" class="btn btn-sm btn-primary">
-                                                    <i class="fas fa-check"></i> Verify
+                                                    <i class="fas fa-check"></i> Vérifier
                                                 </a>
                                             </td>
                                         </tr>
@@ -337,7 +337,7 @@
                         {% else %}
                             <div class="text-center py-5">
                                 <i class="fas fa-check-circle fa-4x mb-3" style="color: #617da8; opacity: 0.3;"></i>
-                                <p class="text-muted">No pending payments</p>
+                                <p class="text-muted">Aucun paiement en attente</p>
                             </div>
                         {% endif %}
                     </div>

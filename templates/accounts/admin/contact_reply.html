@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}Reply to Contact - Admin{% endblock %}
+{% block title %}Répondre au contact - Admin{% endblock %}
 
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
@@ -14,16 +14,16 @@
             <div class="col-lg-8">
                 <div class="card">
                     <div class="card-header bg-primary text-white">
-                        <h4 class="mb-0"><i class="fas fa-reply me-2"></i>Reply to Contact</h4>
+                        <h4 class="mb-0"><i class="fas fa-reply me-2"></i>Répondre au contact</h4>
                     </div>
                     <div class="card-body">
                         <!-- Original Message -->
                         <div class="alert alert-light border">
-                            <h5>Original Message</h5>
-                            <p><strong>From:</strong> {{ contact.name }} ({{ contact.email }})</p>
-                            <p><strong>Type:</strong> {{ contact.get_inquiry_type_display }}</p>
-                            <p><strong>Subject:</strong> {{ contact.subject }}</p>
-                            <p><strong>Message:</strong></p>
+                            <h5>Message original</h5>
+                            <p><strong>De :</strong> {{ contact.name }} ({{ contact.email }})</p>
+                            <p><strong>Type :</strong> {{ contact.get_inquiry_type_display }}</p>
+                            <p><strong>Objet :</strong> {{ contact.subject }}</p>
+                            <p><strong>Message :</strong></p>
                             <p class="mb-0">{{ contact.message }}</p>
                         </div>
 
@@ -31,7 +31,7 @@
                         <form method="post">
                             {% csrf_token %}
                             <div class="mb-3">
-                                <label class="form-label">Subject *</label>
+                                <label class="form-label">Objet *</label>
                                 {{ form.subject }}
                             </div>
                             <div class="mb-3">
@@ -40,9 +40,9 @@
                             </div>
                             <div class="d-flex gap-2">
                                 <button type="submit" class="btn btn-primary">
-                                    <i class="fas fa-paper-plane me-2"></i>Send Reply
+                                    <i class="fas fa-paper-plane me-2"></i>Envoyer la réponse
                                 </button>
-                                <a href="{% url 'accounts:admin_contacts_list' %}" class="btn btn-secondary">Cancel</a>
+                                <a href="{% url 'accounts:admin_contacts_list' %}" class="btn btn-secondary">Annuler</a>
                             </div>
                         </form>
                     </div>

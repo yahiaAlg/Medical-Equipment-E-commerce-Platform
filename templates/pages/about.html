@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}{{ site_info.site_name }} - About Us{% endblock %}
+{% block title %}{{ site_info.site_name }} - À Propos{% endblock %}
 
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'css/aboutUs.css' %}">
@@ -24,20 +24,20 @@
           {% if site_info.about_hero_description %}
             {{ site_info.about_hero_description }}
           {% else %}
-            We believe that obtaining medical supplies should be both easy and reliable. Ultimately,
-            we believe that sourcing medical materials shouldn't be a daunting experience,
-            and we aim to reflect this in our service. From the moment you reach out to us,
-            you'll experience a seamless process with a warm and supportive team.
-            Our commitment to excellence means that we're constantly evolving,
-            ensuring you receive the best products and service possible.
+            Nous croyons que l'obtention de fournitures médicales doit être à la fois facile et fiable. 
+            En fin de compte, nous pensons que l'approvisionnement en matériel médical ne devrait pas être 
+            une expérience intimidante, et nous visons à refléter cela dans notre service. Dès le moment où 
+            vous nous contactez, vous vivrez un processus fluide avec une équipe chaleureuse et solidaire. 
+            Notre engagement envers l'excellence signifie que nous évoluons constamment, en veillant à ce que 
+            vous receviez les meilleurs produits et services possibles.
           {% endif %}
         </p>
       </div>
       <div class="card-image">
         {% if site_info.about_image_1 %}
-          <img src="{{ site_info.about_image_1.url }}" alt="Medical Team" />
+          <img src="{{ site_info.about_image_1.url }}" alt="Équipe Médicale" />
         {% else %}
-          <img src="{% static 'images/aboutUs4.jpg' %}" alt="Medical Team" />
+          <img src="{% static 'images/aboutUs4.jpg' %}" alt="Équipe Médicale" />
         {% endif %}
       </div>
     </div>
@@ -47,11 +47,11 @@
       <div class="card-image">
         {% if site_info.about_image_2 %}
           <a href="{% url 'products:list' %}?category={{ category.slug }}">
-            <img src="{{ site_info.about_image_2.url }}" alt="Medical Consultation" />
+            <img src="{{ site_info.about_image_2.url }}" alt="Consultation Médicale" />
           </a>
         {% else %}
           <a href="{% url 'products:list' %}?category={{ category.slug }}">
-            <img src="{% static 'images/aboutUs5.png' %}" alt="Medical Consultation" />
+            <img src="{% static 'images/aboutUs5.png' %}" alt="Consultation Médicale" />
           </a>
         {% endif %}
       </div>
@@ -62,20 +62,21 @@
           {{ site_info.about_story_content|linebreaks }}
         {% else %}
           <p>
-            {{ site_info.site_name }} was established with a clear mission: to provide quality medical materials and
-            supplies to families and healthcare providers across the region. Since our inception in 2022, we 
-            have been dedicated to ensuring that healthcare professionals and individuals have access to 
-            the essential medical materials they need.
+            {{ site_info.site_name }} a été créé avec une mission claire : fournir des matériaux et 
+            fournitures médicales de qualité aux familles et aux prestataires de soins de santé de 
+            la région. Depuis notre création en 2022, nous nous sommes consacrés à garantir que les 
+            professionnels de la santé et les particuliers aient accès aux matériaux médicaux essentiels 
+            dont ils ont besoin.
           </p>
           <p>
-            We believe that healthcare should be both quality and affordable. 
-            Ultimately, we believe that obtaining medical supplies shouldn't be a daunting experience,
-            and we aim to reflect this in our service. From the moment you reach out to us,
-            you'll experience a seamless process with a warm and supportive team.
-            Our commitment to excellence means that we're constantly evolving,
-            ensuring you receive the best products and service possible. 
-            Choose {{ site_info.site_name }} for reliable medical supplies that make 
-            your healthcare journey as comfortable and simple as possible.
+            Nous croyons que les soins de santé doivent être à la fois de qualité et abordables. 
+            En fin de compte, nous pensons que l'obtention de fournitures médicales ne devrait pas 
+            être une expérience intimidante, et nous visons à refléter cela dans notre service. 
+            Dès le moment où vous nous contactez, vous vivrez un processus fluide avec une équipe 
+            chaleureuse et solidaire. Notre engagement envers l'excellence signifie que nous évoluons 
+            constamment, en veillant à ce que vous receviez les meilleurs produits et services possibles. 
+            Choisissez {{ site_info.site_name }} pour des fournitures médicales fiables qui rendent 
+            votre parcours de santé aussi confortable et simple que possible.
           </p>
         {% endif %}
       </div>
@@ -86,38 +87,38 @@
 <!-- Why Choose Section -->
 <div class="why-choose-section">
   <div class="why-choose-container">
-    <h2>Why Choose {{ site_info.site_name }}?</h2>
+    <h2>Pourquoi Choisir {{ site_info.site_name }} ?</h2>
     <div class="features-grid">
       <div class="feature-card">
         <div class="feature-icon">
-          <img src="{% static 'images/team.png' %}" alt="Expert Team Icon" class="feature-icon">
+          <img src="{% static 'images/team.png' %}" alt="Icône Équipe Experte" class="feature-icon">
         </div> 
-        <h3>Expert Team</h3>
+        <h3>Équipe Experte</h3>
         <p>
-          Our experienced medical professionals are dedicated to providing
-          the highest quality care.
+          Nos professionnels de santé expérimentés se consacrent à fournir 
+          des soins de la plus haute qualité.
         </p>
       </div>
 
       <div class="feature-card">
         <div class="feature-icon">
-          <img src="{% static 'images/heart2.png' %}" alt="Compassionate Care Icon" class="feature-icon">
+          <img src="{% static 'images/heart2.png' %}" alt="Icône Soins Compatissants" class="feature-icon">
         </div>
-        <h3>Compassionate Care</h3>
+        <h3>Soins Compatissants</h3>
         <p>
-          We treat every patient with empathy, respect, and personalized
-          attention.
+          Nous traitons chaque patient avec empathie, respect et attention 
+          personnalisée.
         </p>
       </div>
 
       <div class="feature-card">
         <div class="feature-icon">
-          <img src="{% static 'images/technology.png' %}" alt="Modern Technology Icon" class="feature-icon">
+          <img src="{% static 'images/technology.png' %}" alt="Icône Technologie Moderne" class="feature-icon">
         </div>
-        <h3>Modern Technology</h3>
+        <h3>Technologie Moderne</h3>
         <p>
-          State-of-the-art equipment and innovative treatment approaches for
-          optimal outcomes.
+          Équipements de pointe et approches de traitement innovantes pour 
+          des résultats optimaux.
         </p>
       </div>
     </div>
@@ -128,7 +129,7 @@
 {% if team_members %}
 <div class="team-section">
   <div class="team-container">
-    <h2>Meet Our Team</h2>
+    <h2>Rencontrez Notre Équipe</h2>
     <div class="team-grid">
       {% for member in team_members %}
       <div class="team-member-card">

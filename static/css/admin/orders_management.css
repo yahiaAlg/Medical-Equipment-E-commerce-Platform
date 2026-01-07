@@ -90,3 +90,14 @@
   background: #e7e7e7;
   color: #666;
 }
+
+/* red one */
+.status-rejected {
+  background: #f8d7da;
+  color: #721c24;
+}
+/* yellow one */
+.status-pending_confirmation {
+  background: #fff3cd;
+  color: #856404;
+}

@@ -12,8 +12,8 @@
 <div class="product-container">
   <!-- Breadcrumb -->
   <nav class="breadcrumb">
-    <a href="{% url 'pages:index' %}">Home</a> ›
-    <a href="{% url 'products:list' %}">Products</a> ›
+    <a href="{% url 'pages:index' %}">Accueil</a> ›
+    <a href="{% url 'products:list' %}">Produits</a> ›
     {% for category in product.categories.all %}
       <a href="{% url 'products:list' %}?category={{ category.slug }}">{{ category.name }}</a>
       {% if not forloop.last %}|{% endif %}
@@ -45,19 +45,19 @@
 
     <!-- Info -->
     <div class="product-info">
-      <p class="product-brand">Brand: {{ product.brand.name }}</p>
+      <p class="product-brand">Marque : {{ product.brand.name }}</p>
       <h1 class="product-title">{{ product.name }}</h1>
 
       <div class="product-rating">
         <span class="stars">{% for i in "12345" %}{% if forloop.counter <= product.get_average_rating %}★{% else %}☆{% endif %}{% endfor %}</span>
-        <span class="rating-text">{{ product.get_average_rating|floatformat:1 }} ({{ product.get_review_count }} reviews)</span>
+        <span class="rating-text">{{ product.get_average_rating|floatformat:1 }} ({{ product.get_review_count }} avis)</span>
       </div>
 
       <div class="price-section">
         <span class="current-price" id="displayPrice">DZD {{ product.price }}</span>
         {% if product.bulk_price %}
         <span class="original-price">DZD {{ product.bulk_price }}</span>
-        <span class="discount-badge">17% OFF</span>
+        <span class="discount-badge">-17%</span>
         {% endif %}
       </div>
 
@@ -66,18 +66,18 @@
       </div>
 
       <div class="key-features">
-        <h4>Key Features</h4>
+        <h4>Caractéristiques principales</h4>
         <ul>
-          <li>{{ product.brand.name }} Certified</li>
-          <li>High Quality Product</li>
-          <li>Perfect for {{ product.category.name }}</li>
-          {% if product.warranty %}<li>{{ product.warranty }} Warranty</li>{% endif %}
+          <li>Certifié {{ product.brand.name }}</li>
+          <li>Produit de haute qualité</li>
+          <li>Parfait pour {{ product.category.name }}</li>
+          {% if product.warranty %}<li>Garantie {{ product.warranty }}</li>{% endif %}
         </ul>
       </div>
 
       <div class="product-meta">
         <div class="meta-item">
-          <strong>Categories:</strong>
+          <strong>Catégories :</strong>
           <span>
             {% for category in product.categories.all %}
               {{ category.name }}{% if not forloop.last %}, {% endif %}
@@ -89,11 +89,11 @@
       <!-- Variants Section -->
       {% if variants %}
       <div class="size-selector">
-        <h4>Available Options:</h4>
+        <h4>Options disponibles :</h4>
         {% regroup variants by variant_title as variant_groups %}
         {% for group in variant_groups %}
           <div class="mb-3">
-            <label class="form-label fw-bold">{{ group.grouper }}:</label>
+            <label class="form-label fw-bold">{{ group.grouper }} :</label>
             <div class="size-options">
               {% for variant in group.list %}
               <button class="size-btn" data-variant-id="{{ variant.id }}" data-price="{{ variant.additional_cost }}">
@@ -112,7 +112,7 @@
           <input type="number" class="qty-input" id="quantity" value="1" min="1" max="{{ product.stock_quantity }}" readonly />
           <button class="qty-btn" onclick="changeQty(1)">+</button>
         </div>
-        <button class="btn-add-cart" onclick="addToCart({{ product.id }})">🛒 Add to Cart</button>
+        <button class="btn-add-cart" onclick="addToCart({{ product.id }})">🛒 Ajouter au panier</button>
       </div>
 
       <div class="action-buttons">
@@ -121,7 +121,7 @@
             {% if in_wishlist %}♥{% else %}♡{% endif %}
           </span>
           <span id="wishlist-text-{{ product.id }}">
-            {% if in_wishlist %}Remove from Wishlist{% else %}Add to Wishlist{% endif %}
+            {% if in_wishlist %}Retirer de la liste{% else %}Ajouter à la liste{% endif %}
           </span>
         </button>
       </div>
@@ -132,33 +132,33 @@
   <div class="product-tabs">
     <div class="tab-nav">
       <button class="tab-link active" onclick="openTab(event, 'description')">📄 Description</button>
-      <button class="tab-link" onclick="openTab(event, 'specifications')">⚙ Specifications</button>
-      <button class="tab-link" onclick="openTab(event, 'reviews')">⭐ Reviews</button>
-      <button class="tab-link" onclick="openTab(event, 'questions')">❓ Q&A</button>
+      <button class="tab-link" onclick="openTab(event, 'specifications')">⚙ Spécifications</button>
+      <button class="tab-link" onclick="openTab(event, 'reviews')">⭐ Avis</button>
+      <button class="tab-link" onclick="openTab(event, 'questions')">❓ Questions</button>
     </div>
 
     <!-- Description -->
     <div id="description" class="tab-content active">
-      <h3>Product Description</h3>
+      <h3>Description du produit</h3>
       {{ product.description|linebreaks }}
       {% if product.compatibility %}
-      <h4>Compatibility</h4>
+      <h4>Compatibilité</h4>
       {{ product.compatibility|linebreaks }}
       {% endif %}
     </div>
 
     <!-- Specifications -->
     <div id="specifications" class="tab-content">
-      <h3>Technical Specifications</h3>
-      {{ product.specifications|default:"Specifications coming soon"|linebreaks }}
+      <h3>Spécifications techniques</h3>
+      {{ product.specifications|default:"Spécifications à venir"|linebreaks }}
     </div>
 
     <!-- Reviews -->
     <div id="reviews" class="tab-content">
       <div class="reviews-header">
-        <h3>Customer Reviews</h3>
+        <h3>Avis clients</h3>
         {% if user.is_authenticated %}
-        <button class="btn-write-review" onclick="document.getElementById('reviewForm').style.display='block'">Write a Review</button>
+        <button class="btn-write-review" onclick="document.getElementById('reviewForm').style.display='block'">Rédiger un avis</button>
         {% endif %}
       </div>
 
@@ -172,7 +172,7 @@
               {% endfor %}
             {% endwith %}
           </div>
-          <p>Based on {{ review_stats.total_count|default:0 }} review{{ review_stats.total_count|pluralize }}</p>
+          <p>Basé sur {{ review_stats.total_count|default:0 }} avis</p>
         </div>
         <div class="rating-bars">
           {% for star in "54321" %}
@@ -194,30 +194,30 @@
         <input type="hidden" name="product_slug" value="{{ product.slug }}">
 
         <div class="form-group">
-          <label>Your Rating *</label>
+          <label>Votre note *</label>
           <select name="rating" required>
-            <option value="">Choose rating</option>
-            <option value="5">5 Stars</option>
-            <option value="4">4 Stars</option>
-            <option value="3">3 Stars</option>
-            <option value="2">2 Stars</option>
-            <option value="1">1 Star</option>
+            <option value="">Choisir une note</option>
+            <option value="5">5 étoiles</option>
+            <option value="4">4 étoiles</option>
+            <option value="3">3 étoiles</option>
+            <option value="2">2 étoiles</option>
+            <option value="1">1 étoile</option>
           </select>
         </div>
 
         <div class="form-group">
-          <label>Review Title *</label>
-          <input type="text" name="title" placeholder="Summarize your review" required>
+          <label>Titre de l'avis *</label>
+          <input type="text" name="title" placeholder="Résumez votre avis" required>
         </div>
 
         <div class="form-group">
-          <label>Your Review *</label>
-          <textarea name="comment" placeholder="Share details of your experience" required></textarea>
+          <label>Votre avis *</label>
+          <textarea name="comment" placeholder="Partagez les détails de votre expérience" required></textarea>
         </div>
 
         <div class="form-actions">
-          <button type="button" class="btn-cancel" onclick="document.getElementById('reviewForm').style.display='none'">Cancel</button>
-          <button type="submit" class="btn-submit">Submit Review</button>
+          <button type="button" class="btn-cancel" onclick="document.getElementById('reviewForm').style.display='none'">Annuler</button>
+          <button type="submit" class="btn-submit">Soumettre l'avis</button>
         </div>
       </form>
       {% endif %}
@@ -230,11 +230,11 @@
             <div>
               <div class="reviewer-name">{{ review.user.username }}</div>
               <div class="stars">{% for i in "12345" %}{% if forloop.counter <= review.rating %}★{% else %}☆{% endif %}{% endfor %}</div>
-              <div class="review-date">{{ review.created_at|date:"M d, Y" }}</div>
+              <div class="review-date">{{ review.created_at|date:"d M Y" }}</div>
             </div>
           </div>
           {% if review.verified_purchase %}
-          <span class="verified-badge">✓ Verified Purchase</span>
+          <span class="verified-badge">✓ Achat vérifié</span>
           {% endif %}
         </div>
         <div class="border rounded-2 mb-2 px-3 py-2" >
@@ -247,7 +247,7 @@
 
       {% if reviews.count > 5 %}
       <div class="show-more">
-        <button class="btn-show-more">Show All {{ reviews.count }} Reviews</button>
+        <button class="btn-show-more">Afficher les {{ reviews.count }} avis</button>
       </div>
       {% endif %}
     </div>
@@ -255,9 +255,9 @@
     <!-- Q&A -->
     <div id="questions" class="tab-content">
       <div class="reviews-header">
-        <h3>Product Questions</h3>
+        <h3>Questions sur le produit</h3>
         {% if user.is_authenticated %}
-        <button class="btn-write-review" onclick="document.getElementById('questionForm').style.display='block'">Ask a Question</button>
+        <button class="btn-write-review" onclick="document.getElementById('questionForm').style.display='block'">Poser une question</button>
         {% endif %}
       </div>
 
@@ -268,25 +268,25 @@
         <input type="hidden" name="product_slug" value="{{ product.slug }}">
 
         <div class="form-group">
-          <label>Your Question *</label>
-          <textarea name="question" placeholder="Ask a question about this product..." required></textarea>
+          <label>Votre question *</label>
+          <textarea name="question" placeholder="Posez une question sur ce produit..." required></textarea>
         </div>
 
         <div class="form-actions">
-          <button type="button" class="btn-cancel" onclick="document.getElementById('questionForm').style.display='none'">Cancel</button>
-          <button type="submit" class="btn-submit">Submit Question</button>
+          <button type="button" class="btn-cancel" onclick="document.getElementById('questionForm').style.display='none'">Annuler</button>
+          <button type="submit" class="btn-submit">Soumettre la question</button>
         </div>
       </form>
       {% endif %}
 
       {% for question in questions %}
       <div class="review-item">
-        <p><strong>Q:</strong> {{ question.question }}</p>
-        <small>Asked by {{ question.user.username }} - {{ question.created_at|date:"M d, Y" }}</small>
+        <p><strong>Q :</strong> {{ question.question }}</p>
+        <small>Posée par {{ question.user.username }} - {{ question.created_at|date:"d M Y" }}</small>
         {% if question.answer %}
-        <p style="margin-top:1rem;"><strong>A:</strong> {{ question.answer }}</p>
+        <p style="margin-top:1rem;"><strong>R :</strong> {{ question.answer }}</p>
         {% else %}
-        <p style="color:#999;margin-top:0.5rem;">Awaiting answer</p>
+        <p style="color:#999;margin-top:0.5rem;">En attente de réponse</p>
         {% endif %}
       </div>
       {% endfor %}
@@ -297,8 +297,8 @@
   {% if related_products %}
   <div class="related-products">
     <h2>
-      Related Products
-      <a href="{% url 'products:list' %}?category={{ product.category.slug }}" class="view-all">View All →</a>
+      Produits similaires
+      <a href="{% url 'products:list' %}?category={{ product.category.slug }}" class="view-all">Voir tout →</a>
     </h2>
     <div class="products-grid">
       {% for related in related_products %}
@@ -333,7 +333,7 @@
             <div class="product-card-price">
               <span class="price">DZD {{ related.price }}</span>
             </div>
-            <button class="btn-add" onclick="event.preventDefault(); quickAddToCart({{ related.id }})">+ Add</button>
+            <button class="btn-add" onclick="event.preventDefault(); quickAddToCart({{ related.id }})">+ Ajouter</button>
           </div>
       </div>
       {% endfor %}
@@ -384,11 +384,11 @@
 
           if(data.in_wishlist) {
             icon.textContent = '♥';
-            if(text) text.textContent = 'Remove from Wishlist';
+            if(text) text.textContent = 'Retirer de la liste';
             button.style.color = '#dc3545';
           } else {
             icon.textContent = '♡';
-            if(text) text.textContent = 'Add to Wishlist';
+            if(text) text.textContent = 'Ajouter à la liste';
             button.style.color = '#666';
           }
         }
@@ -432,13 +432,13 @@
       .then(res => res.json())
       .then(data => {
         if (data.success) {
-          alert('Added to cart!');
+          alert('Ajouté au panier !');
           window.location.href = "{% url 'payments:cart' %}";
         } else {
-          alert(data.message || 'Error adding to cart');
+          alert(data.message || 'Erreur lors de l\'ajout au panier');
         }
       })
-      .catch(err => alert('Error: ' + err));
+      .catch(err => alert('Erreur : ' + err));
       {% else %}
       window.location.href = "{% url 'accounts:login' %}";
       {% endif %}
@@ -461,9 +461,9 @@
       .then(res => res.json())
       .then(data => {
         if (data.success) {
-          alert('Added to cart!');
+          alert('Ajouté au panier !');
         } else {
-          alert(data.message || 'Error adding to cart');
+          alert(data.message || 'Erreur lors de l\'ajout au panier');
         }
       });
       {% else %}

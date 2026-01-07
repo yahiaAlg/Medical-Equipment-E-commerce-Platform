@@ -24,23 +24,25 @@ from datetime import datetime, timedelta
 
 
 class Command(BaseCommand):
-    help = "Seeds carts, orders, and related payment data for testing"
+    help = "Génère des paniers, commandes et données de paiement pour les tests"
 
     def handle(self, *args, **kwargs):
-        self.stdout.write("Seeding orders, carts, and payment data...")
+        self.stdout.write("Génération des commandes, paniers et données de paiement...")
 
         users = User.objects.all()
         products = list(Product.objects.filter(availability_status="in_stock"))
 
         if not users.exists() or not products:
             self.stdout.write(
-                self.style.WARNING("Please run seed_users and seed_products first")
+                self.style.WARNING(
+                    "Veuillez exécuter seed_users et seed_products d'abord"
+                )
             )
             return
 
-        # Algerian wilayas (states)
+        # Wilayas algériennes
         algerian_wilayas = [
-            "Algiers",
+            "Alger",
             "Oran",
             "Constantine",
             "Annaba",
@@ -57,31 +59,31 @@ class Command(BaseCommand):
             "Béjaïa",
         ]
 
-        # Create shipping types
-        self.stdout.write("Creating shipping types...")
+        # Créer les types de livraison
+        self.stdout.write("Création des types de livraison...")
         shipping_types = []
         shipping_data = [
             {
-                "name": "Standard Shipping",
-                "description": "Regular delivery service",
+                "name": "Livraison standard",
+                "description": "Service de livraison régulier",
                 "estimated_days": 7,
                 "cost": Decimal("500.00"),
             },
             {
-                "name": "Express Shipping",
-                "description": "Fast delivery service",
+                "name": "Livraison express",
+                "description": "Service de livraison rapide",
                 "estimated_days": 3,
                 "cost": Decimal("1000.00"),
             },
             {
-                "name": "Same Wilaya",
-                "description": "Local delivery within same wilaya",
+                "name": "Même wilaya",
+                "description": "Livraison locale dans la même wilaya",
                 "estimated_days": 2,
                 "cost": Decimal("300.00"),
             },
             {
-                "name": "Remote Area",
-                "description": "Delivery to remote areas",
+                "name": "Zone éloignée",
+                "description": "Livraison vers les zones éloignées",
                 "estimated_days": 10,
                 "cost": Decimal("800.00"),
             },
@@ -101,33 +103,36 @@ class Command(BaseCommand):
             shipping_types.append(shipping_type)
             if created:
                 self.stdout.write(
-                    f"  ✓ Created: {shipping_type.name} - {shipping_type.cost} DZD"
+                    f"  ✓ Créé : {shipping_type.name} - {shipping_type.cost} DZD"
                 )
             else:
-                self.stdout.write(f"  - Already exists: {shipping_type.name}")
+                self.stdout.write(f"  - Existe déjà : {shipping_type.name}")
 
-        # Create complaint reasons
-        self.stdout.write("Creating complaint reasons...")
+        # Créer les motifs de réclamation
+        self.stdout.write("Création des motifs de réclamation...")
         complaint_reasons_data = [
             {
-                "name": "Damaged Product",
-                "description": "Product arrived damaged or broken",
+                "name": "Produit endommagé",
+                "description": "Produit arrivé endommagé ou cassé",
             },
-            {"name": "Wrong Item", "description": "Received incorrect product"},
-            {"name": "Missing Items", "description": "Some items missing from order"},
+            {"name": "Mauvais article", "description": "Produit incorrect reçu"},
             {
-                "name": "Late Delivery",
-                "description": "Order delivered after estimated time",
-            },
-            {
-                "name": "Quality Issues",
-                "description": "Product quality below expectations",
+                "name": "Articles manquants",
+                "description": "Certains articles manquants de la commande",
             },
             {
-                "name": "Payment Issues",
-                "description": "Problems with payment processing",
+                "name": "Livraison tardive",
+                "description": "Commande livrée après le délai estimé",
             },
-            {"name": "Other", "description": "Other complaints"},
+            {
+                "name": "Problèmes de qualité",
+                "description": "Qualité du produit inférieure aux attentes",
+            },
+            {
+                "name": "Problèmes de paiement",
+                "description": "Problèmes avec le traitement du paiement",
+            },
+            {"name": "Autre", "description": "Autres réclamations"},
         ]
 
         complaint_reasons = []
@@ -142,11 +147,11 @@ class Command(BaseCommand):
             )
             complaint_reasons.append(reason)
             if created:
-                self.stdout.write(f"  ✓ Created: {reason.name}")
+                self.stdout.write(f"  ✓ Créé : {reason.name}")
             else:
-                self.stdout.write(f"  - Already exists: {reason.name}")
+                self.stdout.write(f"  - Existe déjà : {reason.name}")
 
-        # Create carts with items for each user
+        # Créer des paniers avec articles pour chaque utilisateur
         for user in users:
             cart, created = Cart.objects.get_or_create(user=user)
 
@@ -162,13 +167,13 @@ class Command(BaseCommand):
                     )
 
                 self.stdout.write(
-                    f"Created cart for {user.username} with {num_items} items"
+                    f"Panier créé pour {user.username} avec {num_items} articles"
                 )
 
-        # Create sample orders with full workflow
+        # Créer des exemples de commandes avec workflow complet
         admin_users = list(User.objects.filter(is_staff=True))
 
-        for user in users[:8]:  # Create orders for first 8 users
+        for user in users[:8]:  # Créer des commandes pour les 8 premiers utilisateurs
             for i in range(random.randint(1, 3)):
                 order_products = random.sample(products, random.randint(2, 4))
 
@@ -188,14 +193,14 @@ class Command(BaseCommand):
                         {"product": product, "quantity": quantity, "price": price}
                     )
 
-                # Tax and shipping
+                # Taxe et livraison
                 tax_rate = Decimal("0.00")
                 tax_amount = subtotal * tax_rate
                 shipping_type = random.choice(shipping_types)
                 shipping_cost = shipping_type.cost
                 total_amount = subtotal + tax_amount + shipping_cost
 
-                # Determine order status progression
+                # Déterminer la progression du statut de commande
                 status_progression = random.choice(
                     [
                         ["pending_confirmation"],
@@ -232,7 +237,7 @@ class Command(BaseCommand):
                     shipping_city=wilaya,
                     shipping_state=wilaya,
                     shipping_zip=f"{random.randint(10000, 99999)}",
-                    shipping_country="Algeria",
+                    shipping_country="Algérie",
                     subtotal=subtotal,
                     tax_amount=tax_amount,
                     shipping_cost=shipping_cost,
@@ -240,7 +245,7 @@ class Command(BaseCommand):
                     created_at=timezone.now() - timedelta(days=random.randint(1, 60)),
                 )
 
-                # Set timestamps based on status
+                # Définir les horodatages en fonction du statut
                 if current_status == "rejected":
                     order.rejected_at = order.created_at + timedelta(
                         hours=random.randint(1, 48)
@@ -268,7 +273,7 @@ class Command(BaseCommand):
 
                 order.save()
 
-                # Create order items
+                # Créer les articles de commande
                 for item_data in order_items_data:
                     OrderItem.objects.create(
                         order=order,
@@ -277,7 +282,7 @@ class Command(BaseCommand):
                         price=item_data["price"],
                     )
 
-                # Create invoice for confirmed orders
+                # Créer la facture pour les commandes confirmées
                 if "confirmed" in status_progression:
                     invoice_status = "unpaid"
                     if current_status in ["payment_under_review"]:
@@ -290,7 +295,7 @@ class Command(BaseCommand):
                     ]:
                         invoice_status = "paid"
 
-                    # Use get_or_create to avoid duplicate invoices
+                    # Utiliser get_or_create pour éviter les factures en double
                     invoice, invoice_created = Invoice.objects.get_or_create(
                         order=order,
                         defaults={
@@ -302,7 +307,7 @@ class Command(BaseCommand):
                         },
                     )
 
-                    # Update status if invoice already existed
+                    # Mettre à jour le statut si la facture existait déjà
                     if not invoice_created:
                         invoice.status = invoice_status
                         if invoice_status == "paid" and not invoice.paid_at:
@@ -312,19 +317,19 @@ class Command(BaseCommand):
                         invoice.paid_at = order.paid_at
                         invoice.save()
 
-                    # Create payment proof for submitted/paid invoices
+                    # Créer la preuve de paiement pour les factures soumises/payées
                     if invoice_status in ["payment_submitted", "paid"]:
                         payment_method = random.choice(
                             ["baridimob", "ccp_cheque", "bank_transfer"]
                         )
 
-                        # Check if payment proof already exists
+                        # Vérifier si la preuve de paiement existe déjà
                         if not PaymentProof.objects.filter(invoice=invoice).exists():
                             proof = PaymentProof.objects.create(
                                 invoice=invoice,
                                 payment_method=payment_method,
                                 transaction_reference=f"TRX{random.randint(100000, 999999)}",
-                                notes="Payment completed successfully",
+                                notes="Paiement effectué avec succès",
                                 verified=(invoice_status == "paid"),
                                 uploaded_at=order.confirmed_at + timedelta(days=1),
                             )
@@ -334,7 +339,7 @@ class Command(BaseCommand):
                                 proof.verified_at = order.paid_at
                                 proof.save()
 
-                                # Create payment receipt if it doesn't exist
+                                # Créer le reçu de paiement s'il n'existe pas
                                 if not PaymentReceipt.objects.filter(
                                     invoice=invoice
                                 ).exists():
@@ -346,15 +351,15 @@ class Command(BaseCommand):
                                         payment_method=payment_method,
                                     )
 
-                # Add order notes for some orders
+                # Ajouter des notes de commande pour certaines commandes
                 if random.random() < 0.3 and admin_users:
                     note_content = random.choice(
                         [
-                            "Customer requested gift wrapping",
-                            "Verified address with customer",
-                            "Priority delivery requested",
-                            "Customer prefers delivery after 5 PM",
-                            "Left package with building security",
+                            "Client a demandé un emballage cadeau",
+                            "Adresse vérifiée avec le client",
+                            "Livraison prioritaire demandée",
+                            "Client préfère livraison après 17h",
+                            "Colis laissé à la sécurité du bâtiment",
                         ]
                     )
                     OrderNote.objects.create(
@@ -363,7 +368,7 @@ class Command(BaseCommand):
                         created_by=random.choice(admin_users),
                     )
 
-                # Create complaints for some delivered orders
+                # Créer des réclamations pour certaines commandes livrées
                 if current_status == "delivered" and random.random() < 0.2:
                     complaint_status = random.choice(["open", "in_review", "resolved"])
                     complaint = Complaint.objects.create(
@@ -371,7 +376,7 @@ class Command(BaseCommand):
                         order=order,
                         invoice=getattr(order, "invoice", None),
                         reason=random.choice(complaint_reasons),
-                        description=f"Issue with order {order.order_id}. {random.choice(['Product was damaged', 'Wrong item received', 'Item missing from package'])}",
+                        description=f"Problème avec la commande {order.order_id}. {random.choice(['Produit endommagé', 'Mauvais article reçu', 'Article manquant du colis'])}",
                         status=complaint_status,
                         created_at=order.delivered_at
                         + timedelta(days=random.randint(1, 5)),
@@ -379,17 +384,17 @@ class Command(BaseCommand):
 
                     if complaint_status in ["in_review", "resolved"] and admin_users:
                         complaint.handled_by = random.choice(admin_users)
-                        complaint.admin_notes = "Investigating the issue"
+                        complaint.admin_notes = "Enquête en cours sur le problème"
                         if complaint_status == "resolved":
                             complaint.resolution_notes = (
-                                "Issue resolved, replacement sent"
+                                "Problème résolu, remplacement envoyé"
                             )
                             complaint.resolved_at = complaint.created_at + timedelta(
                                 days=random.randint(1, 7)
                             )
                         complaint.save()
 
-                    # Create refund for some resolved complaints
+                    # Créer un remboursement pour certaines réclamations résolues
                     if complaint_status == "resolved" and random.random() < 0.5:
                         refund_amount = (
                             total_amount if random.random() < 0.5 else subtotal
@@ -399,7 +404,7 @@ class Command(BaseCommand):
                             invoice=order.invoice,
                             complaint=complaint,
                             amount=refund_amount,
-                            reason="Compensation for complaint",
+                            reason="Compensation pour réclamation",
                             status="refund_completed",
                             created_at=complaint.created_at,
                             completed_at=complaint.resolved_at,
@@ -412,12 +417,12 @@ class Command(BaseCommand):
                             refund.processed_at = refund.approved_at + timedelta(days=1)
                             refund.save()
 
-                # Create notifications
+                # Créer des notifications
                 Notification.objects.create(
                     user=user,
                     notification_type="order_created",
-                    title="Order Created",
-                    message=f"Your order {order.order_id} has been created",
+                    title="Commande créée",
+                    message=f"Votre commande {order.order_id} a été créée",
                     order=order,
                     created_at=order.created_at,
                 )
@@ -426,8 +431,8 @@ class Command(BaseCommand):
                     Notification.objects.create(
                         user=user,
                         notification_type="invoice_created",
-                        title="Invoice Generated",
-                        message=f"Invoice {order.invoice.invoice_number} is ready",
+                        title="Facture générée",
+                        message=f"La facture {order.invoice.invoice_number} est prête",
                         order=order,
                         invoice=order.invoice,
                         created_at=order.invoice.created_at,
@@ -437,16 +442,18 @@ class Command(BaseCommand):
                     Notification.objects.create(
                         user=user,
                         notification_type="order_shipped",
-                        title="Order Shipped",
-                        message=f"Your order {order.order_id} has been shipped. Tracking: {order.tracking_number}",
+                        title="Commande expédiée",
+                        message=f"Votre commande {order.order_id} a été expédiée. Suivi : {order.tracking_number}",
                         order=order,
                         created_at=order.shipped_at,
                     )
 
                 self.stdout.write(
-                    f"Created order {order.order_id} for {user.username} - Status: {current_status}"
+                    f"Commande {order.order_id} créée pour {user.username} - Statut : {current_status}"
                 )
 
         self.stdout.write(
-            self.style.SUCCESS("Successfully seeded all order and payment data!")
+            self.style.SUCCESS(
+                "Génération réussie de toutes les données de commande et paiement !"
+            )
         )

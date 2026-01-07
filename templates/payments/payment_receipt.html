@@ -1,7 +1,8 @@
+<!-- payment_receipt.html -->
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}Payment Receipt - Fennec Med{% endblock %}
+{% block title %}Reçu de paiement - Fennec Med{% endblock %}
 
 {% block extra_css %}
   <link rel="stylesheet" href="{% static 'css/payment_receipt.css' %}">
@@ -13,66 +14,66 @@
     <div class="receipt-paper">
       <div class="receipt-header">
         <a href="{% url "accounts:dashboard" %}" class="btn btn-outline-secondary mb-3">
-            <i class="fas fa-arrow-left"></i> Back to Invoices
+            <i class="fas fa-arrow-left"></i> Retour aux factures
         </a>
         <div class="success-icon">
           <i class="fas fa-check-circle"></i>
         </div>
-        <h1>Payment Receipt</h1>
+        <h1>Reçu de paiement</h1>
         <p class="receipt-number">{{ receipt.receipt_number }}</p>
       </div>
 
       <div class="receipt-info">
         <div class="info-item">
-          <span class="info-label">Invoice Number</span>
+          <span class="info-label">Numéro de facture</span>
           <span class="info-value">{{ invoice.invoice_number }}</span>
         </div>
         <div class="info-item">
-          <span class="info-label">Order Number</span>
+          <span class="info-label">Numéro de commande</span>
           <span class="info-value">{{ invoice.order.order_id }}</span>
         </div>
         <div class="info-item">
-          <span class="info-label">Payment Date</span>
-          <span class="info-value">{{ receipt.payment_date|date:"M d, Y" }}</span>
+          <span class="info-label">Date de paiement</span>
+          <span class="info-value">{{ receipt.payment_date|date:"d M Y" }}</span>
         </div>
         <div class="info-item">
-          <span class="info-label">Payment Method</span>
+          <span class="info-label">Mode de paiement</span>
           <span class="info-value">{{ receipt.get_payment_method_display }}</span>
         </div>
       </div>
 
       <div class="amount-paid-section">
-        <h2>Amount Paid</h2>
+        <h2>Montant payé</h2>
         <div class="amount-paid">{{ receipt.amount_paid|floatformat:2 }} DZD</div>
       </div>
 
       <div class="receipt-details">
         <div class="detail-row">
-          <span class="detail-label">Customer Name</span>
+          <span class="detail-label">Nom du client</span>
           <span class="detail-value">{{ invoice.order.user.get_full_name|default:invoice.order.user.username }}</span>
         </div>
         <div class="detail-row">
-          <span class="detail-label">Shipping Address</span>
+          <span class="detail-label">Adresse de livraison</span>
           <span class="detail-value">{{ invoice.order.shipping_address }}, {{ invoice.order.shipping_city }}</span>
         </div>
         <div class="detail-row">
-          <span class="detail-label">Receipt Generated</span>
-          <span class="detail-value">{{ receipt.generated_at|date:"M d, Y h:i A" }}</span>
+          <span class="detail-label">Reçu généré le</span>
+          <span class="detail-value">{{ receipt.generated_at|date:"d M Y H:i" }}</span>
         </div>
       </div>
 
       <div class="receipt-footer">
-        <p><strong>Thank you for your payment!</strong></p>
-        <p>This is an official receipt from Fennec Med</p>
-        <p>For any questions, please contact our support team</p>
+        <p><strong>Merci pour votre paiement !</strong></p>
+        <p>Ceci est un reçu officiel de Fennec Med</p>
+        <p>Pour toute question, veuillez contacter notre équipe d'assistance</p>
       </div>
 
       <div class="action-buttons">
         <button onclick="window.print()" class="btn-print">
-          <i class="fas fa-print"></i> Print Receipt
+          <i class="fas fa-print"></i> Imprimer le reçu
         </button>
         <a href="{% url 'payments:invoice_list' %}" class="btn-back">
-          <i class="fas fa-arrow-left"></i> Back to Invoices
+          <i class="fas fa-arrow-left"></i> Retour aux factures
         </a>
       </div>
     </div>

@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Account Deactivated</title>
+    <title>Compte désactivé</title>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -143,34 +143,34 @@
                 <img src="{{ site_info.logo.url }}" alt="{{ site_info.site_name }}" style="max-height: 60px;">
             </div>
             {% endif %}
-            <h1>⚠️ Account Deactivated</h1>
+            <h1>⚠️ Compte désactivé</h1>
         </div>
         <div class="content">
-            <h2>Hello {{ user.username }},</h2>
-            <p>We're writing to inform you that your account at <strong>{{ site_info.site_name }}</strong> has been deactivated by an administrator.</p>
+            <h2>Bonjour {{ user.username }},</h2>
+            <p>Nous vous informons que votre compte sur <strong>{{ site_info.site_name }}</strong> a été désactivé par un administrateur.</p>
             
-            <div class="status-badge">✕ Account Inactive</div>
+            <div class="status-badge">✕ Compte inactif</div>
             
             <div class="info-box">
-                <p><strong>What does this mean?</strong></p>
-                <p>Your account access has been temporarily suspended. You will not be able to log in or access your account until it is reactivated.</p>
+                <p><strong>Qu'est-ce que cela signifie ?</strong></p>
+                <p>L'accès à votre compte a été temporairement suspendu. Vous ne pourrez pas vous connecter ni accéder à votre compte jusqu'à ce qu'il soit réactivé.</p>
             </div>
             
             <div class="support-box">
-                <p><strong>If you believe this is a mistake:</strong></p>
+                <p><strong>Si vous pensez qu'il s'agit d'une erreur :</strong></p>
                 <ul>
-                    <li>Contact our support team for assistance</li>
-                    <li>Provide your username or email for verification</li>
-                    <li>Explain your situation clearly</li>
+                    <li>Contactez notre équipe d'assistance pour obtenir de l'aide</li>
+                    <li>Fournissez votre nom d'utilisateur ou e-mail pour vérification</li>
+                    <li>Expliquez votre situation clairement</li>
                 </ul>
             </div>
             
             <center>
-                <a href="mailto:{{ site_info.email }}" class="cta-button">Contact Support</a>
+                <a href="mailto:{{ site_info.email }}" class="cta-button">Contacter l'assistance</a>
             </center>
             
             <p style="margin-top: 30px; font-size: 14px; color: #6c757d;">
-                We value your business and are here to help resolve any issues you may have.
+                Nous apprécions votre confiance et sommes là pour vous aider à résoudre tout problème que vous pourriez rencontrer.
             </p>
         </div>
         <div class="footer">
@@ -213,8 +213,8 @@
             
             <div class="divider"></div>
             
-            <p style="font-size: 12px; margin-top: 15px;">This is an automated message. Please do not reply to this email.</p>
-            <p style="font-size: 12px;">&copy; {{ current_year }} {{ site_info.site_name }}. All rights reserved.</p>
+            <p style="font-size: 12px; margin-top: 15px;">Ceci est un message automatique. Veuillez ne pas répondre à cet e-mail.</p>
+            <p style="font-size: 12px;">&copy; {{ current_year }} {{ site_info.site_name }}. Tous droits réservés.</p>
         </div>
     </div>
 </body>

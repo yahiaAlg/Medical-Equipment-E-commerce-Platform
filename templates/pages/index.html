@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}Fennec Med - Premium Medical Equipment{% endblock %}
+{% block title %}Fennec Med - Équipement Médical Premium{% endblock %}
 
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'css/index.css' %}">
@@ -14,17 +14,17 @@
 {% block content %}
 <!-- Hero Section -->
 <section class="hero">
-  <h1>Welcome to Fennec Med</h1>
+  <h1>Bienvenue chez Fennec Med</h1>
   <p>
-    Providing quality medical materials to families across the region since
+    Fournisseur de matériaux médicaux de qualité aux familles de la région depuis 
     2022.
   </p>
   <div class="hero-buttons">
-    <a href="{% url 'pages:contact' %}" class="btn btn-call">Call Us</a>
+    <a href="{% url 'pages:contact' %}" class="btn btn-call">Appelez-nous</a>
     {% if user.is_authenticated %}
-      <a href="{% url 'accounts:dashboard' %}" class="btn btn-login">Dashboard</a>
+      <a href="{% url 'accounts:dashboard' %}" class="btn btn-login">Tableau de Bord</a>
     {% else %}
-      <a href="{% url 'accounts:login' %}" class="btn btn-login">Login</a>
+      <a href="{% url 'accounts:login' %}" class="btn btn-login">Connexion</a>
     {% endif %}
   </div>
 </section>
@@ -36,19 +36,19 @@
       <img src="{% static 'images/aboutUs-section.png' %}" alt="Fennec Med" />
     </div>
     <div class="about-us-content">
-      <h2>About Our Brighton-Based Practice</h2>
+      <h2>À Propos de Notre Cabinet Basé à Brighton</h2>
       {% if site_info.about_hero_description %}
         {{ site_info.about_hero_description }}
       {% else %}
         <p>
-          We know visiting the doctor can feel a bit daunting. At Newbay
-          Medical Clinic, we've shaped our practice to make every visit feel
-          safe, calm, and comfortable. We keep our space clean and welcoming,
-          and we're mindful of your time—so you can focus on feeling cared
-          for, not stressed.
+          Nous savons que consulter un médecin peut sembler un peu intimidant. Chez 
+          Newbay Medical Clinic, nous avons façonné notre cabinet pour que chaque visite 
+          soit sûre, calme et confortable. Nous gardons notre espace propre et accueillant, 
+          et nous respectons votre temps—afin que vous puissiez vous concentrer sur le fait 
+          d'être bien soigné, et non stressé.
         </p>
       {% endif %}
-      <a href="{% url 'pages:about' %}" class="btn btn-learn-more">Learn More About Us</a>
+      <a href="{% url 'pages:about' %}" class="btn btn-learn-more">En Savoir Plus Sur Nous</a>
     </div>
   </div>
 </section>
@@ -56,7 +56,7 @@
 <!-- Products Section -->
 {% if featured_products %}
 <section class="products-section">
-  <h2 class="h2-p">Our Products</h2>
+  <h2 class="h2-p">Nos Produits</h2>
   <div class="products-container">
     {% for product in featured_products %}
     <div class="product-card">
@@ -75,7 +75,7 @@
           {{ product.price }} DZD
         {% endif %}
       </p>
-      <a href="{{ product.get_absolute_url }}" class="btn btn-view-details">View Details</a>
+      <a href="{{ product.get_absolute_url }}" class="btn btn-view-details">Voir les Détails</a>
     </div>
     {% endfor %}
   </div>
@@ -84,18 +84,18 @@
 
 <!-- Specialties Section -->
 <section class="specialties-section">
-  <h2 class="h2-specialty">Our Specialties</h2>
+  <h2 class="h2-specialty">Nos Spécialités</h2>
   <div class="specialties-container">
     {% for category in categories %}
     <div class="specialty-card">
       <div class="specialty-icon">
           {% if category.image %}
           <a href="{% url 'products:list' %}?category={{ category.slug }}">
-            <img src="{{ category.image.url }}" alt="{{ category.name }} Icon" />
+            <img src="{{ category.image.url }}" alt="Icône {{ category.name }}" />
           </a>
           {% else %}
           <a href="{% url 'products:list' %}?category={{ category.slug }}">
-            <img src="{% static 'images/specialties-'|add:category.slug|add:'.png' %}" alt="{{ category.name }} Icon" />
+            <img src="{% static 'images/specialties-'|add:category.slug|add:'.png' %}" alt="Icône {{ category.name }}" />
           </a>
           {% endif %}
       </div>
@@ -108,7 +108,7 @@
 <!-- Testimonials -->
 {% if testimonials %}
 <section class="testimonial-section">
-  <h2>What Our Customers Say</h2>
+  <h2>Ce Que Disent Nos Clients</h2>
   <div class="testimonial-container">
     {% for testimonial in testimonials %}
     <div class="testimonial-card">
@@ -130,7 +130,7 @@
 <!-- Trending Products -->
 {% if trending_products %}
 <section class="products-section" style="background-color: #f0f4f8;">
-  <h2 class="h2-p" style="color: #34588f;">Trending Products</h2>
+  <h2 class="h2-p" style="color: #34588f;">Produits Tendance</h2>
   <div class="products-container">
     {% for product in trending_products %}
     <div class="product-card">
@@ -143,7 +143,7 @@
       </div>
       <h3>{{ product.short_description|truncatechars:80 }}</h3>
       <p class="product-price">{{ product.price }} DZD</p>
-      <a href="{{ product.get_absolute_url }}" class="btn btn-view-details">View Details</a>
+      <a href="{{ product.get_absolute_url }}" class="btn btn-view-details">Voir les Détails</a>
     </div>
     {% endfor %}
   </div>
@@ -152,16 +152,16 @@
 
 <!-- Find Us Section -->
 <section class="find-us-section">
-  <h2>Where To Find Us</h2>
+  <h2>Où Nous Trouver</h2>
   <p>
-    Looking for your new go-to Fennec Med in Brighton and Bayside?
-    Newbay Medical is based in the Brighton area, offering care to anyone in
-    and around Brighton; including <a href="#">Caulfield South</a>,
+    Vous recherchez votre nouveau cabinet Fennec Med de confiance à Brighton et Bayside ?
+    Newbay Medical est basé dans la région de Brighton, offrant des soins à tous ceux qui 
+    se trouvent à Brighton et dans les environs ; y compris <a href="#">Caulfield South</a>,
     <a href="#">Elwood</a>, <a href="#">Bentleigh</a>,
     <a href="#">Gardenvale</a>, <a href="#">Hampton</a>,
-    <a href="#">Sandringham</a>. If you're from the Brighton area and want a
-    local medical practice you know you can trust when things get tough,
-    we're ready to take your call.
+    <a href="#">Sandringham</a>. Si vous êtes de la région de Brighton et que vous souhaitez 
+    un cabinet médical local en qui vous pouvez avoir confiance lorsque les choses deviennent 
+    difficiles, nous sommes prêts à prendre votre appel.
   </p>
 </section>
 
@@ -180,14 +180,14 @@
 
 <!-- CTA Section -->
 <section class="cta-section">
-  <h2>Ready to Take the Next Step?</h2>
+  <h2>Prêt à Franchir la Prochaine Étape ?</h2>
   <p>
-    Contact us today to learn more about our medical materials and services.
+    Contactez-nous aujourd'hui pour en savoir plus sur nos matériaux médicaux et services.
   </p>
   {% if user.is_authenticated %}
-    <a href="{% url 'products:list' %}" class="btn btn-cta">Browse Products</a>
+    <a href="{% url 'products:list' %}" class="btn btn-cta">Parcourir les Produits</a>
   {% else %}
-    <a href="{% url 'accounts:register' %}" class="btn btn-cta">Get Started</a>
+    <a href="{% url 'accounts:register' %}" class="btn btn-cta">Commencer</a>
   {% endif %}
 </section>
 {% endblock %}

@@ -12,8 +12,8 @@
     <div class="container">
         <div class="row">
             <div class="col-12 text-center">
-                <h1 class="display-4 fw-bold mb-3">Frequently Asked Questions</h1>
-                <p class="lead">Find answers to common questions about our medical equipment and services</p>
+                <h1 class="display-4 fw-bold mb-3">Questions Fréquemment Posées</h1>
+                <p class="lead">Trouvez des réponses aux questions courantes sur nos équipements médicaux et services</p>
             </div>
         </div>
     </div>
@@ -25,7 +25,7 @@
         <div class="row">
             <div class="col-lg-6 mx-auto">
                 <div class="input-group input-group-lg">
-                    <input type="text" class="form-control" placeholder="Search FAQ..." id="faqSearch">
+                    <input type="text" class="form-control" placeholder="Rechercher dans la FAQ..." id="faqSearch">
                     <button class="btn btn-primary" type="button">
                         <i class="fas fa-search"></i>
                     </button>
@@ -43,7 +43,7 @@
             <div class="col-lg-3 mb-4">
                 <div class="card shadow-sm">
                     <div class="card-header bg-primary text-white">
-                        <h5 class="mb-0"><i class="fas fa-list me-2"></i>Categories</h5>
+                        <h5 class="mb-0"><i class="fas fa-list me-2"></i>Catégories</h5>
                     </div>
                     <div class="list-group list-group-flush">
                         {% for category, faqs in faqs_by_category.items %}
@@ -59,9 +59,9 @@
                 <div class="card shadow-sm mt-4">
                     <div class="card-body text-center">
                         <i class="fas fa-headset fa-3x text-primary mb-3"></i>
-                        <h5 class="fw-bold">Still Need Help?</h5>
-                        <p class="text-muted small">Can't find what you're looking for? Our support team is here to help.</p>
-                        <a href="{% url 'pages:contact' %}" class="btn btn-primary">Contact Support</a>
+                        <h5 class="fw-bold">Besoin d'Aide ?</h5>
+                        <p class="text-muted small">Vous ne trouvez pas ce que vous cherchez ? Notre équipe de support est là pour vous aider.</p>
+                        <a href="{% url 'pages:contact' %}" class="btn btn-primary">Contacter le Support</a>
                     </div>
                 </div>
             </div>
@@ -72,15 +72,15 @@
                 <div class="faq-category mb-5" id="{{ category|slugify }}">
                     <div class="d-flex align-items-center mb-4">
                         <div class="category-icon me-3">
-                            {% if 'Ordering' in category %}
+                            {% if 'Ordering' in category or 'Commande' in category %}
                                 <i class="fas fa-shopping-cart fa-2x text-primary"></i>
-                            {% elif 'Shipping' in category %}
+                            {% elif 'Shipping' in category or 'Livraison' in category %}
                                 <i class="fas fa-truck fa-2x text-success"></i>
-                            {% elif 'Technical' in category %}
+                            {% elif 'Technical' in category or 'Technique' in category %}
                                 <i class="fas fa-tools fa-2x text-warning"></i>
-                            {% elif 'Warranties' in category %}
+                            {% elif 'Warranties' in category or 'Garantie' in category %}
                                 <i class="fas fa-shield-alt fa-2x text-info"></i>
-                            {% elif 'Returns' in category %}
+                            {% elif 'Returns' in category or 'Retour' in category %}
                                 <i class="fas fa-undo fa-2x text-danger"></i>
                             {% else %}
                                 <i class="fas fa-question-circle fa-2x text-secondary"></i>
@@ -109,8 +109,8 @@
                 {% empty %}
                 <div class="text-center py-5">
                     <i class="fas fa-question-circle fa-4x text-muted mb-3"></i>
-                    <h3 class="text-muted">No FAQs Available</h3>
-                    <p class="text-muted">We're working on adding frequently asked questions. Please check back soon!</p>
+                    <h3 class="text-muted">Aucune FAQ Disponible</h3>
+                    <p class="text-muted">Nous travaillons à ajouter des questions fréquemment posées. Veuillez revenir bientôt !</p>
                 </div>
                 {% endfor %}
             </div>
@@ -122,8 +122,8 @@
 <section class="py-5 bg-light">
     <div class="container">
         <div class="text-center mb-5">
-            <h2 class="display-5 fw-bold mb-3">Popular Topics</h2>
-            <p class="lead text-muted">Quick access to our most searched topics</p>
+            <h2 class="display-5 fw-bold mb-3">Sujets Populaires</h2>
+            <p class="lead text-muted">Accès rapide à nos sujets les plus recherchés</p>
         </div>
         
         <div class="row g-4">
@@ -131,9 +131,9 @@
                 <div class="card topic-card border-0 shadow-sm h-100">
                     <div class="card-body text-center p-4">
                         <i class="fas fa-shipping-fast fa-3x text-primary mb-3"></i>
-                        <h5 class="fw-bold">Shipping & Delivery</h5>
-                        <p class="text-muted">Learn about our shipping options, delivery times, and tracking.</p>
-                        <a href="#shipping" class="btn btn-outline-primary">View Details</a>
+                        <h5 class="fw-bold">Expédition & Livraison</h5>
+                        <p class="text-muted">Découvrez nos options d'expédition, délais de livraison et suivi.</p>
+                        <a href="#shipping" class="btn btn-outline-primary">Voir les Détails</a>
                     </div>
                 </div>
             </div>
@@ -142,9 +142,9 @@
                 <div class="card topic-card border-0 shadow-sm h-100">
                     <div class="card-body text-center p-4">
                         <i class="fas fa-credit-card fa-3x text-success mb-3"></i>
-                        <h5 class="fw-bold">Payment Methods</h5>
-                        <p class="text-muted">Information about accepted payment methods and billing.</p>
-                        <a href="#ordering" class="btn btn-outline-success">View Details</a>
+                        <h5 class="fw-bold">Modes de Paiement</h5>
+                        <p class="text-muted">Informations sur les modes de paiement acceptés et la facturation.</p>
+                        <a href="#ordering" class="btn btn-outline-success">Voir les Détails</a>
                     </div>
                 </div>
             </div>
@@ -153,9 +153,9 @@
                 <div class="card topic-card border-0 shadow-sm h-100">
                     <div class="card-body text-center p-4">
                         <i class="fas fa-tools fa-3x text-warning mb-3"></i>
-                        <h5 class="fw-bold">Technical Support</h5>
-                        <p class="text-muted">Get help with equipment setup, troubleshooting, and maintenance.</p>
-                        <a href="#technical-support" class="btn btn-outline-warning">View Details</a>
+                        <h5 class="fw-bold">Support Technique</h5>
+                        <p class="text-muted">Obtenez de l'aide pour l'installation, le dépannage et la maintenance des équipements.</p>
+                        <a href="#technical-support" class="btn btn-outline-warning">Voir les Détails</a>
                     </div>
                 </div>
             </div>
@@ -164,9 +164,9 @@
                 <div class="card topic-card border-0 shadow-sm h-100">
                     <div class="card-body text-center p-4">
                         <i class="fas fa-shield-alt fa-3x text-info mb-3"></i>
-                        <h5 class="fw-bold">Warranties</h5>
-                        <p class="text-muted">Understanding warranty coverage and claim procedures.</p>
-                        <a href="#warranties" class="btn btn-outline-info">View Details</a>
+                        <h5 class="fw-bold">Garanties</h5>
+                        <p class="text-muted">Comprendre la couverture de garantie et les procédures de réclamation.</p>
+                        <a href="#warranties" class="btn btn-outline-info">Voir les Détails</a>
                     </div>
                 </div>
             </div>
@@ -175,9 +175,9 @@
                 <div class="card topic-card border-0 shadow-sm h-100">
                     <div class="card-body text-center p-4">
                         <i class="fas fa-undo fa-3x text-danger mb-3"></i>
-                        <h5 class="fw-bold">Returns & Exchanges</h5>
-                        <p class="text-muted">Learn about our return policy and exchange procedures.</p>
-                        <a href="#returns-exchanges" class="btn btn-outline-danger">View Details</a>
+                        <h5 class="fw-bold">Retours & Échanges</h5>
+                        <p class="text-muted">Découvrez notre politique de retour et les procédures d'échange.</p>
+                        <a href="#returns-exchanges" class="btn btn-outline-danger">Voir les Détails</a>
                     </div>
                 </div>
             </div>
@@ -186,9 +186,9 @@
                 <div class="card topic-card border-0 shadow-sm h-100">
                     <div class="card-body text-center p-4">
                         <i class="fas fa-user-md fa-3x text-secondary mb-3"></i>
-                        <h5 class="fw-bold">Account Management</h5>
-                        <p class="text-muted">Managing your account, orders, and personal information.</p>
-                        <a href="#ordering" class="btn btn-outline-secondary">View Details</a>
+                        <h5 class="fw-bold">Gestion de Compte</h5>
+                        <p class="text-muted">Gérez votre compte, vos commandes et vos informations personnelles.</p>
+                        <a href="#ordering" class="btn btn-outline-secondary">Voir les Détails</a>
                     </div>
                 </div>
             </div>
@@ -201,16 +201,16 @@
     <div class="container">
         <div class="row align-items-center">
             <div class="col-lg-8">
-                <h3 class="fw-bold mb-2">Didn't Find Your Answer?</h3>
-                <p class="mb-0">Our expert support team is ready to help you with any questions about medical equipment.</p>
+                <h3 class="fw-bold mb-2">Vous n'avez pas trouvé votre réponse ?</h3>
+                <p class="mb-0">Notre équipe de support experte est prête à vous aider avec toutes vos questions sur les équipements médicaux.</p>
             </div>
             <div class="col-lg-4 text-lg-end">
                 <div class="d-flex flex-column flex-lg-row gap-2">
                     <a href="{% url 'pages:contact' %}" class="btn btn-light">
-                        <i class="fas fa-envelope me-2"></i>Contact Us
+                        <i class="fas fa-envelope me-2"></i>Nous Contacter
                     </a>
                     <a href="tel:{{ site_info. }}" class="btn btn-outline-light">
-                        <i class="fas fa-phone me-2"></i>Call Now
+                        <i class="fas fa-phone me-2"></i>Appeler Maintenant
                     </a>
                 </div>
             </div>

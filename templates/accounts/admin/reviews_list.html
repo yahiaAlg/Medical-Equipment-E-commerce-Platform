@@ -1,7 +1,8 @@
+<!-- reviews_list.html -->
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}Manage Reviews - Admin{% endblock %}
+{% block title %}Gérer les avis - Admin{% endblock %}
 
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
@@ -11,9 +12,9 @@
 <section class="py-5">
     <div class="container">
         <div class="d-flex justify-content-between align-items-center mb-4">
-            <h2><i class="fas fa-star me-2"></i>Product Reviews</h2>
+            <h2><i class="fas fa-star me-2"></i>Avis sur les produits</h2>
             <a href="{% url 'accounts:admin_dashboard' %}" class="btn btn-outline-secondary">
-                <i class="fas fa-arrow-left me-2"></i>Back to Dashboard
+                <i class="fas fa-arrow-left me-2"></i>Retour au tableau de bord
             </a>
         </div>
 
@@ -21,12 +22,12 @@
         <div class="card mb-4">
             <div class="card-body">
                 <div class="btn-group" role="group">
-                    <a href="?rating=all" class="btn btn-outline-primary {% if rating_filter == 'all' %}active{% endif %}">All</a>
-                    <a href="?rating=5" class="btn btn-outline-success {% if rating_filter == '5' %}active{% endif %}">5 Stars</a>
-                    <a href="?rating=4" class="btn btn-outline-info {% if rating_filter == '4' %}active{% endif %}">4 Stars</a>
-                    <a href="?rating=3" class="btn btn-outline-warning {% if rating_filter == '3' %}active{% endif %}">3 Stars</a>
-                    <a href="?rating=2" class="btn btn-outline-danger {% if rating_filter == '2' %}active{% endif %}">2 Stars</a>
-                    <a href="?rating=1" class="btn btn-outline-dark {% if rating_filter == '1' %}active{% endif %}">1 Star</a>
+                    <a href="?rating=all" class="btn btn-outline-primary {% if rating_filter == 'all' %}active{% endif %}">Tous</a>
+                    <a href="?rating=5" class="btn btn-outline-success {% if rating_filter == '5' %}active{% endif %}">5 étoiles</a>
+                    <a href="?rating=4" class="btn btn-outline-info {% if rating_filter == '4' %}active{% endif %}">4 étoiles</a>
+                    <a href="?rating=3" class="btn btn-outline-warning {% if rating_filter == '3' %}active{% endif %}">3 étoiles</a>
+                    <a href="?rating=2" class="btn btn-outline-danger {% if rating_filter == '2' %}active{% endif %}">2 étoiles</a>
+                    <a href="?rating=1" class="btn btn-outline-dark {% if rating_filter == '1' %}active{% endif %}">1 étoile</a>
                 </div>
             </div>
         </div>
@@ -52,15 +53,15 @@
                                 </div>
                                 <h6>{{ review.title }}</h6>
                                 <p class="mb-2">{{ review.comment }}</p>
-                                <small class="text-muted">By {{ review.user.username }} on {{ review.created_at|date:"M d, Y" }}</small>
+                                <small class="text-muted">Par {{ review.user.username }} le {{ review.created_at|date:"d M Y" }}</small>
                             </div>
                             <div class="d-flex gap-2 ms-3">
                                 <a href="{% url 'accounts:admin_review_reply' review.id %}" class="btn btn-sm btn-primary">
-                                    <i class="fas fa-reply"></i> Reply
+                                    <i class="fas fa-reply"></i> Répondre
                                 </a>
                                 <form method="post" action="{% url 'accounts:admin_review_delete' review.id %}" class="d-inline">
                                     {% csrf_token %}
-                                    <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Delete this review?')">
+                                    <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Supprimer cet avis ?')">
                                         <i class="fas fa-trash"></i>
                                     </button>
                                 </form>
@@ -72,7 +73,7 @@
                 {% else %}
                 <div class="text-center py-5">
                     <i class="fas fa-star fa-4x mb-3 text-muted"></i>
-                    <p class="text-muted">No reviews</p>
+                    <p class="text-muted">Aucun avis</p>
                 </div>
                 {% endif %}
             </div>

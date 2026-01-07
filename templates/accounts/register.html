@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}Sign Up - Fennec Med{% endblock %}
+{% block title %}Inscription - Fennec Med{% endblock %}
 
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'css/signup.css' %}">
@@ -10,8 +10,8 @@
 {% block content %}
 <div class="auth-container">
   <div class="auth-form">
-    <h2>Create Your Account</h2>
-    <p>Join Fennec Med to access our services and products.</p>
+    <h2>Créer votre compte</h2>
+    <p>Rejoignez Fennec Med pour accéder à nos services et produits.</p>
     
     {% if messages %}
       {% for message in messages %}
@@ -30,7 +30,7 @@
             type="text"
             id="{{ form.first_name.id_for_label }}"
             name="{{ form.first_name.name }}"
-            placeholder="First Name"
+            placeholder="Prénom"
             required
             {% if form.first_name.value %}value="{{ form.first_name.value }}"{% endif %}
           />
@@ -43,7 +43,7 @@
             type="text"
             id="{{ form.last_name.id_for_label }}"
             name="{{ form.last_name.name }}"
-            placeholder="Last Name"
+            placeholder="Nom"
             required
             {% if form.last_name.value %}value="{{ form.last_name.value }}"{% endif %}
           />
@@ -58,7 +58,7 @@
           type="text"
           id="{{ form.username.id_for_label }}"
           name="{{ form.username.name }}"
-          placeholder="Username"
+          placeholder="Nom d'utilisateur"
           required
           {% if form.username.value %}value="{{ form.username.value }}"{% endif %}
         />
@@ -72,7 +72,7 @@
           type="email"
           id="{{ form.email.id_for_label }}"
           name="{{ form.email.name }}"
-          placeholder="Email Address"
+          placeholder="Adresse e-mail"
           required
           {% if form.email.value %}value="{{ form.email.value }}"{% endif %}
         />
@@ -87,7 +87,7 @@
           name="{{ form.user_type.name }}"
           required
           style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px; font-size: 16px;">
-          <option value="">Select Account Type</option>
+          <option value="">Sélectionner le type de compte</option>
           {% for value, label in form.user_type.field.choices %}
             <option value="{{ value }}" {% if form.user_type.value == value %}selected{% endif %}>{{ label }}</option>
           {% endfor %}
@@ -102,7 +102,7 @@
           type="password"
           id="{{ form.password1.id_for_label }}"
           name="{{ form.password1.name }}"
-          placeholder="Password"
+          placeholder="Mot de passe"
           required
         />
         {% if form.password1.errors %}
@@ -115,7 +115,7 @@
           type="password"
           id="{{ form.password2.id_for_label }}"
           name="{{ form.password2.name }}"
-          placeholder="Confirm Password"
+          placeholder="Confirmer le mot de passe"
           required
         />
         {% if form.password2.errors %}
@@ -129,11 +129,11 @@
         </div>
       {% endif %}
       
-      <button type="submit" class="submit-btn">Sign Up</button>
+      <button type="submit" class="submit-btn">S'inscrire</button>
     </form>
     
     <p class="login-link">
-      Already have an account? <a href="{% url 'accounts:login' %}">Login</a>
+      Vous avez déjà un compte ? <a href="{% url 'accounts:login' %}">Se connecter</a>
     </p>
   </div>
 </div>
@@ -148,7 +148,7 @@ document.addEventListener('DOMContentLoaded', function() {
         form.addEventListener('submit', function(e) {
             const submitBtn = form.querySelector('button[type="submit"]');
             if (submitBtn) {
-                submitBtn.innerHTML = 'Creating Account...';
+                submitBtn.innerHTML = 'Création du compte...';
                 submitBtn.disabled = true;
             }
         });

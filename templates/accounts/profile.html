@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}My Profile - Fennec Med{% endblock %}
+{% block title %}Mon profil - Fennec Med{% endblock %}
 
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'css/profile.css' %}">
@@ -27,18 +27,18 @@
                     </div>
                     
                     <div class="quick-links-card">
-                        <h6>Quick Links</h6>
+                        <h6>Liens rapides</h6>
                         <a href="{% url 'accounts:dashboard' %}" class="quick-link-item">
                             <i class="fas fa-tachometer-alt"></i>
-                            Dashboard
+                            Tableau de bord
                         </a>
                         <a href="{% url 'payments:invoice_list' %}" class="quick-link-item">
                             <i class="fas fa-shopping-bag"></i>
-                            My Orders
+                            Mes commandes
                         </a>
                         <a href="{% url 'accounts:wishlist' %}" class="quick-link-item">
                             <i class="fas fa-heart"></i>
-                            Wishlist
+                            Favoris
                         </a>
                     </div>
                 </div>
@@ -51,11 +51,11 @@
                     <div class="profile-tabs">
                         <button class="profile-tab active" data-tab="profile-info">
                             <i class="fas fa-user"></i>
-                            Profile Information
+                            Informations du profil
                         </button>
                         <button class="profile-tab" data-tab="change-password">
                             <i class="fas fa-key"></i>
-                            Change Password
+                            Changer le mot de passe
                         </button>
                     </div>
                     
@@ -67,17 +67,17 @@
                                 {% csrf_token %}
                                 <input type="hidden" name="form_type" value="profile">
                                 
-                                <h5 class="section-title">Personal Information</h5>
+                                <h5 class="section-title">Informations personnelles</h5>
                                 <div class="row mb-3">
                                     <div class="col-md-6 mb-3">
-                                        <label class="form-label">First Name</label>
+                                        <label class="form-label">Prénom</label>
                                         {{ user_form.first_name }}
                                         {% if user_form.first_name.errors %}
                                             <div class="error-message">{{ user_form.first_name.errors.0 }}</div>
                                         {% endif %}
                                     </div>
                                     <div class="col-md-6 mb-3">
-                                        <label class="form-label">Last Name</label>
+                                        <label class="form-label">Nom</label>
                                         {{ user_form.last_name }}
                                         {% if user_form.last_name.errors %}
                                             <div class="error-message">{{ user_form.last_name.errors.0 }}</div>
@@ -85,62 +85,62 @@
                                     </div>
                                 </div>
                                 <div class="mb-4">
-                                    <label class="form-label">Email Address</label>
+                                    <label class="form-label">Adresse e-mail</label>
                                     {{ user_form.email }}
                                     {% if user_form.email.errors %}
                                         <div class="error-message">{{ user_form.email.errors.0 }}</div>
                                     {% endif %}
                                 </div>
                                 
-                                <h5 class="section-title">Contact Details</h5>
+                                <h5 class="section-title">Coordonnées</h5>
                                 <div class="row mb-3">
                                     <div class="col-md-6 mb-3">
-                                        <label class="form-label">Phone</label>
+                                        <label class="form-label">Téléphone</label>
                                         {{ profile_form.phone }}
                                     </div>
                                     <div class="col-md-6 mb-3">
-                                        <label class="form-label">Date of Birth</label>
+                                        <label class="form-label">Date de naissance</label>
                                         {{ profile_form.date_of_birth }}
                                     </div>
                                 </div>
                                 <div class="mb-3">
-                                    <label class="form-label">Address</label>
+                                    <label class="form-label">Adresse</label>
                                     {{ profile_form.address }}
                                 </div>
                                 <div class="row mb-3">
                                     <div class="col-md-4 mb-3">
-                                        <label class="form-label">City</label>
+                                        <label class="form-label">Ville</label>
                                         {{ profile_form.city }}
                                     </div>
                                     <div class="col-md-4 mb-3">
-                                        <label class="form-label">State</label>
+                                        <label class="form-label">Wilaya</label>
                                         {{ profile_form.state }}
                                     </div>
                                     <div class="col-md-4 mb-3">
-                                        <label class="form-label">Zip Code</label>
+                                        <label class="form-label">Code postal</label>
                                         {{ profile_form.zip_code }}
                                     </div>
                                 </div>
                                 <div class="mb-3">
-                                    <label class="form-label">Country</label>
+                                    <label class="form-label">Pays</label>
                                     {{ profile_form.country }}
                                 </div>
                                 <div class="mb-4">
                                     <label class="form-label">Avatar</label>
                                     {{ profile_form.avatar }}
                                     {% if user_profile.avatar %}
-                                        <small class="text-muted d-block mt-2">Current avatar will be replaced if you upload a new one</small>
+                                        <small class="text-muted d-block mt-2">L'avatar actuel sera remplacé si vous en téléchargez un nouveau</small>
                                     {% endif %}
                                 </div>
                                 
                                 {% if specific_form %}
                                     <h5 class="section-title">
                                         {% if user_profile.user_type == 'pharmacy' %}
-                                            Pharmacy Information
+                                            Informations de la pharmacie
                                         {% elif user_profile.user_type == 'clinic' %}
-                                            Clinic Information
+                                            Informations de la clinique
                                         {% elif user_profile.user_type == 'doctor' %}
-                                            Medical Information
+                                            Informations médicales
                                         {% endif %}
                                     </h5>
                                     {% for field in specific_form %}
@@ -156,24 +156,24 @@
                                 
                                 <div class="mt-4 d-flex gap-3">
                                     <button type="submit" class="btn-update-profile">
-                                        <i class="fas fa-save me-2"></i>Update Profile
+                                        <i class="fas fa-save me-2"></i>Mettre à jour le profil
                                     </button>
-                                    <a href="{% url 'accounts:dashboard' %}" class="btn-cancel">Cancel</a>
+                                    <a href="{% url 'accounts:dashboard' %}" class="btn-cancel">Annuler</a>
                                 </div>
                             </form>
                         </div>
                         
                         <!-- Change Password Tab -->
                         <div class="tab-pane" id="change-password">
-                            <h5 class="section-title">Change Password</h5>
+                            <h5 class="section-title">Changer le mot de passe</h5>
                             
                             <div class="password-requirements">
-                                <h6><i class="fas fa-info-circle"></i> Password Requirements</h6>
+                                <h6><i class="fas fa-info-circle"></i> Exigences du mot de passe</h6>
                                 <ul>
-                                    <li>Your password must contain at least 8 characters</li>
-                                    <li>Your password can't be too similar to your other personal information</li>
-                                    <li>Your password can't be a commonly used password</li>
-                                    <li>Your password can't be entirely numeric</li>
+                                    <li>Votre mot de passe doit contenir au moins 8 caractères</li>
+                                    <li>Votre mot de passe ne peut pas être trop similaire à vos autres informations personnelles</li>
+                                    <li>Votre mot de passe ne peut pas être un mot de passe couramment utilisé</li>
+                                    <li>Votre mot de passe ne peut pas être entièrement numérique</li>
                                 </ul>
                             </div>
 
@@ -182,7 +182,7 @@
                                 
                                 <div class="password-form-group">
                                     <label for="{{ password_form.old_password.id_for_label }}" class="form-label">
-                                        Current Password
+                                        Mot de passe actuel
                                     </label>
                                     {{ password_form.old_password }}
                                     {% if password_form.old_password.errors %}
@@ -194,7 +194,7 @@
 
                                 <div class="password-form-group">
                                     <label for="{{ password_form.new_password1.id_for_label }}" class="form-label">
-                                        New Password
+                                        Nouveau mot de passe
                                     </label>
                                     {{ password_form.new_password1 }}
                                     {% if password_form.new_password1.errors %}
@@ -206,7 +206,7 @@
 
                                 <div class="password-form-group">
                                     <label for="{{ password_form.new_password2.id_for_label }}" class="form-label">
-                                        Confirm New Password
+                                        Confirmer le nouveau mot de passe
                                     </label>
                                     {{ password_form.new_password2 }}
                                     {% if password_form.new_password2.errors %}
@@ -218,10 +218,10 @@
 
                                 <div class="password-form-actions">
                                     <button type="submit" class="btn-change-password-submit">
-                                        <i class="fas fa-key"></i> Change Password
+                                        <i class="fas fa-key"></i> Changer le mot de passe
                                     </button>
                                     <button type="reset" class="btn-reset">
-                                        Reset
+                                        Réinitialiser
                                     </button>
                                 </div>
                             </form>

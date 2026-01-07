@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}Complaint Details - Fennec Med{% endblock %}
+{% block title %}Détails de la réclamation - Fennec Med{% endblock %}
 
 {% block extra_css %}
   <link rel="stylesheet" href="{% static 'css/admin/complaint_detail.css' %}">
@@ -12,11 +12,11 @@
   <div class="container">
     <div class="d-flex justify-content-between align-items-center">
       <div>
-        <h1><i class="fas fa-flag me-2"></i>Complaint Details</h1>
+        <h1><i class="fas fa-flag me-2"></i>Détails de la réclamation</h1>
         <p class="mb-0">{{ complaint.complaint_number }}</p>
       </div>
       <a href="{% url 'accounts:admin_complaints_management' %}" class="btn btn-light">
-        <i class="fas fa-arrow-left me-2"></i>Back to Complaints
+        <i class="fas fa-arrow-left me-2"></i>Retour aux réclamations
       </a>
     </div>
   </div>
@@ -28,19 +28,19 @@
     <div class="col-lg-8 mb-4">
       <div class="card-custom">
         <div class="d-flex justify-content-between align-items-start mb-3">
-          <h5><i class="fas fa-info-circle me-2"></i>Complaint Information</h5>
+          <h5><i class="fas fa-info-circle me-2"></i>Informations sur la réclamation</h5>
           <span class="status-badge status-{{ complaint.status }}">
             {{ complaint.get_status_display }}
           </span>
         </div>
         
         <div class="info-row">
-          <span class="info-label">Complaint Number:</span>
+          <span class="info-label">Numéro de réclamation :</span>
           <span class="info-value">{{ complaint.complaint_number }}</span>
         </div>
         
         <div class="info-row">
-          <span class="info-label">Order ID:</span>
+          <span class="info-label">ID de commande :</span>
           <span class="info-value">
             <a href="{% url 'accounts:admin_orders_management' %}?search={{ complaint.order.order_id }}">
               {{ complaint.order.order_id }}
@@ -49,7 +49,7 @@
         </div>
         
         <div class="info-row">
-          <span class="info-label">Customer:</span>
+          <span class="info-label">Client :</span>
           <span class="info-value">
             <a href="{% url 'accounts:admin_user_detail' complaint.user.id %}">
               {{ complaint.user.get_full_name|default:complaint.user.username }}
@@ -58,44 +58,44 @@
         </div>
         
         <div class="info-row">
-          <span class="info-label">Reason:</span>
+          <span class="info-label">Motif :</span>
           <span class="info-value">{{ complaint.reason.name|default:complaint.custom_reason }}</span>
         </div>
         
         <div class="info-row">
-          <span class="info-label">Submitted:</span>
-          <span class="info-value">{{ complaint.created_at|date:"M d, Y H:i" }}</span>
+          <span class="info-label">Soumise le :</span>
+          <span class="info-value">{{ complaint.created_at|date:"d M Y H:i" }}</span>
         </div>
         
         {% if complaint.resolved_at %}
         <div class="info-row">
-          <span class="info-label">Resolved:</span>
-          <span class="info-value">{{ complaint.resolved_at|date:"M d, Y H:i" }}</span>
+          <span class="info-label">Résolue le :</span>
+          <span class="info-value">{{ complaint.resolved_at|date:"d M Y H:i" }}</span>
         </div>
         {% endif %}
         
         {% if complaint.handled_by %}
         <div class="info-row">
-          <span class="info-label">Handled By:</span>
+          <span class="info-label">Traitée par :</span>
           <span class="info-value">{{ complaint.handled_by.username }}</span>
         </div>
         {% endif %}
         
         <div class="mt-4">
-          <h6><strong>Description:</strong></h6>
+          <h6><strong>Description :</strong></h6>
           <p class="text-muted">{{ complaint.description }}</p>
         </div>
         
         {% if complaint.admin_notes %}
         <div class="mt-3 alert alert-info">
-          <h6><strong>Admin Notes:</strong></h6>
+          <h6><strong>Notes administratives :</strong></h6>
           <p class="mb-0">{{ complaint.admin_notes }}</p>
         </div>
         {% endif %}
         
         {% if complaint.resolution_notes %}
         <div class="mt-3 alert alert-success">
-          <h6><strong>Resolution Notes:</strong></h6>
+          <h6><strong>Notes de résolution :</strong></h6>
           <p class="mb-0">{{ complaint.resolution_notes }}</p>
         </div>
         {% endif %}
@@ -104,13 +104,13 @@
       <!-- Attachments -->
       {% if attachments %}
       <div class="card-custom">
-        <h5 class="mb-3"><i class="fas fa-paperclip me-2"></i>Attachments</h5>
+        <h5 class="mb-3"><i class="fas fa-paperclip me-2"></i>Pièces jointes</h5>
         <div class="attachment-grid">
           {% for attachment in attachments %}
           <div class="attachment-item">
             <a href="{{ attachment.file.url }}" target="_blank">
               {% if 'image' in attachment.file_type %}
-                <img src="{{ attachment.file.url }}" alt="Attachment">
+                <img src="{{ attachment.file.url }}" alt="Pièce jointe">
               {% elif 'video' in attachment.file_type %}
                 <div class="file-icon">
                   <i class="fas fa-video fa-3x text-primary"></i>
@@ -132,31 +132,31 @@
     <div class="col-lg-4 mb-4">
       <!-- Update Status Form -->
       <div class="card-custom">
-        <h5 class="mb-3"><i class="fas fa-tasks me-2"></i>Update Complaint</h5>
+        <h5 class="mb-3"><i class="fas fa-tasks me-2"></i>Mettre à jour la réclamation</h5>
         
         <form method="post">
           {% csrf_token %}
           
           <div class="mb-3">
-            <label class="form-label"><strong>Status *</strong></label>
+            <label class="form-label"><strong>Statut *</strong></label>
             {{ form.status }}
           </div>
           
           <div class="mb-3">
-            <label class="form-label"><strong>Admin Notes</strong></label>
+            <label class="form-label"><strong>Notes administratives</strong></label>
             {{ form.admin_notes }}
-            <small class="form-text text-muted">Internal notes for tracking</small>
+            <small class="form-text text-muted">Notes internes pour le suivi</small>
           </div>
           
           <div class="mb-3">
-            <label class="form-label"><strong>Resolution Notes</strong></label>
+            <label class="form-label"><strong>Notes de résolution</strong></label>
             {{ form.resolution_notes }}
-            <small class="form-text text-muted">Visible to customer if status is resolved</small>
+            <small class="form-text text-muted">Visible par le client si le statut est résolu</small>
           </div>
           
           <div class="d-grid gap-2">
             <button type="submit" class="btn btn-primary">
-              <i class="fas fa-save me-2"></i>Update Complaint
+              <i class="fas fa-save me-2"></i>Mettre à jour la réclamation
             </button>
           </div>
         </form>
@@ -164,46 +164,46 @@
       
       <!-- Quick Actions -->
       <div class="card-custom">
-        <h5 class="mb-3"><i class="fas fa-bolt me-2"></i>Quick Actions</h5>
+        <h5 class="mb-3"><i class="fas fa-bolt me-2"></i>Actions rapides</h5>
         
         <div class="d-grid gap-2">
           <a href="{% url 'accounts:admin_initiate_refund' complaint.order.order_id %}" class="btn btn-outline-warning">
-            <i class="fas fa-undo me-2"></i>Initiate Refund
+            <i class="fas fa-undo me-2"></i>Initier un remboursement
           </a>
           
           <a href="{% url 'accounts:admin_order_detail' complaint.order.order_id %}" class="btn btn-outline-primary" target="_blank">
-            <i class="fas fa-file-invoice me-2"></i>View Invoice
+            <i class="fas fa-file-invoice me-2"></i>Voir la facture
           </a>
           
           <a href="mailto:{{ complaint.user.email }}" class="btn btn-outline-secondary">
-            <i class="fas fa-envelope me-2"></i>Email Customer
+            <i class="fas fa-envelope me-2"></i>Envoyer un e-mail au client
           </a>
         </div>
       </div>
       
       <!-- Timeline -->
       <div class="card-custom">
-        <h5 class="mb-3"><i class="fas fa-history me-2"></i>Activity Timeline</h5>
+        <h5 class="mb-3"><i class="fas fa-history me-2"></i>Chronologie des activités</h5>
         
         <div class="timeline">
           <div class="timeline-item">
-            <div class="timeline-date">{{ complaint.created_at|date:"M d, Y H:i" }}</div>
-            <strong>Complaint Submitted</strong>
-            <p class="text-muted mb-0 small">By {{ complaint.user.username }}</p>
+            <div class="timeline-date">{{ complaint.created_at|date:"d M Y H:i" }}</div>
+            <strong>Réclamation soumise</strong>
+            <p class="text-muted mb-0 small">Par {{ complaint.user.username }}</p>
           </div>
           
           {% if complaint.status == 'in_review' %}
           <div class="timeline-item">
-            <div class="timeline-date">{{ complaint.updated_at|date:"M d, Y H:i" }}</div>
-            <strong>Status: In Review</strong>
+            <div class="timeline-date">{{ complaint.updated_at|date:"d M Y H:i" }}</div>
+            <strong>Statut : En cours d'examen</strong>
           </div>
           {% endif %}
           
           {% if complaint.resolved_at %}
           <div class="timeline-item">
-            <div class="timeline-date">{{ complaint.resolved_at|date:"M d, Y H:i" }}</div>
-            <strong>Complaint Resolved</strong>
-            <p class="text-muted mb-0 small">By {{ complaint.handled_by.username }}</p>
+            <div class="timeline-date">{{ complaint.resolved_at|date:"d M Y H:i" }}</div>
+            <strong>Réclamation résolue</strong>
+            <p class="text-muted mb-0 small">Par {{ complaint.handled_by.username }}</p>
           </div>
           {% endif %}
         </div>

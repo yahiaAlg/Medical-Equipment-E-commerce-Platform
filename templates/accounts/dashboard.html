@@ -1,7 +1,9 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}Dashboard - Fennec Med{% endblock %}
+{% block title %}Tableau de bord - Fennec Med{% endblock %}
+
+{# ===== login.html (Français) ===== #}
 
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
@@ -41,14 +43,14 @@
                         </div>
                     {% endif %}
                     <div>
-                        <h1 class="h2 mb-2">Welcome back, {{ user.get_full_name|default:user.username }}!</h1>
+                        <h1 class="h2 mb-2">Bienvenue, {{ user.get_full_name|default:user.username }} !</h1>
                         <p class="mb-0 opacity-90">
                             <span class="badge user-type-{{ user_profile.user_type }}">
                                 {{ user_profile.get_user_type_display }}
                             </span>
                             {% if role_specific_data.verified %}
                                 <span class="badge bg-success ms-2">
-                                    <i class="fas fa-check-circle me-1"></i>Verified
+                                    <i class="fas fa-check-circle me-1"></i>Vérifié
                                 </span>
                             {% endif %}
                         </p>
@@ -58,10 +60,10 @@
             <div class="col-lg-4 text-lg-end mt-3 mt-lg-0">
                 <div class="d-flex flex-column flex-lg-row gap-2 justify-content-lg-end">
                     <a href="{% url 'accounts:profile' %}" class="btn btn-light">
-                        <i class="fas fa-edit me-2"></i>Edit Profile
+                        <i class="fas fa-edit me-2"></i>Modifier le profil
                     </a>
                     <a href="{% url 'products:list' %}" class="btn btn-outline-light">
-                        <i class="fas fa-shopping-cart me-2"></i>Shop Now
+                        <i class="fas fa-shopping-cart me-2"></i>Acheter maintenant
                     </a>
                 </div>
             </div>
@@ -79,7 +81,7 @@
                         <div class="d-flex align-items-center justify-content-between mb-3">
                             <div>
                                 <h3 class="fw-bold mb-1">{{ total_orders }}</h3>
-                                <small class="text-muted">Total Orders</small>
+                                <small class="text-muted">Commandes totales</small>
                             </div>
                             <i class="fas fa-shopping-bag stat-icon text-primary"></i>
                         </div>
@@ -95,8 +97,8 @@
                     <div class="card-body">
                         <div class="d-flex align-items-center justify-content-between mb-3">
                             <div>
-                                <h3 class="fw-bold mb-1">DZD {{ total_spent|floatformat:0 }}</h3>
-                                <small class="text-muted">Total Spent</small>
+                                <h3 class="fw-bold mb-1">{{ total_spent|floatformat:0 }} DZD</h3>
+                                <small class="text-muted">Total dépensé</small>
                             </div>
                             <i class="fas fa-dollar-sign stat-icon text-success"></i>
                         </div>
@@ -113,7 +115,7 @@
                         <div class="d-flex align-items-center justify-content-between mb-3">
                             <div>
                                 <h3 class="fw-bold mb-1">{{ cart_items_count }}</h3>
-                                <small class="text-muted">Cart Items</small>
+                                <small class="text-muted">Articles au panier</small>
                             </div>
                             <i class="fas fa-shopping-cart stat-icon text-info"></i>
                         </div>
@@ -130,7 +132,7 @@
                         <div class="d-flex align-items-center justify-content-between mb-3">
                             <div>
                                 <h3 class="fw-bold mb-1">{{ wishlist_items_count }}</h3>
-                                <small class="text-muted">Wishlist Items</small>
+                                <small class="text-muted">Articles favoris</small>
                             </div>
                             <i class="fas fa-heart stat-icon text-warning"></i>
                         </div>
@@ -154,11 +156,11 @@
                 <div class="card mb-4">
                     <div class="card-header d-flex justify-content-between align-items-center">
                         <h5 class="mb-0">
-                            <i class="fas fa-bell me-2"></i>Recent Notifications
+                            <i class="fas fa-bell me-2"></i>Notifications récentes
                         </h5>
                         {% if unread_notifications_count > 0 %}
                         <button onclick="markAllNotificationsRead()" class="btn btn-sm btn-outline-primary">
-                            Mark All as Read
+                            Tout marquer comme lu
                         </button>
                         {% endif %}
                     </div>
@@ -198,7 +200,7 @@
                                         <div class="flex-grow-1">
                                             <h6 class="mb-1">{{ notification.title }}</h6>
                                             <p class="mb-1 text-muted small">{{ notification.message|truncatewords:20 }}</p>
-                                            <small class="text-muted">{{ notification.created_at|timesince }} ago</small>
+                                            <small class="text-muted">Il y a {{ notification.created_at|timesince }}</small>
                                         </div>
                                         {% if not notification.is_read %}
                                         <button onclick="markNotificationRead({{ notification.id }})" class="btn btn-sm btn-link text-primary">
@@ -212,7 +214,7 @@
                         {% else %}
                             <div class="text-center py-4">
                                 <i class="fas fa-bell-slash fa-3x mb-3" style="color: #617da8; opacity: 0.3;"></i>
-                                <p class="text-muted">No notifications</p>
+                                <p class="text-muted">Aucune notification</p>
                             </div>
                         {% endif %}
                     </div>
@@ -222,9 +224,9 @@
                 <div class="card">
                     <div class="card-header d-flex justify-content-between align-items-center">
                         <h5 class="mb-0">
-                            <i class="fas fa-clock me-2"></i>Recent Orders
+                            <i class="fas fa-clock me-2"></i>Commandes récentes
                         </h5>
-                        <a href="{% url 'payments:invoice_list' %}" class="btn btn-outline-primary btn-sm">View All</a>
+                        <a href="{% url 'payments:invoice_list' %}" class="btn btn-outline-primary btn-sm">Voir tout</a>
                     </div>
                     <div class="card-body">
                         {% if recent_orders %}
@@ -232,9 +234,9 @@
                                 <table class="table table-hover">
                                     <thead>
                                         <tr>
-                                            <th>Order ID</th>
+                                            <th>N° commande</th>
                                             <th>Date</th>
-                                            <th>Status</th>
+                                            <th>Statut</th>
                                             <th>Total</th>
                                             <th>Actions</th>
                                         </tr>
@@ -243,31 +245,31 @@
                                         {% for order in recent_orders %}
                                         <tr>
                                             <td><strong>#{{ order.order_id|truncatechars:10 }}</strong></td>
-                                            <td>{{ order.created_at|date:"M d, Y" }}</td>
+                                            <td>{{ order.created_at|date:"d M Y" }}</td>
                                             <td>
                                                 <span class="badge status-{{ order.status }}">
                                                     {{ order.get_status_display }}
                                                 </span>
                                             </td>
-                                            <td><strong>DZD {{ order.total_amount }}</strong></td>
+                                            <td><strong>{{ order.total_amount }} DZD</strong></td>
                                             <td>
                                                 <div class="btn-group" role="group">
                                                     {% if order.invoice %}
                                                         <a href="{% url 'payments:invoice_detail' order.invoice.id %}" 
                                                         class="btn btn-sm btn-outline-primary" 
-                                                        title="View Details">
+                                                        title="Voir les détails">
                                                             <i class="fas fa-eye"></i>
                                                         </a>
                                                     {% else %}
                                                         <span class="btn btn-sm btn-outline-secondary disabled" 
-                                                            title="Awaiting confirmation">
+                                                            title="En attente de confirmation">
                                                             <i class="fas fa-clock"></i>
                                                         </span>
                                                     {% endif %}
                                                     {% if order.status in 'delivered,shipped,paid' and not order.complaints.exists %}
                                                     <a href="{% url 'payments:complaint_create' order.id %}" 
                                                        class="btn btn-sm btn-outline-warning" 
-                                                       title="File Complaint">
+                                                       title="Déposer une réclamation">
                                                         <i class="fas fa-flag"></i>
                                                     </a>
                                                     {% endif %}
@@ -281,9 +283,9 @@
                         {% else %}
                             <div class="text-center py-5">
                                 <i class="fas fa-shopping-bag fa-4x mb-3" style="color: #617da8; opacity: 0.3;"></i>
-                                <h6 class="text-muted mb-2">No orders yet</h6>
-                                <p class="text-muted small mb-4">Start shopping to see your orders here</p>
-                                <a href="{% url 'products:list' %}" class="btn btn-primary">Browse Products</a>
+                                <h6 class="text-muted mb-2">Aucune commande pour le moment</h6>
+                                <p class="text-muted small mb-4">Commencez vos achats pour voir vos commandes ici</p>
+                                <a href="{% url 'products:list' %}" class="btn btn-primary">Parcourir les produits</a>
                             </div>
                         {% endif %}
                     </div>
@@ -293,9 +295,9 @@
                 <div class="card mt-4">
                     <div class="card-header d-flex justify-content-between align-items-center">
                         <h5 class="mb-0">
-                            <i class="fas fa-flag me-2"></i>My Complaints
+                            <i class="fas fa-flag me-2"></i>Mes réclamations
                         </h5>
-                        <a href="{% url 'payments:complaint_list' %}" class="btn btn-outline-primary btn-sm">View All</a>
+                        <a href="{% url 'payments:complaint_list' %}" class="btn btn-outline-primary btn-sm">Voir tout</a>
                     </div>
                     <div class="card-body">
                         {% if user_complaints %}
@@ -307,7 +309,7 @@
                                         <div>
                                             <h6 class="mb-1">{{ complaint.complaint_number }}</h6>
                                             <p class="mb-1 text-muted small">{{ complaint.reason.name }}</p>
-                                            <small class="text-muted">{{ complaint.created_at|date:"M d, Y" }}</small>
+                                            <small class="text-muted">{{ complaint.created_at|date:"d M Y" }}</small>
                                         </div>
                                         <span class="badge status-{{ complaint.status }}">
                                             {{ complaint.get_status_display }}
@@ -319,7 +321,7 @@
                         {% else %}
                             <div class="text-center py-4">
                                 <i class="fas fa-check-circle fa-3x mb-3" style="color: #617da8; opacity: 0.3;"></i>
-                                <p class="text-muted">No complaints filed</p>
+                                <p class="text-muted">Aucune réclamation déposée</p>
                             </div>
                         {% endif %}
                     </div>
@@ -329,7 +331,7 @@
                 <div class="card mt-4">
                     <div class="card-header">
                         <h5 class="mb-0">
-                            <i class="fas fa-undo me-2"></i>Refund History
+                            <i class="fas fa-undo me-2"></i>Historique des remboursements
                         </h5>
                     </div>
                     <div class="card-body">
@@ -338,10 +340,10 @@
                                 <table class="table table-hover">
                                     <thead>
                                         <tr>
-                                            <th>Refund #</th>
-                                            <th>Order</th>
-                                            <th>Amount</th>
-                                            <th>Status</th>
+                                            <th>N° remboursement</th>
+                                            <th>Commande</th>
+                                            <th>Montant</th>
+                                            <th>Statut</th>
                                             <th>Action</th>
                                         </tr>
                                     </thead>
@@ -350,7 +352,7 @@
                                         <tr>
                                             <td><strong>{{ refund.refund_number }}</strong></td>
                                             <td>{{ refund.order.order_id }}</td>
-                                            <td><strong>DZD {{ refund.amount }}</strong></td>
+                                            <td><strong>{{ refund.amount }} DZD</strong></td>
                                             <td>
                                                 <span class="badge status-{{ refund.status }}">
                                                     {{ refund.get_status_display }}
@@ -363,7 +365,7 @@
                                                     <i class="fas fa-receipt"></i>
                                                 </a>
                                                 {% else %}
-                                                <span class="text-muted small">Pending</span>
+                                                <span class="text-muted small">En attente</span>
                                                 {% endif %}
                                             </td>
                                         </tr>
@@ -374,7 +376,7 @@
                         {% else %}
                             <div class="text-center py-4">
                                 <i class="fas fa-money-bill-wave fa-3x mb-3" style="color: #617da8; opacity: 0.3;"></i>
-                                <p class="text-muted">No refunds</p>
+                                <p class="text-muted">Aucun remboursement</p>
                             </div>
                         {% endif %}
                     </div>
@@ -384,7 +386,7 @@
                 <div class="card mt-4">
                     <div class="card-header">
                         <h5 class="mb-0">
-                            <i class="fas fa-chart-line me-2"></i>Recent Activity (Last 30 Days)
+                            <i class="fas fa-chart-line me-2"></i>Activité récente (30 derniers jours)
                         </h5>
                     </div>
                     <div class="card-body">
@@ -394,7 +396,7 @@
                                     <i class="fas fa-shopping-cart"></i>
                                 </div>
                                 <h4 class="fw-bold mb-1">{{ recent_activity.orders }}</h4>
-                                <small class="text-muted">Orders Placed</small>
+                                <small class="text-muted">Commandes passées</small>
                             </div>
                             
                             <div class="col-md-4">
@@ -402,7 +404,7 @@
                                     <i class="fas fa-star"></i>
                                 </div>
                                 <h4 class="fw-bold mb-1">{{ recent_activity.reviews }}</h4>
-                                <small class="text-muted">Reviews Written</small>
+                                <small class="text-muted">Avis rédigés</small>
                             </div>
                             
                             <div class="col-md-4">
@@ -410,7 +412,7 @@
                                     <i class="fas fa-question-circle"></i>
                                 </div>
                                 <h4 class="fw-bold mb-1">{{ recent_activity.questions }}</h4>
-                                <small class="text-muted">Questions Asked</small>
+                                <small class="text-muted">Questions posées</small>
                             </div>
                         </div>
                     </div>
@@ -424,62 +426,62 @@
                 <div class="card">
                     <div class="card-header">
                         <h5 class="mb-0">
-                            <i class="fas fa-id-badge me-2"></i>{{ user_profile.get_user_type_display }} Info
+                            <i class="fas fa-id-badge me-2"></i>Informations {{ user_profile.get_user_type_display }}
                         </h5>
                     </div>
                     <div class="card-body">
                         {% if user_profile.user_type == 'pharmacy' %}
                             <div class="mb-3 pb-3 border-bottom">
-                                <strong class="d-block mb-1">Pharmacy</strong>
-                                <span class="text-muted">{{ role_specific_data.pharmacy_name|default:"Not specified" }}</span>
+                                <strong class="d-block mb-1">Pharmacie</strong>
+                                <span class="text-muted">{{ role_specific_data.pharmacy_name|default:"Non spécifié" }}</span>
                             </div>
                             <div class="mb-3 pb-3 border-bottom">
-                                <strong class="d-block mb-1">License</strong>
-                                <span class="text-muted">{{ role_specific_data.license_number|default:"Not specified" }}</span>
+                                <strong class="d-block mb-1">Licence</strong>
+                                <span class="text-muted">{{ role_specific_data.license_number|default:"Non spécifié" }}</span>
                             </div>
                             <div>
-                                <strong class="d-block mb-1">Status</strong>
+                                <strong class="d-block mb-1">Statut</strong>
                                 {% if role_specific_data.verified %}
-                                    <span class="badge bg-success">Verified</span>
+                                    <span class="badge bg-success">Vérifié</span>
                                 {% else %}
-                                    <span class="badge bg-warning text-dark">Pending Verification</span>
+                                    <span class="badge bg-warning text-dark">Vérification en attente</span>
                                 {% endif %}
                             </div>
                         {% elif user_profile.user_type == 'clinic' %}
                             <div class="mb-3 pb-3 border-bottom">
-                                <strong class="d-block mb-1">Clinic</strong>
-                                <span class="text-muted">{{ role_specific_data.clinic_name|default:"Not specified" }}</span>
+                                <strong class="d-block mb-1">Clinique</strong>
+                                <span class="text-muted">{{ role_specific_data.clinic_name|default:"Non spécifié" }}</span>
                             </div>
                             <div class="mb-3 pb-3 border-bottom">
-                                <strong class="d-block mb-1">Department</strong>
-                                <span class="text-muted">{{ role_specific_data.department|default:"Not specified" }}</span>
+                                <strong class="d-block mb-1">Département</strong>
+                                <span class="text-muted">{{ role_specific_data.department|default:"Non spécifié" }}</span>
                             </div>
                             <div>
-                                <strong class="d-block mb-1">Budget Limit</strong>
-                                <span class="text-muted">DZD {{ role_specific_data.budget_limit|default:"Not set" }}</span>
+                                <strong class="d-block mb-1">Limite budgétaire</strong>
+                                <span class="text-muted">{{ role_specific_data.budget_limit|default:"Non défini" }} DZD</span>
                             </div>
                         {% elif user_profile.user_type == 'doctor' %}
                             <div class="mb-3 pb-3 border-bottom">
-                                <strong class="d-block mb-1">Specialty</strong>
-                                <span class="text-muted">{{ role_specific_data.specialty|default:"Not specified" }}</span>
+                                <strong class="d-block mb-1">Spécialité</strong>
+                                <span class="text-muted">{{ role_specific_data.specialty|default:"Non spécifié" }}</span>
                             </div>
                             <div class="mb-3 pb-3 border-bottom">
-                                <strong class="d-block mb-1">Hospital</strong>
-                                <span class="text-muted">{{ role_specific_data.hospital_affiliation|default:"Not specified" }}</span>
+                                <strong class="d-block mb-1">Hôpital</strong>
+                                <span class="text-muted">{{ role_specific_data.hospital_affiliation|default:"Non spécifié" }}</span>
                             </div>
                             <div>
-                                <strong class="d-block mb-1">Status</strong>
+                                <strong class="d-block mb-1">Statut</strong>
                                 {% if role_specific_data.verified %}
-                                    <span class="badge bg-success">Verified</span>
+                                    <span class="badge bg-success">Vérifié</span>
                                 {% else %}
-                                    <span class="badge bg-warning text-dark">Pending Verification</span>
+                                    <span class="badge bg-warning text-dark">Vérification en attente</span>
                                 {% endif %}
                             </div>
                         {% endif %}
                         
                         <div class="mt-4">
                             <a href="{% url 'accounts:profile' %}" class="btn btn-outline-primary w-100">
-                                <i class="fas fa-edit me-2"></i>Update Information
+                                <i class="fas fa-edit me-2"></i>Mettre à jour les informations
                             </a>
                         </div>
                     </div>
@@ -490,28 +492,28 @@
                 <div class="card mt-4">
                     <div class="card-header">
                         <h5 class="mb-0">
-                            <i class="fas fa-bolt me-2"></i>Quick Actions
+                            <i class="fas fa-bolt me-2"></i>Actions rapides
                         </h5>
                     </div>
                     <div class="card-body">
                         <div class="d-grid gap-2">
                             <a href="{% url 'products:list' %}" class="btn btn-primary">
-                                <i class="fas fa-search me-2"></i>Browse Products
+                                <i class="fas fa-search me-2"></i>Parcourir les produits
                             </a>
                             <a href="{% url 'payments:cart' %}" class="btn btn-outline-primary">
-                                <i class="fas fa-shopping-cart me-2"></i>View Cart ({{ cart_items_count }})
+                                <i class="fas fa-shopping-cart me-2"></i>Voir le panier ({{ cart_items_count }})
                             </a>
                             <a href="{% url 'accounts:wishlist' %}" class="btn btn-outline-success">
-                                <i class="fas fa-heart me-2"></i>My Wishlist ({{ wishlist_items_count }})
+                                <i class="fas fa-heart me-2"></i>Mes favoris ({{ wishlist_items_count }})
                             </a>
                             <a href="{% url 'payments:invoice_list' %}" class="btn btn-outline-info">
-                                <i class="fas fa-list me-2"></i>Order History
+                                <i class="fas fa-list me-2"></i>Historique des commandes
                             </a>
                             <a href="{% url 'payments:complaint_list' %}" class="btn btn-outline-warning">
-                                <i class="fas fa-flag me-2"></i>My Complaints
+                                <i class="fas fa-flag me-2"></i>Mes réclamations
                             </a>
                             <a href="{% url 'pages:contact' %}" class="btn btn-outline-secondary">
-                                <i class="fas fa-headset me-2"></i>Contact Support
+                                <i class="fas fa-headset me-2"></i>Contacter le support
                             </a>
                         </div>
                     </div>
@@ -521,17 +523,17 @@
                 <div class="card mt-4">
                     <div class="card-header">
                         <h5 class="mb-0">
-                            <i class="fas fa-shield-alt me-2"></i>Account Security
+                            <i class="fas fa-shield-alt me-2"></i>Sécurité du compte
                         </h5>
                     </div>
                     <div class="card-body">
                         <div class="security-item">
                             <div class="d-flex justify-content-between align-items-center">
                                 <div>
-                                    <strong class="d-block">Password</strong>
-                                    <small class="text-muted">Manage your password</small>
+                                    <strong class="d-block">Mot de passe</strong>
+                                    <small class="text-muted">Gérer votre mot de passe</small>
                                 </div>
-                                <a href="{% url 'accounts:profile' %}" class="btn btn-outline-primary btn-sm">Change</a>
+                                <a href="{% url 'accounts:profile' %}" class="btn btn-outline-primary btn-sm">Modifier</a>
                             </div>
                         </div>
                         
@@ -540,9 +542,9 @@
                                 <div>
                                     <strong class="d-block">Email</strong>
                                     <small class="text-muted">{{ user.email }}</small>
-                                    <span class="badge bg-success">Verified</span>
+                                    <span class="badge bg-success">Vérifié</span>
                                 </div>
-                                <a href="{% url 'accounts:profile' %}" class="btn btn-outline-primary btn-sm">Change</a>
+                                <a href="{% url 'accounts:profile' %}" class="btn btn-outline-primary btn-sm">Modifier</a>
                             </div>
                         </div>
                         

@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}Payments Management - Fennec Med{% endblock %}
+{% block title %}Gestion des paiements - Fennec Med{% endblock %}
 
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'css/admin/payments_list.css' %}">
@@ -12,11 +12,11 @@
   <div class="container">
     <div class="d-flex justify-content-between align-items-center">
       <div>
-        <h1><i class="fas fa-credit-card me-2"></i>Payments Management</h1>
-        <p class="mb-0">Verify and manage payment submissions</p>
+        <h1><i class="fas fa-credit-card me-2"></i>Gestion des paiements</h1>
+        <p class="mb-0">Vérifier et gérer les soumissions de paiement</p>
       </div>
       <a href="{% url 'accounts:admin_dashboard' %}" class="btn btn-light">
-        <i class="fas fa-arrow-left me-2"></i>Back to Dashboard
+        <i class="fas fa-arrow-left me-2"></i>Retour au tableau de bord
       </a>
     </div>
   </div>
@@ -29,28 +29,28 @@
       <div class="stat-card">
         <div class="icon text-warning"><i class="fas fa-clock"></i></div>
         <div class="number">{{ payment_stats.pending }}</div>
-        <div class="label">Pending Verification</div>
+        <div class="label">En attente de vérification</div>
       </div>
     </div>
     <div class="col-md-3 mb-3">
       <div class="stat-card">
         <div class="icon text-success"><i class="fas fa-check-circle"></i></div>
         <div class="number">{{ payment_stats.verified }}</div>
-        <div class="label">Verified</div>
+        <div class="label">Vérifiés</div>
       </div>
     </div>
     <div class="col-md-3 mb-3">
       <div class="stat-card">
         <div class="icon text-danger"><i class="fas fa-times-circle"></i></div>
         <div class="number">{{ payment_stats.rejected }}</div>
-        <div class="label">Rejected</div>
+        <div class="label">Rejetés</div>
       </div>
     </div>
     <div class="col-md-3 mb-3">
       <div class="stat-card">
         <div class="icon text-primary"><i class="fas fa-file-invoice-dollar"></i></div>
         <div class="number">{{ payment_stats.total }}</div>
-        <div class="label">Total Payments</div>
+        <div class="label">Total paiements</div>
       </div>
     </div>
   </div>
@@ -59,21 +59,21 @@
   <div class="filter-section">
     <form method="get" class="row g-3">
       <div class="col-md-4">
-        <label class="form-label">Status</label>
+        <label class="form-label">Statut</label>
         <select name="status" class="form-select" onchange="this.form.submit()">
-          <option value="all" {% if status_filter == 'all' %}selected{% endif %}>All Payments</option>
-          <option value="pending" {% if status_filter == 'pending' %}selected{% endif %}>Pending</option>
-          <option value="verified" {% if status_filter == 'verified' %}selected{% endif %}>Verified</option>
-          <option value="rejected" {% if status_filter == 'rejected' %}selected{% endif %}>Rejected</option>
+          <option value="all" {% if status_filter == 'all' %}selected{% endif %}>Tous les paiements</option>
+          <option value="pending" {% if status_filter == 'pending' %}selected{% endif %}>En attente</option>
+          <option value="verified" {% if status_filter == 'verified' %}selected{% endif %}>Vérifiés</option>
+          <option value="rejected" {% if status_filter == 'rejected' %}selected{% endif %}>Rejetés</option>
         </select>
       </div>
       <div class="col-md-6">
-        <label class="form-label">Search</label>
-        <input type="text" name="search" class="form-control" placeholder="Invoice number, order ID, username..." value="{{ search }}">
+        <label class="form-label">Rechercher</label>
+        <input type="text" name="search" class="form-control" placeholder="Numéro facture, ID commande, nom d'utilisateur..." value="{{ search }}">
       </div>
       <div class="col-md-2 d-flex align-items-end">
         <button type="submit" class="btn btn-primary w-100">
-          <i class="fas fa-search me-2"></i>Search
+          <i class="fas fa-search me-2"></i>Rechercher
         </button>
       </div>
     </form>
@@ -82,22 +82,22 @@
   <!-- Payments Table -->
   <div class="table-container">
     <div class="d-flex justify-content-between align-items-center mb-3">
-      <h5><i class="fas fa-list me-2"></i>Payment Submissions</h5>
-      <span class="text-muted">{{ payments|length }} results</span>
+      <h5><i class="fas fa-list me-2"></i>Soumissions de paiement</h5>
+      <span class="text-muted">{{ payments|length }} résultats</span>
     </div>
     
     <div class="table-responsive">
       <table class="table table-hover">
         <thead>
           <tr>
-            <th>Invoice</th>
-            <th>Order ID</th>
-            <th>User</th>
-            <th>Amount</th>
-            <th>Method</th>
-            <th>Proof</th>
-            <th>Uploaded</th>
-            <th>Status</th>
+            <th>Facture</th>
+            <th>ID commande</th>
+            <th>Utilisateur</th>
+            <th>Montant</th>
+            <th>Méthode</th>
+            <th>Preuve</th>
+            <th>Téléchargé</th>
+            <th>Statut</th>
             <th>Actions</th>
           </tr>
         </thead>
@@ -119,28 +119,28 @@
                   {% if payment.proof_file.url|slice:"-4:" == ".pdf" %}
                     <i class="fas fa-file-pdf text-danger fa-2x"></i>
                   {% else %}
-                    <img src="{{ payment.proof_file.url }}" alt="Payment Proof" class="payment-proof-thumb">
+                    <img src="{{ payment.proof_file.url }}" alt="Preuve paiement" class="payment-proof-thumb">
                   {% endif %}
                 </a>
               {% else %}
                 <span class="text-muted">
-                  <i class="fas fa-file-exclamation"></i> No file
+                  <i class="fas fa-file-exclamation"></i> Aucun fichier
                 </span>
               {% endif %}
             </td>
-            <td>{{ payment.uploaded_at|timesince }} ago</td>
+            <td>Il y a {{ payment.uploaded_at|timesince }}</td>
             <td>
               {% if payment.verified %}
                 <span class="status-badge status-verified">
-                  <i class="fas fa-check-circle"></i> Verified
+                  <i class="fas fa-check-circle"></i> Vérifié
                 </span>
               {% elif payment.rejection_reason %}
                 <span class="status-badge status-rejected">
-                  <i class="fas fa-times-circle"></i> Rejected
+                  <i class="fas fa-times-circle"></i> Rejeté
                 </span>
               {% else %}
                 <span class="status-badge status-pending">
-                  <i class="fas fa-clock"></i> Pending
+                  <i class="fas fa-clock"></i> En attente
                 </span>
               {% endif %}
             </td>
@@ -148,12 +148,12 @@
               {% if not payment.verified and not payment.rejection_reason %}
                 <a href="{% url 'accounts:admin_verify_payment' payment.id %}" 
                    class="btn btn-sm btn-primary">
-                  <i class="fas fa-check"></i> Review
+                  <i class="fas fa-check"></i> Examiner
                 </a>
               {% else %}
                 <a href="{% url 'accounts:admin_verify_payment' payment.id %}" 
                    class="btn btn-sm btn-outline-secondary">
-                  <i class="fas fa-eye"></i> View
+                  <i class="fas fa-eye"></i> Voir
                 </a>
               {% endif %}
             </td>
@@ -162,7 +162,7 @@
           <tr>
             <td colspan="9" class="text-center text-muted py-4">
               <i class="fas fa-inbox fa-3x mb-3 d-block"></i>
-              No payment submissions found
+              Aucune soumission de paiement trouvée
             </td>
           </tr>
           {% endfor %}

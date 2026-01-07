@@ -9,8 +9,12 @@ class Cart(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
+    class Meta:
+        verbose_name = "Panier"
+        verbose_name_plural = "Paniers"
+
     def __str__(self):
-        return f"{self.user.username}'s Cart"
+        return f"Panier de {self.user.username}"
 
     def get_total_price(self):
         return sum(item.get_total_price() for item in self.items.all())
@@ -25,23 +29,24 @@ class CartItem(models.Model):
     variant = models.ForeignKey(
         "products.ProductVariant", on_delete=models.CASCADE, null=True, blank=True
     )
-    quantity = models.PositiveIntegerField(default=1)
+    quantity = models.PositiveIntegerField(default=1, verbose_name="Quantité")
     added_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
         unique_together = ("cart", "product", "variant")
+        verbose_name = "Article du panier"
+        verbose_name_plural = "Articles du panier"
 
     def __str__(self):
         variant_info = f" ({self.variant.variant_value})" if self.variant else ""
         return f"{self.quantity} x {self.product.name}{variant_info}"
 
     def get_unit_price(self):
-        """Get price per unit including variant cost"""
+        """Obtenir le prix unitaire incluant le coût de la variante"""
         base_price = self.product.price
         if self.variant:
             base_price += self.variant.additional_cost
 
-        # Apply bulk pricing if applicable
         if self.quantity >= self.product.bulk_quantity and self.product.bulk_price:
             return self.product.bulk_price
 
@@ -51,94 +56,124 @@ class CartItem(models.Model):
         return self.quantity * self.get_unit_price()
 
 
-# Add these models to payments/models.py
 class ShippingType(models.Model):
-    name = models.CharField(max_length=100)
-    description = models.TextField(blank=True)
-    estimated_days = models.PositiveIntegerField(help_text="Estimated delivery days")
-    cost = models.DecimalField(max_digits=10, decimal_places=2)
-    is_active = models.BooleanField(default=True)
-    display_order = models.PositiveIntegerField(default=0)
+    name = models.CharField(max_length=100, verbose_name="Nom")
+    description = models.TextField(blank=True, verbose_name="Description")
+    estimated_days = models.PositiveIntegerField(
+        help_text="Délai de livraison estimé en jours"
+    )
+    cost = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="Coût")
+    is_active = models.BooleanField(default=True, verbose_name="Actif")
+    display_order = models.PositiveIntegerField(
+        default=0, verbose_name="Ordre d'affichage"
+    )
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
         ordering = ["display_order", "name"]
+        verbose_name = "Type de livraison"
+        verbose_name_plural = "Types de livraison"
 
     def __str__(self):
-        return f"{self.name} - {self.cost} DZD ({self.estimated_days} days)"
+        return f"{self.name} - {self.cost} DZD ({self.estimated_days} jours)"
 
 
 class Order(models.Model):
     STATUS_CHOICES = [
-        ("pending_confirmation", "Pending Confirmation"),
-        ("confirmed", "Confirmed"),
-        ("rejected", "Rejected"),
-        ("awaiting_payment", "Awaiting Payment"),
-        ("payment_under_review", "Payment Under Review"),
-        ("paid", "Paid"),
-        ("processing", "Processing"),
-        ("shipped", "Shipped"),
-        ("delivered", "Delivered"),
-        ("cancelled", "Cancelled"),
-        ("refund_pending", "Refund Pending"),
-        ("refunded", "Refunded"),
+        ("pending_confirmation", "En attente de confirmation"),
+        ("confirmed", "Confirmée"),
+        ("rejected", "Rejetée"),
+        ("awaiting_payment", "En attente de paiement"),
+        ("payment_under_review", "Paiement en cours de vérification"),
+        ("paid", "Payée"),
+        ("processing", "En traitement"),
+        ("shipped", "Expédiée"),
+        ("delivered", "Livrée"),
+        ("cancelled", "Annulée"),
+        ("refund_pending", "Remboursement en attente"),
+        ("refunded", "Remboursée"),
     ]
 
     order_id = models.CharField(max_length=50, unique=True, editable=False)
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="orders")
     status = models.CharField(
-        max_length=30, choices=STATUS_CHOICES, default="pending_confirmation"
+        max_length=30,
+        choices=STATUS_CHOICES,
+        default="pending_confirmation",
+        verbose_name="Statut",
     )
 
-    # Shipping information
     shipping_type = models.ForeignKey(
-        ShippingType, on_delete=models.SET_NULL, null=True, blank=True
+        ShippingType,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        verbose_name="Type de livraison",
     )
-    shipping_address = models.TextField()
-    shipping_city = models.CharField(max_length=100)
-    shipping_state = models.CharField(max_length=100)
-    shipping_zip = models.CharField(max_length=10)
-    shipping_country = models.CharField(max_length=100, default="Algeria")
+    shipping_address = models.TextField(verbose_name="Adresse de livraison")
+    shipping_city = models.CharField(max_length=100, verbose_name="Ville")
+    shipping_state = models.CharField(max_length=100, verbose_name="Wilaya")
+    shipping_zip = models.CharField(max_length=10, verbose_name="Code postal")
+    shipping_country = models.CharField(
+        max_length=100, default="Algérie", verbose_name="Pays"
+    )
 
-    # Pricing
-    subtotal = models.DecimalField(max_digits=10, decimal_places=2)
-    tax_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0)
-    shipping_cost = models.DecimalField(max_digits=10, decimal_places=2, default=0)
-    total_amount = models.DecimalField(max_digits=10, decimal_places=2)
+    subtotal = models.DecimalField(
+        max_digits=10, decimal_places=2, verbose_name="Sous-total"
+    )
+    tax_amount = models.DecimalField(
+        max_digits=10, decimal_places=2, default=0, verbose_name="Montant TVA"
+    )
+    shipping_cost = models.DecimalField(
+        max_digits=10, decimal_places=2, default=0, verbose_name="Frais de livraison"
+    )
+    total_amount = models.DecimalField(
+        max_digits=10, decimal_places=2, verbose_name="Montant total"
+    )
 
-    # Timestamps
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    confirmed_at = models.DateTimeField(blank=True, null=True)
-    rejected_at = models.DateTimeField(blank=True, null=True)
-    paid_at = models.DateTimeField(blank=True, null=True)
-    shipped_at = models.DateTimeField(blank=True, null=True)
-    delivered_at = models.DateTimeField(blank=True, null=True)
+    confirmed_at = models.DateTimeField(
+        blank=True, null=True, verbose_name="Confirmée le"
+    )
+    rejected_at = models.DateTimeField(blank=True, null=True, verbose_name="Rejetée le")
+    paid_at = models.DateTimeField(blank=True, null=True, verbose_name="Payée le")
+    shipped_at = models.DateTimeField(blank=True, null=True, verbose_name="Expédiée le")
+    delivered_at = models.DateTimeField(blank=True, null=True, verbose_name="Livrée le")
 
-    # Tracking
-    tracking_number = models.CharField(max_length=100, blank=True)
+    tracking_number = models.CharField(
+        max_length=100, blank=True, verbose_name="Numéro de suivi"
+    )
 
     class Meta:
         ordering = ["-created_at"]
+        verbose_name = "Commande"
+        verbose_name_plural = "Commandes"
 
     def __str__(self):
-        return f"Order {self.order_id}"
+        return f"Commande {self.order_id}"
 
     def save(self, *args, **kwargs):
         if not self.order_id:
-            self.order_id = f"ORD-{uuid.uuid4().hex[:12].upper()}"
+            self.order_id = f"CMD-{uuid.uuid4().hex[:12].upper()}"
         super().save(*args, **kwargs)
 
     def can_update_status(self):
-        """Check if order status can be updated (must be confirmed first)"""
+        """Vérifier si le statut de la commande peut être mis à jour"""
         return self.status not in ["pending_confirmation", "rejected"]
 
 
 class OrderItem(models.Model):
     order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name="items")
-    product = models.ForeignKey(Product, on_delete=models.CASCADE)
-    quantity = models.PositiveIntegerField()
-    price = models.DecimalField(max_digits=10, decimal_places=2)
+    product = models.ForeignKey(
+        Product, on_delete=models.CASCADE, verbose_name="Produit"
+    )
+    quantity = models.PositiveIntegerField(verbose_name="Quantité")
+    price = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="Prix")
+
+    class Meta:
+        verbose_name = "Article de commande"
+        verbose_name_plural = "Articles de commande"
 
     def __str__(self):
         return f"{self.quantity} x {self.product.name}"
@@ -149,114 +184,142 @@ class OrderItem(models.Model):
 
 class OrderNote(models.Model):
     order = models.OneToOneField(Order, on_delete=models.CASCADE, related_name="note")
-    content = models.TextField()
-    created_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
+    content = models.TextField(verbose_name="Contenu")
+    created_by = models.ForeignKey(
+        User, on_delete=models.SET_NULL, null=True, verbose_name="Créée par"
+    )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
+    class Meta:
+        verbose_name = "Note de commande"
+        verbose_name_plural = "Notes de commande"
+
     def __str__(self):
-        return f"Note for {self.order.order_id}"
+        return f"Note pour {self.order.order_id}"
 
 
 class OrderNoteAttachment(models.Model):
     order_note = models.ForeignKey(
         OrderNote, on_delete=models.CASCADE, related_name="attachments"
     )
-    file = models.FileField(upload_to="order_notes/%Y/%m/")
-    file_name = models.CharField(max_length=255)
-    file_type = models.CharField(max_length=50)
+    file = models.FileField(upload_to="order_notes/%Y/%m/", verbose_name="Fichier")
+    file_name = models.CharField(max_length=255, verbose_name="Nom du fichier")
+    file_type = models.CharField(max_length=50, verbose_name="Type de fichier")
     uploaded_at = models.DateTimeField(auto_now_add=True)
 
+    class Meta:
+        verbose_name = "Pièce jointe de note"
+        verbose_name_plural = "Pièces jointes de notes"
+
     def __str__(self):
-        return f"Attachment for {self.order_note.order.order_id}"
+        return f"Pièce jointe pour {self.order_note.order.order_id}"
 
 
 class Invoice(models.Model):
     STATUS_CHOICES = [
-        ("unpaid", "Unpaid"),
-        ("payment_submitted", "Payment Submitted"),
-        ("payment_rejected", "Payment Rejected"),
-        ("paid", "Paid"),
-        ("refunded", "Refunded"),
+        ("unpaid", "Impayée"),
+        ("payment_submitted", "Paiement soumis"),
+        ("payment_rejected", "Paiement rejeté"),
+        ("paid", "Payée"),
+        ("refunded", "Remboursée"),
     ]
 
     invoice_number = models.CharField(max_length=50, unique=True, editable=False)
     order = models.OneToOneField(
         Order, on_delete=models.CASCADE, related_name="invoice"
     )
-    status = models.CharField(max_length=30, choices=STATUS_CHOICES, default="unpaid")
-
-    # Amounts
-    subtotal = models.DecimalField(max_digits=10, decimal_places=2)
-    tax_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0)
-    total_amount = models.DecimalField(max_digits=10, decimal_places=2)
-
-    # Payment instructions
-    payment_instructions = models.TextField(
-        default=(
-            "Please make payment via one of the following methods:\n"
-            "1. BaridiMob: +213 XXX XXX XXX\n"
-            "2. CCP: XXXXXX Clé XX\n"
-            "3. Bank Transfer: IBAN DZXX XXXX XXXX XXXX XXXX\n"
-            "After payment, upload your proof in your dashboard."
-        )
+    status = models.CharField(
+        max_length=30, choices=STATUS_CHOICES, default="unpaid", verbose_name="Statut"
     )
 
-    # Timestamps
+    subtotal = models.DecimalField(
+        max_digits=10, decimal_places=2, verbose_name="Sous-total"
+    )
+    tax_amount = models.DecimalField(
+        max_digits=10, decimal_places=2, default=0, verbose_name="Montant TVA"
+    )
+    total_amount = models.DecimalField(
+        max_digits=10, decimal_places=2, verbose_name="Montant total"
+    )
+
+    payment_instructions = models.TextField(
+        default=(
+            "Veuillez effectuer le paiement via l'une des méthodes suivantes :\n"
+            "1. BaridiMob : +213 XXX XXX XXX\n"
+            "2. CCP : XXXXXX Clé XX\n"
+            "3. Virement bancaire : IBAN DZXX XXXX XXXX XXXX XXXX\n"
+            "Après paiement, téléchargez votre preuve dans votre tableau de bord."
+        ),
+        verbose_name="Instructions de paiement",
+    )
+
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    paid_at = models.DateTimeField(blank=True, null=True)
+    paid_at = models.DateTimeField(blank=True, null=True, verbose_name="Payée le")
 
     class Meta:
         ordering = ["-created_at"]
+        verbose_name = "Facture"
+        verbose_name_plural = "Factures"
 
     def __str__(self):
-        return f"Invoice {self.invoice_number}"
+        return f"Facture {self.invoice_number}"
 
     def save(self, *args, **kwargs):
         if not self.invoice_number:
-            self.invoice_number = f"INV-{uuid.uuid4().hex[:12].upper()}"
+            self.invoice_number = f"FACT-{uuid.uuid4().hex[:12].upper()}"
         super().save(*args, **kwargs)
 
 
 class PaymentProof(models.Model):
     PAYMENT_METHODS = [
         ("baridimob", "BaridiMob"),
-        ("ccp_cheque", "CCP Cheque"),
-        ("bank_transfer", "Bank Transfer"),
-        ("cash_deposit", "Cash Deposit"),
-        ("other", "Other"),
+        ("ccp_cheque", "Chèque CCP"),
+        ("bank_transfer", "Virement bancaire"),
+        ("cash_deposit", "Dépôt en espèces"),
+        ("other", "Autre"),
     ]
 
     invoice = models.ForeignKey(
-        Invoice, on_delete=models.CASCADE, related_name="payment_proofs"
+        Invoice,
+        on_delete=models.CASCADE,
+        related_name="payment_proofs",
+        verbose_name="Facture",
     )
-    payment_method = models.CharField(max_length=20, choices=PAYMENT_METHODS)
-    proof_file = models.FileField(upload_to="payment_proofs/%Y/%m/")
-    transaction_reference = models.CharField(max_length=100, blank=True)
-    notes = models.TextField(blank=True)
+    payment_method = models.CharField(
+        max_length=20, choices=PAYMENT_METHODS, verbose_name="Méthode de paiement"
+    )
+    proof_file = models.FileField(
+        upload_to="payment_proofs/%Y/%m/", verbose_name="Preuve de paiement"
+    )
+    transaction_reference = models.CharField(
+        max_length=100, blank=True, verbose_name="Référence de transaction"
+    )
+    notes = models.TextField(blank=True, verbose_name="Notes")
 
-    # Verification
-    verified = models.BooleanField(default=False)
+    verified = models.BooleanField(default=False, verbose_name="Vérifié")
     verified_by = models.ForeignKey(
         User,
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
         related_name="verified_payments",
+        verbose_name="Vérifié par",
     )
-    verified_at = models.DateTimeField(blank=True, null=True)
-    rejection_reason = models.TextField(blank=True)
+    verified_at = models.DateTimeField(blank=True, null=True, verbose_name="Vérifié le")
+    rejection_reason = models.TextField(blank=True, verbose_name="Motif de rejet")
 
-    # Timestamps
     uploaded_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
         ordering = ["-uploaded_at"]
+        verbose_name = "Preuve de paiement"
+        verbose_name_plural = "Preuves de paiement"
 
     def __str__(self):
-        return f"Payment Proof for {self.invoice.invoice_number}"
+        return f"Preuve de paiement pour {self.invoice.invoice_number}"
 
 
 class PaymentReceipt(models.Model):
@@ -268,30 +331,40 @@ class PaymentReceipt(models.Model):
         PaymentProof, on_delete=models.CASCADE, related_name="receipts"
     )
 
-    amount_paid = models.DecimalField(max_digits=10, decimal_places=2)
-    payment_date = models.DateTimeField()
-    payment_method = models.CharField(max_length=20)
+    amount_paid = models.DecimalField(
+        max_digits=10, decimal_places=2, verbose_name="Montant payé"
+    )
+    payment_date = models.DateTimeField(verbose_name="Date de paiement")
+    payment_method = models.CharField(max_length=20, verbose_name="Méthode de paiement")
 
     generated_at = models.DateTimeField(auto_now_add=True)
 
+    class Meta:
+        verbose_name = "Reçu de paiement"
+        verbose_name_plural = "Reçus de paiement"
+
     def __str__(self):
-        return f"Receipt {self.receipt_number}"
+        return f"Reçu {self.receipt_number}"
 
     def save(self, *args, **kwargs):
         if not self.receipt_number:
-            self.receipt_number = f"RCP-{uuid.uuid4().hex[:12].upper()}"
+            self.receipt_number = f"RECU-{uuid.uuid4().hex[:12].upper()}"
         super().save(*args, **kwargs)
 
 
 class ComplaintReason(models.Model):
-    name = models.CharField(max_length=100)
-    description = models.TextField(blank=True)
-    is_active = models.BooleanField(default=True)
-    display_order = models.PositiveIntegerField(default=0)
+    name = models.CharField(max_length=100, verbose_name="Nom")
+    description = models.TextField(blank=True, verbose_name="Description")
+    is_active = models.BooleanField(default=True, verbose_name="Actif")
+    display_order = models.PositiveIntegerField(
+        default=0, verbose_name="Ordre d'affichage"
+    )
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
         ordering = ["display_order", "name"]
+        verbose_name = "Motif de réclamation"
+        verbose_name_plural = "Motifs de réclamation"
 
     def __str__(self):
         return self.name
@@ -299,17 +372,25 @@ class ComplaintReason(models.Model):
 
 class Complaint(models.Model):
     STATUS_CHOICES = [
-        ("open", "Open"),
-        ("in_review", "In Review"),
-        ("awaiting_user", "Awaiting User Response"),
-        ("resolved", "Resolved"),
-        ("rejected", "Rejected"),
+        ("open", "Ouverte"),
+        ("in_review", "En cours d'examen"),
+        ("awaiting_user", "En attente de réponse du client"),
+        ("resolved", "Résolue"),
+        ("rejected", "Rejetée"),
     ]
 
     complaint_number = models.CharField(max_length=50, unique=True, editable=False)
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="complaints")
+    user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name="complaints",
+        verbose_name="Utilisateur",
+    )
     order = models.ForeignKey(
-        Order, on_delete=models.CASCADE, related_name="complaints"
+        Order,
+        on_delete=models.CASCADE,
+        related_name="complaints",
+        verbose_name="Commande",
     )
     invoice = models.ForeignKey(
         Invoice,
@@ -317,39 +398,47 @@ class Complaint(models.Model):
         related_name="complaints",
         null=True,
         blank=True,
+        verbose_name="Facture",
     )
 
-    reason = models.ForeignKey(ComplaintReason, on_delete=models.SET_NULL, null=True)
-    custom_reason = models.CharField(max_length=200, blank=True)
-    description = models.TextField()
+    reason = models.ForeignKey(
+        ComplaintReason, on_delete=models.SET_NULL, null=True, verbose_name="Motif"
+    )
+    custom_reason = models.CharField(
+        max_length=200, blank=True, verbose_name="Motif personnalisé"
+    )
+    description = models.TextField(verbose_name="Description")
 
-    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="open")
+    status = models.CharField(
+        max_length=20, choices=STATUS_CHOICES, default="open", verbose_name="Statut"
+    )
 
-    # Admin response
-    admin_notes = models.TextField(blank=True)
-    resolution_notes = models.TextField(blank=True)
+    admin_notes = models.TextField(blank=True, verbose_name="Notes administrateur")
+    resolution_notes = models.TextField(blank=True, verbose_name="Notes de résolution")
     handled_by = models.ForeignKey(
         User,
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
         related_name="handled_complaints",
+        verbose_name="Traitée par",
     )
 
-    # Timestamps
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    resolved_at = models.DateTimeField(blank=True, null=True)
+    resolved_at = models.DateTimeField(blank=True, null=True, verbose_name="Résolue le")
 
     class Meta:
         ordering = ["-created_at"]
+        verbose_name = "Réclamation"
+        verbose_name_plural = "Réclamations"
 
     def __str__(self):
-        return f"Complaint {self.complaint_number}"
+        return f"Réclamation {self.complaint_number}"
 
     def save(self, *args, **kwargs):
         if not self.complaint_number:
-            self.complaint_number = f"CMP-{uuid.uuid4().hex[:12].upper()}"
+            self.complaint_number = f"RECL-{uuid.uuid4().hex[:12].upper()}"
         super().save(*args, **kwargs)
 
 
@@ -357,35 +446,46 @@ class ComplaintAttachment(models.Model):
     complaint = models.ForeignKey(
         Complaint, on_delete=models.CASCADE, related_name="attachments"
     )
-    file = models.FileField(upload_to="complaint_attachments/%Y/%m/")
-    file_type = models.CharField(max_length=50)
+    file = models.FileField(
+        upload_to="complaint_attachments/%Y/%m/", verbose_name="Fichier"
+    )
+    file_type = models.CharField(max_length=50, verbose_name="Type de fichier")
     uploaded_at = models.DateTimeField(auto_now_add=True)
 
+    class Meta:
+        verbose_name = "Pièce jointe de réclamation"
+        verbose_name_plural = "Pièces jointes de réclamations"
+
     def __str__(self):
-        return f"Attachment for {self.complaint.complaint_number}"
+        return f"Pièce jointe pour {self.complaint.complaint_number}"
 
 
 class Refund(models.Model):
     STATUS_CHOICES = [
-        ("refund_pending", "Refund Pending"),
-        ("refund_approved", "Refund Approved"),
-        ("refund_processing", "Refund Processing"),
-        ("refund_completed", "Refund Completed"),
-        ("refund_rejected", "Refund Rejected"),
+        ("refund_pending", "Remboursement en attente"),
+        ("refund_approved", "Remboursement approuvé"),
+        ("refund_processing", "Remboursement en cours"),
+        ("refund_completed", "Remboursement effectué"),
+        ("refund_rejected", "Remboursement rejeté"),
     ]
 
     REFUND_METHODS = [
         ("baridimob", "BaridiMob"),
         ("ccp", "CCP"),
-        ("bank_transfer", "Bank Transfer"),
-        ("cash", "Cash"),
-        ("other", "Other"),
+        ("bank_transfer", "Virement bancaire"),
+        ("cash", "Espèces"),
+        ("other", "Autre"),
     ]
 
     refund_number = models.CharField(max_length=50, unique=True, editable=False)
-    order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name="refunds")
+    order = models.ForeignKey(
+        Order, on_delete=models.CASCADE, related_name="refunds", verbose_name="Commande"
+    )
     invoice = models.ForeignKey(
-        Invoice, on_delete=models.CASCADE, related_name="refunds"
+        Invoice,
+        on_delete=models.CASCADE,
+        related_name="refunds",
+        verbose_name="Facture",
     )
     complaint = models.ForeignKey(
         Complaint,
@@ -393,23 +493,34 @@ class Refund(models.Model):
         null=True,
         blank=True,
         related_name="refunds",
+        verbose_name="Réclamation",
     )
 
-    amount = models.DecimalField(max_digits=10, decimal_places=2)
-    refund_method = models.CharField(max_length=20, choices=REFUND_METHODS, blank=True)
-    reason = models.TextField()
+    amount = models.DecimalField(
+        max_digits=10, decimal_places=2, verbose_name="Montant"
+    )
+    refund_method = models.CharField(
+        max_length=20,
+        choices=REFUND_METHODS,
+        blank=True,
+        verbose_name="Méthode de remboursement",
+    )
+    reason = models.TextField(verbose_name="Motif")
 
     status = models.CharField(
-        max_length=30, choices=STATUS_CHOICES, default="refund_pending"
+        max_length=30,
+        choices=STATUS_CHOICES,
+        default="refund_pending",
+        verbose_name="Statut",
     )
 
-    # Admin
     approved_by = models.ForeignKey(
         User,
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
         related_name="approved_refunds",
+        verbose_name="Approuvé par",
     )
     processed_by = models.ForeignKey(
         User,
@@ -417,23 +528,29 @@ class Refund(models.Model):
         null=True,
         blank=True,
         related_name="processed_refunds",
+        verbose_name="Traité par",
     )
 
-    # Timestamps
     created_at = models.DateTimeField(auto_now_add=True)
-    approved_at = models.DateTimeField(blank=True, null=True)
-    processed_at = models.DateTimeField(blank=True, null=True)
-    completed_at = models.DateTimeField(blank=True, null=True)
+    approved_at = models.DateTimeField(
+        blank=True, null=True, verbose_name="Approuvé le"
+    )
+    processed_at = models.DateTimeField(blank=True, null=True, verbose_name="Traité le")
+    completed_at = models.DateTimeField(
+        blank=True, null=True, verbose_name="Effectué le"
+    )
 
     class Meta:
         ordering = ["-created_at"]
+        verbose_name = "Remboursement"
+        verbose_name_plural = "Remboursements"
 
     def __str__(self):
-        return f"Refund {self.refund_number}"
+        return f"Remboursement {self.refund_number}"
 
     def save(self, *args, **kwargs):
         if not self.refund_number:
-            self.refund_number = f"RFD-{uuid.uuid4().hex[:12].upper()}"
+            self.refund_number = f"REMB-{uuid.uuid4().hex[:12].upper()}"
         super().save(*args, **kwargs)
 
 
@@ -441,14 +558,24 @@ class RefundProof(models.Model):
     refund = models.OneToOneField(
         Refund, on_delete=models.CASCADE, related_name="proof"
     )
-    proof_file = models.FileField(upload_to="refund_proofs/%Y/%m/")
-    transaction_reference = models.CharField(max_length=100, blank=True)
-    notes = models.TextField(blank=True)
-    uploaded_by = models.ForeignKey(User, on_delete=models.CASCADE)
+    proof_file = models.FileField(
+        upload_to="refund_proofs/%Y/%m/", verbose_name="Preuve de remboursement"
+    )
+    transaction_reference = models.CharField(
+        max_length=100, blank=True, verbose_name="Référence de transaction"
+    )
+    notes = models.TextField(blank=True, verbose_name="Notes")
+    uploaded_by = models.ForeignKey(
+        User, on_delete=models.CASCADE, verbose_name="Téléchargé par"
+    )
     uploaded_at = models.DateTimeField(auto_now_add=True)
 
+    class Meta:
+        verbose_name = "Preuve de remboursement"
+        verbose_name_plural = "Preuves de remboursement"
+
     def __str__(self):
-        return f"Refund Proof for {self.refund.refund_number}"
+        return f"Preuve de remboursement pour {self.refund.refund_number}"
 
 
 class RefundReceipt(models.Model):
@@ -460,81 +587,107 @@ class RefundReceipt(models.Model):
         RefundProof, on_delete=models.CASCADE, related_name="receipts"
     )
 
-    amount_refunded = models.DecimalField(max_digits=10, decimal_places=2)
-    refund_date = models.DateTimeField()
-    refund_method = models.CharField(max_length=20)
+    amount_refunded = models.DecimalField(
+        max_digits=10, decimal_places=2, verbose_name="Montant remboursé"
+    )
+    refund_date = models.DateTimeField(verbose_name="Date de remboursement")
+    refund_method = models.CharField(
+        max_length=20, verbose_name="Méthode de remboursement"
+    )
 
     generated_at = models.DateTimeField(auto_now_add=True)
 
+    class Meta:
+        verbose_name = "Reçu de remboursement"
+        verbose_name_plural = "Reçus de remboursement"
+
     def __str__(self):
-        return f"Refund Receipt {self.receipt_number}"
+        return f"Reçu de remboursement {self.receipt_number}"
 
     def save(self, *args, **kwargs):
         if not self.receipt_number:
-            self.receipt_number = f"RFDRCP-{uuid.uuid4().hex[:12].upper()}"
+            self.receipt_number = f"RECUREMB-{uuid.uuid4().hex[:12].upper()}"
         super().save(*args, **kwargs)
-
-
-# Add to payments/models.py - Update the Notification model TYPE_CHOICES
 
 
 class Notification(models.Model):
     TYPE_CHOICES = [
-        ("order_created", "Order Created"),
-        ("invoice_created", "Invoice Created"),
-        ("payment_submitted", "Payment Submitted"),
-        ("payment_confirmed", "Payment Confirmed"),
-        ("payment_rejected", "Payment Rejected"),
-        ("complaint_created", "Complaint Created"),
-        ("complaint_updated", "Complaint Updated"),
-        ("complaint_resolved", "Complaint Resolved"),
-        ("refund_initiated", "Refund Initiated"),
-        ("refund_completed", "Refund Completed"),
-        ("order_shipped", "Order Shipped"),
-        ("order_delivered", "Order Delivered"),
-        ("order_confirmed", "Order Confirmed"),
-        ("order_rejected", "Order Rejected"),
-        # New notification types
-        ("user_registered", "New User Registered"),
-        ("review_submitted", "New Review Submitted"),
-        ("question_submitted", "New Question Submitted"),
-        ("contact_message", "New Contact Message"),
+        ("order_created", "Commande créée"),
+        ("invoice_created", "Facture créée"),
+        ("payment_submitted", "Paiement soumis"),
+        ("payment_confirmed", "Paiement confirmé"),
+        ("payment_rejected", "Paiement rejeté"),
+        ("complaint_created", "Réclamation créée"),
+        ("complaint_updated", "Réclamation mise à jour"),
+        ("complaint_resolved", "Réclamation résolue"),
+        ("refund_initiated", "Remboursement initié"),
+        ("refund_completed", "Remboursement effectué"),
+        ("order_shipped", "Commande expédiée"),
+        ("order_delivered", "Commande livrée"),
+        ("order_confirmed", "Commande confirmée"),
+        ("order_rejected", "Commande rejetée"),
+        ("user_registered", "Nouvel utilisateur inscrit"),
+        ("review_submitted", "Nouvel avis soumis"),
+        ("question_submitted", "Nouvelle question soumise"),
+        ("contact_message", "Nouveau message de contact"),
     ]
 
     user = models.ForeignKey(
-        User, on_delete=models.CASCADE, related_name="notifications"
+        User,
+        on_delete=models.CASCADE,
+        related_name="notifications",
+        verbose_name="Utilisateur",
     )
-    notification_type = models.CharField(max_length=30, choices=TYPE_CHOICES)
-    title = models.CharField(max_length=200)
-    message = models.TextField()
+    notification_type = models.CharField(
+        max_length=30, choices=TYPE_CHOICES, verbose_name="Type de notification"
+    )
+    title = models.CharField(max_length=200, verbose_name="Titre")
+    message = models.TextField(verbose_name="Message")
 
-    # Related objects
-    order = models.ForeignKey(Order, on_delete=models.CASCADE, null=True, blank=True)
+    order = models.ForeignKey(
+        Order, on_delete=models.CASCADE, null=True, blank=True, verbose_name="Commande"
+    )
     invoice = models.ForeignKey(
-        Invoice, on_delete=models.CASCADE, null=True, blank=True
+        Invoice, on_delete=models.CASCADE, null=True, blank=True, verbose_name="Facture"
     )
     complaint = models.ForeignKey(
-        Complaint, on_delete=models.CASCADE, null=True, blank=True
+        Complaint,
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        verbose_name="Réclamation",
     )
-    refund = models.ForeignKey(Refund, on_delete=models.CASCADE, null=True, blank=True)
+    refund = models.ForeignKey(
+        Refund,
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        verbose_name="Remboursement",
+    )
 
-    # Add new related objects - you'll need to add these fields
     related_user = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
         null=True,
         blank=True,
         related_name="notifications_about",
+        verbose_name="Utilisateur concerné",
     )
-    review_id = models.IntegerField(null=True, blank=True)
-    question_id = models.IntegerField(null=True, blank=True)
-    contact_id = models.IntegerField(null=True, blank=True)
+    review_id = models.IntegerField(null=True, blank=True, verbose_name="ID de l'avis")
+    question_id = models.IntegerField(
+        null=True, blank=True, verbose_name="ID de la question"
+    )
+    contact_id = models.IntegerField(
+        null=True, blank=True, verbose_name="ID du contact"
+    )
 
-    is_read = models.BooleanField(default=False)
+    is_read = models.BooleanField(default=False, verbose_name="Lu")
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
         ordering = ["-created_at"]
+        verbose_name = "Notification"
+        verbose_name_plural = "Notifications"
 
     def __str__(self):
         return f"{self.get_notification_type_display()} - {self.user.username}"

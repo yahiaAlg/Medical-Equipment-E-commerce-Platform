@@ -1,7 +1,8 @@
+<!-- shipping_types.html -->
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}Shipping Types - Admin{% endblock %}
+{% block title %}Types de livraison - Admin{% endblock %}
 
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'css/admin/shipping_types.css' %}">
@@ -10,15 +11,15 @@
 {% block content %}
 <div class="admin-header">
   <div class="container">
-    <h1><i class="fas fa-truck me-2"></i>Shipping Types Management</h1>
-    <p class="mb-0">Manage available shipping methods</p>
+    <h1><i class="fas fa-truck me-2"></i>Gestion des types de livraison</h1>
+    <p class="mb-0">Gérer les méthodes de livraison disponibles</p>
   </div>
 </div>
 
 <div class="container mb-5">
   <div class="mb-3">
     <a href="{% url 'accounts:admin_dashboard' %}" class="btn btn-outline-secondary">
-      <i class="fas fa-arrow-left me-2"></i>Back to Dashboard
+      <i class="fas fa-arrow-left me-2"></i>Retour au tableau de bord
     </a>
   </div>
 
@@ -26,7 +27,7 @@
     <!-- Add New Shipping Type -->
     <div class="col-md-4">
       <div class="content-card">
-        <h3 class="mb-3">Add Shipping Type</h3>
+        <h3 class="mb-3">Ajouter type de livraison</h3>
         <form method="post">
           {% csrf_token %}
           
@@ -64,7 +65,7 @@
           </div>
 
           <button type="submit" class="btn btn-primary w-100">
-            <i class="fas fa-plus me-2"></i>Add Shipping Type
+            <i class="fas fa-plus me-2"></i>Ajouter type de livraison
           </button>
         </form>
       </div>
@@ -73,7 +74,7 @@
     <!-- Shipping Types List -->
     <div class="col-md-8">
       <div class="content-card">
-        <h3 class="mb-3">Shipping Types ({{ shipping_types.count }})</h3>
+        <h3 class="mb-3">Types de livraison ({{ shipping_types.count }})</h3>
         
         {% if shipping_types %}
         {% for shipping_type in shipping_types %}
@@ -82,8 +83,8 @@
             <h5>{{ shipping_type.name }}</h5>
             <div class="shipping-type-details">
               <span><i class="fas fa-money-bill-wave me-1"></i>{{ shipping_type.cost }} DZD</span>
-              <span><i class="fas fa-clock me-1"></i>{{ shipping_type.estimated_days }} days</span>
-              <span><i class="fas fa-sort me-1"></i>Order: {{ shipping_type.display_order }}</span>
+              <span><i class="fas fa-clock me-1"></i>{{ shipping_type.estimated_days }} jours</span>
+              <span><i class="fas fa-sort me-1"></i>Ordre : {{ shipping_type.display_order }}</span>
             </div>
             {% if shipping_type.description %}
             <p class="text-muted mb-0 mt-2">{{ shipping_type.description }}</p>
@@ -92,7 +93,7 @@
           
           <div class="d-flex gap-2 align-items-center">
             <span class="status-badge status-{% if shipping_type.is_active %}active{% else %}inactive{% endif %}">
-              {% if shipping_type.is_active %}Active{% else %}Inactive{% endif %}
+              {% if shipping_type.is_active %}Actif{% else %}Inactif{% endif %}
             </span>
             
             <div class="btn-group">
@@ -106,17 +107,17 @@
                     {% csrf_token %}
                     <button type="submit" class="dropdown-item">
                       <i class="fas fa-toggle-{% if shipping_type.is_active %}off{% else %}on{% endif %} me-2"></i>
-                      {% if shipping_type.is_active %}Deactivate{% else %}Activate{% endif %}
+                      {% if shipping_type.is_active %}Désactiver{% else %}Activer{% endif %}
                     </button>
                   </form>
                 </li>
                 <li><hr class="dropdown-divider"></li>
                 <li>
                   <form method="post" action="{% url 'accounts:admin_delete_shipping_type' shipping_type.id %}" 
-                        onsubmit="return confirm('Delete this shipping type?')">
+                        onsubmit="return confirm('Supprimer ce type de livraison ?')">
                     {% csrf_token %}
                     <button type="submit" class="dropdown-item text-danger">
-                      <i class="fas fa-trash me-2"></i>Delete
+                      <i class="fas fa-trash me-2"></i>Supprimer
                     </button>
                   </form>
                 </li>
@@ -128,7 +129,7 @@
         {% else %}
         <div class="text-center text-muted py-4">
           <i class="fas fa-inbox fa-3x mb-3"></i>
-          <p>No shipping types defined yet</p>
+          <p>Aucun type de livraison défini</p>
         </div>
         {% endif %}
       </div>

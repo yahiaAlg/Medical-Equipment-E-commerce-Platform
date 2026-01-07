@@ -1,7 +1,8 @@
+<!-- complaint_detail.html -->
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}Complaint {{ complaint.complaint_number }} - Fennec Med{% endblock %}
+{% block title %}Réclamation {{ complaint.complaint_number }} - Fennec Med{% endblock %}
 
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'css/complaint.css' %}">
@@ -14,7 +15,7 @@
     <div class="complaint-paper">
       <div class="detail-header">
         <a href="{% url "accounts:dashboard" %}" class="btn btn-outline-secondary mb-3">
-          <i class="fas fa-arrow-left"></i> Back to Invoices
+          <i class="fas fa-arrow-left"></i> Retour aux factures
         </a>
         <h1>{{ complaint.complaint_number }}</h1>
         <span class="complaint-status status-{{ complaint.status }}">
@@ -24,15 +25,15 @@
 
       <div class="info-grid">
         <div class="info-item">
-          <h3>Order Number</h3>
+          <h3>Numéro de commande</h3>
           <p>{{ complaint.order.order_id }}</p>
         </div>
         <div class="info-item">
-          <h3>Submitted On</h3>
-          <p>{{ complaint.created_at|date:"M d, Y" }}</p>
+          <h3>Soumise le</h3>
+          <p>{{ complaint.created_at|date:"d M Y" }}</p>
         </div>
         <div class="info-item">
-          <h3>Complaint Reason</h3>
+          <h3>Motif de réclamation</h3>
           <p>
             {% if complaint.reason %}
               {{ complaint.reason.name }}
@@ -43,8 +44,8 @@
         </div>
         {% if complaint.resolved_at %}
         <div class="info-item">
-          <h3>Resolved On</h3>
-          <p>{{ complaint.resolved_at|date:"M d, Y" }}</p>
+          <h3>Résolue le</h3>
+          <p>{{ complaint.resolved_at|date:"d M Y" }}</p>
         </div>
         {% endif %}
       </div>
@@ -56,12 +57,12 @@
 
       {% if complaint.attachments.exists %}
       <div class="attachments-section">
-        <h2>Attachments</h2>
+        <h2>Pièces jointes</h2>
         <div class="attachments-grid">
           {% for attachment in complaint.attachments.all %}
           <div class="attachment-item">
             <i class="fas fa-file"></i>
-            <a href="{{ attachment.file.url }}" target="_blank">View File</a>
+            <a href="{{ attachment.file.url }}" target="_blank">Voir le fichier</a>
           </div>
           {% endfor %}
         </div>
@@ -70,28 +71,28 @@
 
       {% if complaint.admin_notes or complaint.resolution_notes %}
       <div class="admin-response">
-        <h2><i class="fas fa-reply"></i> Admin Response</h2>
+        <h2><i class="fas fa-reply"></i> Réponse de l'administrateur</h2>
         
         {% if complaint.admin_notes %}
-        <h3>Admin Notes:</h3>
+        <h3>Notes de l'administrateur :</h3>
         <p>{{ complaint.admin_notes }}</p>
         {% endif %}
         
         {% if complaint.resolution_notes %}
-        <h3>Resolution:</h3>
+        <h3>Résolution :</h3>
         <p>{{ complaint.resolution_notes }}</p>
         {% endif %}
         
         {% if complaint.handled_by %}
         <p style="margin-top: 1rem; font-size: 0.875rem; color: #666;">
-          Handled by: {{ complaint.handled_by.get_full_name|default:complaint.handled_by.username }}
+          Traitée par : {{ complaint.handled_by.get_full_name|default:complaint.handled_by.username }}
         </p>
         {% endif %}
       </div>
       {% endif %}
 
       <a href="{% url 'payments:complaint_list' %}" class="back-button">
-        <i class="fas fa-arrow-left"></i> Back to Complaints
+        <i class="fas fa-arrow-left"></i> Retour aux réclamations
       </a>
     </div>
   </div>

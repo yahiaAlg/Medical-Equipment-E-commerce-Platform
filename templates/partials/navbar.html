@@ -6,23 +6,23 @@
     <div class="container px-3 px-lg-4">
       <!-- Logo -->
       <a class="navbar-brand d-flex align-items-center" href="{% url 'pages:index' %}">
-        <img src="{% static 'images/logo.png' %}" alt="Fennec Med Logo" width="32" height="32" class="me-2">
+        <img src="{% static 'images/logo.png' %}" alt="Logo Fennec Med" width="32" height="32" class="me-2">
         <span class="fw-bold fs-5">Fennec Med</span>
       </a>
 
       <!-- Desktop Navigation -->
       <ul class="navbar-nav mx-auto mb-0 d-none d-lg-flex">
         <li class="nav-item">
-          <a class="nav-link fw-medium" href="{% url 'pages:index' %}">Home</a>
+          <a class="nav-link fw-medium" href="{% url 'pages:index' %}">Accueil</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link fw-medium" href="{% url 'pages:about' %}">About Us</a>
+          <a class="nav-link fw-medium" href="{% url 'pages:about' %}">À propos</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link fw-medium" href="{% url 'products:specialties' %}">Specialties</a>
+          <a class="nav-link fw-medium" href="{% url 'products:specialties' %}">Spécialités</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link fw-medium" href="{% url 'pages:contact' %}">Contact Us</a>
+          <a class="nav-link fw-medium" href="{% url 'pages:contact' %}">Contactez-nous</a>
         </li>
         <li class="nav-item">
           <a class="nav-link fw-medium" href="{% url 'pages:faq' %}">FAQ</a>
@@ -31,7 +31,7 @@
 
       <!-- Desktop Action Buttons -->
       <div class="d-none d-lg-flex gap-2">
-        <a href="{% url 'pages:contact' %}" class="btn btn-custom-call rounded-pill">Call Us</a>
+        <a href="{% url 'pages:contact' %}" class="btn btn-custom-call rounded-pill">Appelez-nous</a>
         
         {% if user.is_authenticated %}
           <div class="dropdown">
@@ -52,22 +52,22 @@
               <li><hr class="dropdown-divider"></li>
               <li>
                 <a class="dropdown-item" href="{% url 'accounts:dashboard' %}">
-                  <i class="fas fa-tachometer-alt me-2"></i> Dashboard
+                  <i class="fas fa-tachometer-alt me-2"></i> Tableau de bord
                 </a>
               </li>
               <li>
                 <a class="dropdown-item" href="{% url 'accounts:profile' %}">
-                  <i class="fas fa-user-circle me-2"></i> Profile
+                  <i class="fas fa-user-circle me-2"></i> Profil
                 </a>
               </li>
               <li>
                 <a class="dropdown-item" href="{% url 'payments:cart' %}">
-                  <i class="fas fa-shopping-cart me-2"></i> Cart
+                  <i class="fas fa-shopping-cart me-2"></i> Panier
                 </a>
               </li>
               <li>
                 <a class="dropdown-item" href="{% url 'accounts:wishlist' %}">
-                  <i class="fas fa-heart me-2"></i> Wishlist
+                  <i class="fas fa-heart me-2"></i> Favoris
                 </a>
               </li>
               <li><hr class="dropdown-divider"></li>
@@ -75,14 +75,14 @@
                 <form method="post" action="{% url 'accounts:logout' %}">
                   {% csrf_token %}
                   <button type="submit" class="dropdown-item">
-                    <i class="fas fa-sign-out-alt me-2"></i> Logout
+                    <i class="fas fa-sign-out-alt me-2"></i> Déconnexion
                   </button>
                 </form>
               </li>
             </ul>
           </div>
         {% else %}
-          <a href="{% url 'accounts:login' %}" class="btn btn-custom-login rounded-pill">Login</a>
+          <a href="{% url 'accounts:login' %}" class="btn btn-custom-login rounded-pill">Connexion</a>
         {% endif %}
       </div>
 
@@ -95,24 +95,24 @@
       <div class="offcanvas offcanvas-start d-lg-none" tabindex="-1" id="offcanvasNavbar" aria-labelledby="offcanvasNavbarLabel">
         <div class="offcanvas-header border-bottom">
           <div class="d-flex align-items-center">
-            <img src="{% static 'images/logo.png' %}" alt="Fennec Med Logo" width="32" height="32" class="me-2">
+            <img src="{% static 'images/logo.png' %}" alt="Logo Fennec Med" width="32" height="32" class="me-2">
             <span class="fw-bold fs-5" id="offcanvasNavbarLabel">Fennec Med</span>
           </div>
-          <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+          <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Fermer"></button>
         </div>
         <div class="offcanvas-body">
           <ul class="navbar-nav mb-3">
             <li class="nav-item">
-              <a class="nav-link fw-medium py-2" href="{% url 'pages:index' %}">Home</a>
+              <a class="nav-link fw-medium py-2" href="{% url 'pages:index' %}">Accueil</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link fw-medium py-2" href="{% url 'pages:about' %}">About Us</a>
+              <a class="nav-link fw-medium py-2" href="{% url 'pages:about' %}">À propos</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link fw-medium py-2" href="{% url 'products:specialties' %}">Specialties</a>
+              <a class="nav-link fw-medium py-2" href="{% url 'products:specialties' %}">Spécialités</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link fw-medium py-2" href="{% url 'pages:contact' %}">Contact Us</a>
+              <a class="nav-link fw-medium py-2" href="{% url 'pages:contact' %}">Contactez-nous</a>
             </li>
             <li class="nav-item">
               <a class="nav-link fw-medium py-2" href="{% url 'pages:faq' %}">FAQ</a>
@@ -120,19 +120,19 @@
           </ul>
           
           <div class="d-flex flex-column gap-2">
-            <a href="{% url 'pages:contact' %}" class="btn btn-custom-call rounded-pill">Call Us</a>
+            <a href="{% url 'pages:contact' %}" class="btn btn-custom-call rounded-pill">Appelez-nous</a>
             
             {% if user.is_authenticated %}
-              <a href="{% url 'accounts:dashboard' %}" class="btn btn-outline-primary rounded-pill">Dashboard</a>
-              <a href="{% url 'accounts:profile' %}" class="btn btn-outline-primary rounded-pill">Profile</a>
-              <a href="{% url 'payments:cart' %}" class="btn btn-outline-primary rounded-pill">Cart</a>
-              <a href="{% url 'accounts:wishlist' %}" class="btn btn-outline-primary rounded-pill">Wishlist</a>
+              <a href="{% url 'accounts:dashboard' %}" class="btn btn-outline-primary rounded-pill">Tableau de bord</a>
+              <a href="{% url 'accounts:profile' %}" class="btn btn-outline-primary rounded-pill">Profil</a>
+              <a href="{% url 'payments:cart' %}" class="btn btn-outline-primary rounded-pill">Panier</a>
+              <a href="{% url 'accounts:wishlist' %}" class="btn btn-outline-primary rounded-pill">Favoris</a>
               <form method="post" action="{% url 'accounts:logout' %}">
                 {% csrf_token %}
-                <button type="submit" class="btn btn-outline-secondary rounded-pill w-100">Logout</button>
+                <button type="submit" class="btn btn-outline-secondary rounded-pill w-100">Déconnexion</button>
               </form>
             {% else %}
-              <a href="{% url 'accounts:login' %}" class="btn btn-custom-login rounded-pill">Login</a>
+              <a href="{% url 'accounts:login' %}" class="btn btn-custom-login rounded-pill">Connexion</a>
             {% endif %}
           </div>
         </div>

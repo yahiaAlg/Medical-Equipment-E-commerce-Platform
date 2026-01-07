@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}Complaints Management - Admin{% endblock %}
+{% block title %}Gestion des réclamations - Admin{% endblock %}
 
 {% block extra_css %}
   <link rel="stylesheet" href="{% static 'css/admin/complaints_management.css' %}">
@@ -10,18 +10,18 @@
 {% block content %}
 <div class="admin-header">
   <div class="container">
-    <h1><i class="fas fa-flag me-2"></i>Complaints Management</h1>
-    <p class="mb-0">Review and resolve customer complaints</p>
+    <h1><i class="fas fa-flag me-2"></i>Gestion des réclamations</h1>
+    <p class="mb-0">Examiner et résoudre les réclamations des clients</p>
   </div>
 </div>
 
 <div class="container mb-5">
   <div class="mb-3">
     <a href="{% url 'accounts:admin_dashboard' %}" class="btn btn-outline-secondary">
-      <i class="fas fa-arrow-left me-2"></i>Back to Dashboard
+      <i class="fas fa-arrow-left me-2"></i>Retour au tableau de bord
     </a>
     <a href="{% url 'accounts:admin_complaint_reasons' %}" class="btn btn-outline-primary">
-      <i class="fas fa-cog me-2"></i>Manage Complaint Reasons
+      <i class="fas fa-cog me-2"></i>Gérer les motifs de réclamation
     </a>
   </div>
 
@@ -29,19 +29,19 @@
   <div class="stat-row">
     <div class="mini-stat">
       <div class="number">{{ complaint_stats.total }}</div>
-      <div class="label">Total Complaints</div>
+      <div class="label">Total des réclamations</div>
     </div>
     <div class="mini-stat">
       <div class="number">{{ complaint_stats.open }}</div>
-      <div class="label">Open</div>
+      <div class="label">Ouvertes</div>
     </div>
     <div class="mini-stat">
       <div class="number">{{ complaint_stats.in_review }}</div>
-      <div class="label">In Review</div>
+      <div class="label">En cours d'examen</div>
     </div>
     <div class="mini-stat">
       <div class="number">{{ complaint_stats.resolved }}</div>
-      <div class="label">Resolved</div>
+      <div class="label">Résolues</div>
     </div>
   </div>
 
@@ -49,19 +49,19 @@
   <div class="filter-bar">
     <form method="get" class="row g-3">
       <div class="col-md-10">
-        <label class="form-label">Status</label>
+        <label class="form-label">Statut</label>
         <select name="status" class="form-select">
-          <option value="all" {% if status_filter == 'all' %}selected{% endif %}>All Complaints</option>
-          <option value="open" {% if status_filter == 'open' %}selected{% endif %}>Open</option>
-          <option value="in_review" {% if status_filter == 'in_review' %}selected{% endif %}>In Review</option>
-          <option value="awaiting_user" {% if status_filter == 'awaiting_user' %}selected{% endif %}>Awaiting User</option>
-          <option value="resolved" {% if status_filter == 'resolved' %}selected{% endif %}>Resolved</option>
-          <option value="rejected" {% if status_filter == 'rejected' %}selected{% endif %}>Rejected</option>
+          <option value="all" {% if status_filter == 'all' %}selected{% endif %}>Toutes les réclamations</option>
+          <option value="open" {% if status_filter == 'open' %}selected{% endif %}>Ouvertes</option>
+          <option value="in_review" {% if status_filter == 'in_review' %}selected{% endif %}>En cours d'examen</option>
+          <option value="awaiting_user" {% if status_filter == 'awaiting_user' %}selected{% endif %}>En attente de l'utilisateur</option>
+          <option value="resolved" {% if status_filter == 'resolved' %}selected{% endif %}>Résolues</option>
+          <option value="rejected" {% if status_filter == 'rejected' %}selected{% endif %}>Rejetées</option>
         </select>
       </div>
       <div class="col-md-2 d-flex align-items-end">
         <button type="submit" class="btn btn-primary w-100">
-          <i class="fas fa-search me-2"></i>Filter
+          <i class="fas fa-search me-2"></i>Filtrer
         </button>
       </div>
     </form>
@@ -70,20 +70,20 @@
   <!-- Complaints Table -->
   <div class="table-container">
     <div class="d-flex justify-content-between align-items-center mb-3">
-      <h5 class="mb-0">Complaints List ({{ complaints.count }})</h5>
+      <h5 class="mb-0">Liste des réclamations ({{ complaints.count }})</h5>
     </div>
 
     <div class="table-responsive">
       <table class="table table-hover">
         <thead>
           <tr>
-            <th>Complaint #</th>
-            <th>Customer</th>
-            <th>Order #</th>
-            <th>Reason</th>
+            <th>N° de réclamation</th>
+            <th>Client</th>
+            <th>N° de commande</th>
+            <th>Motif</th>
             <th>Description</th>
             <th>Date</th>
-            <th>Status</th>
+            <th>Statut</th>
             <th>Actions</th>
           </tr>
         </thead>
@@ -102,13 +102,13 @@
               {% elif complaint.custom_reason %}
                 {{ complaint.custom_reason }}
               {% else %}
-                <em class="text-muted">Not specified</em>
+                <em class="text-muted">Non spécifié</em>
               {% endif %}
             </td>
             <td>
               <small>{{ complaint.description|truncatewords:15 }}</small>
             </td>
-            <td>{{ complaint.created_at|date:"M d, Y" }}</td>
+            <td>{{ complaint.created_at|date:"d M Y" }}</td>
             <td>
               <span class="status-badge status-{{ complaint.status }}">
                 {{ complaint.get_status_display }}
@@ -117,13 +117,13 @@
             <td>
               <a href="{% url 'accounts:admin_complaint_detail' complaint.id %}" 
                  class="btn btn-sm btn-primary">
-                <i class="fas fa-eye"></i> View
+                <i class="fas fa-eye"></i> Voir
               </a>
             </td>
           </tr>
           {% empty %}
           <tr>
-            <td colspan="8" class="text-center text-muted py-4">No complaints found</td>
+            <td colspan="8" class="text-center text-muted py-4">Aucune réclamation trouvée</td>
           </tr>
           {% endfor %}
         </tbody>

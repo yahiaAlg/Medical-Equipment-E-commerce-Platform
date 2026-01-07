@@ -3,16 +3,18 @@ from ...models import ContactMessage, FAQ, Testimonial, SiteInformation
 
 
 class Command(BaseCommand):
-    help = "Seeds contact messages, FAQs, testimonials, and site information"
+    help = (
+        "Initialise les messages de contact, FAQ, témoignages et informations du site"
+    )
 
     def handle(self, *args, **kwargs):
-        self.stdout.write("Seeding contact data...")
+        self.stdout.write("Initialisation des données de contact...")
 
         # Create or update Site Information
         site_info = SiteInformation.get_instance()
         site_info.company_name = "Fennec Med"
         site_info.tva_rate = 0.05
-        site_info.tagline = "Providing quality medical materials to families across the region since 2022"
+        site_info.tagline = "Fournisseur de matériel médical de qualité aux familles de la région depuis 2022"
         site_info.phone = "03 9591 5378"
         site_info.fax = "03 7068 5073"
         site_info.email = "admin@newbaymedical.com.au"
@@ -21,73 +23,73 @@ class Command(BaseCommand):
         site_info.instagram_url = "#"
         site_info.whatsapp_url = "#"
         site_info.youtube_url = "#"
-        site_info.about_text = """We believe that obtaining medical supplies should be both easy and reliable. 
-        From the moment you reach out to us, you'll experience a seamless process with a warm and supportive team. 
-        Our commitment to excellence means that we're constantly evolving, ensuring you receive the best products 
-        and service possible."""
+        site_info.about_text = """Nous croyons que l'obtention de fournitures médicales doit être à la fois simple et fiable. 
+        Dès que vous nous contactez, vous bénéficiez d'un processus fluide avec une équipe chaleureuse et attentionnée. 
+        Notre engagement envers l'excellence signifie que nous évoluons constamment, afin de vous garantir les meilleurs produits 
+        et le meilleur service possible."""
         site_info.save()
-        self.stdout.write("Created/Updated site information")
+        self.stdout.write("Informations du site créées/mises à jour")
 
         # Create FAQs
         faqs_data = [
             {
                 "category": "ordering",
-                "question": "How do I place a bulk order?",
-                "answer": "You can place bulk orders directly through our website. Add products to cart and quantities of 10+ automatically receive bulk pricing discounts. For orders over $10,000, contact our sales team for additional discounts.",
+                "question": "Comment passer une commande en gros ?",
+                "answer": "Vous pouvez passer des commandes en gros directement via notre site web. Ajoutez des produits au panier et les quantités de 10+ bénéficient automatiquement de remises sur les prix en gros. Pour les commandes supérieures à 10 000 $, contactez notre équipe commerciale pour des remises supplémentaires.",
                 "order": 1,
             },
             {
                 "category": "ordering",
-                "question": "Do you offer leasing options?",
-                "answer": "Yes, we offer flexible leasing options for equipment purchases. Contact our financing department to discuss terms and requirements.",
+                "question": "Proposez-vous des options de location ?",
+                "answer": "Oui, nous proposons des options de location flexibles pour l'achat d'équipements. Contactez notre service de financement pour discuter des conditions et des exigences.",
                 "order": 2,
             },
             {
                 "category": "shipping",
-                "question": "What are your shipping times?",
-                "answer": "Standard shipping takes 5-7 business days. Expedited shipping (2-3 days) and next-day delivery are available for urgent orders.",
+                "question": "Quels sont vos délais de livraison ?",
+                "answer": "La livraison standard prend 5 à 7 jours ouvrables. La livraison express (2-3 jours) et la livraison le lendemain sont disponibles pour les commandes urgentes.",
                 "order": 1,
             },
             {
                 "category": "shipping",
-                "question": "Do you ship internationally?",
-                "answer": "Yes, we ship to most countries worldwide. International shipping times vary by destination, typically 10-15 business days.",
+                "question": "Livrez-vous à l'international ?",
+                "answer": "Oui, nous livrons dans la plupart des pays du monde. Les délais de livraison internationale varient selon la destination, généralement 10 à 15 jours ouvrables.",
                 "order": 2,
             },
             {
                 "category": "technical",
-                "question": "Do your products come with installation support?",
-                "answer": "All major equipment includes installation guides. Professional installation services are available for an additional fee.",
+                "question": "Vos produits sont-ils livrés avec un support d'installation ?",
+                "answer": "Tous les équipements majeurs incluent des guides d'installation. Des services d'installation professionnelle sont disponibles moyennant des frais supplémentaires.",
                 "order": 1,
             },
             {
                 "category": "technical",
-                "question": "What kind of training do you provide?",
-                "answer": "We offer comprehensive training programs including online tutorials, in-person training, and ongoing technical support.",
+                "question": "Quel type de formation proposez-vous ?",
+                "answer": "Nous proposons des programmes de formation complets incluant des tutoriels en ligne, des formations en présentiel et un support technique continu.",
                 "order": 2,
             },
             {
                 "category": "warranty",
-                "question": "What is covered under warranty?",
-                "answer": "Our warranty covers manufacturing defects and equipment failures under normal use. Extended warranty options are available.",
+                "question": "Que couvre la garantie ?",
+                "answer": "Notre garantie couvre les défauts de fabrication et les pannes d'équipement dans des conditions d'utilisation normale. Des options de garantie étendue sont disponibles.",
                 "order": 1,
             },
             {
                 "category": "warranty",
-                "question": "How do I claim warranty service?",
-                "answer": "Contact our support team with your order number and issue description. We will arrange repair or replacement as appropriate.",
+                "question": "Comment faire valoir la garantie ?",
+                "answer": "Contactez notre équipe d'assistance avec votre numéro de commande et la description du problème. Nous organiserons une réparation ou un remplacement selon le cas.",
                 "order": 2,
             },
             {
                 "category": "returns",
-                "question": "What is your return policy?",
-                "answer": "30-day return policy on most items. Equipment must be unused and in original packaging. Custom orders are non-returnable.",
+                "question": "Quelle est votre politique de retour ?",
+                "answer": "Politique de retour de 30 jours sur la plupart des articles. L'équipement doit être inutilisé et dans son emballage d'origine. Les commandes personnalisées ne sont pas remboursables.",
                 "order": 1,
             },
             {
                 "category": "returns",
-                "question": "How do I initiate a return?",
-                "answer": "Contact customer service to receive a return authorization number. Ship the item back with all original packaging and documentation.",
+                "question": "Comment initier un retour ?",
+                "answer": "Contactez le service client pour recevoir un numéro d'autorisation de retour. Renvoyez l'article avec tout l'emballage et la documentation d'origine.",
                 "order": 2,
             },
         ]
@@ -95,47 +97,47 @@ class Command(BaseCommand):
         for faq_data in faqs_data:
             FAQ.objects.get_or_create(question=faq_data["question"], defaults=faq_data)
 
-        self.stdout.write(f"Created {len(faqs_data)} FAQs")
+        self.stdout.write(f"{len(faqs_data)} FAQ créées")
 
         # Create Testimonials
         testimonials_data = [
             {
-                "name": "John Doe",
-                "position": "Customer",
+                "name": "Jean Dupont",
+                "position": "Client",
                 "company": "",
-                "content": "The products are of high quality and the service is excellent. Highly recommend!",
+                "content": "Les produits sont de grande qualité et le service est excellent. Je recommande vivement !",
                 "rating": 5,
                 "is_featured": True,
             },
             {
-                "name": "Jane Smith",
-                "position": "Customer",
+                "name": "Marie Dubois",
+                "position": "Cliente",
                 "company": "",
-                "content": "Great experience with Fennec Med. The staff is very knowledgeable and helpful.",
+                "content": "Excellente expérience avec Fennec Med. Le personnel est très compétent et serviable.",
                 "rating": 5,
                 "is_featured": True,
             },
             {
-                "name": "Robert Johnson",
-                "position": "Customer",
+                "name": "Pierre Martin",
+                "position": "Client",
                 "company": "",
-                "content": "I've been using their medical supplies for years and have always been satisfied.",
+                "content": "J'utilise leurs fournitures médicales depuis des années et j'ai toujours été satisfait.",
                 "rating": 5,
                 "is_featured": True,
             },
             {
-                "name": "Dr. Robert Martinez",
-                "position": "Chief of Cardiology",
-                "company": "Metro General Hospital",
-                "content": "Outstanding quality equipment and exceptional customer service. The diagnostic tools have significantly improved our patient care capabilities.",
+                "name": "Dr Robert Martinez",
+                "position": "Chef de cardiologie",
+                "company": "Hôpital général métropolitain",
+                "content": "Équipement de qualité exceptionnelle et service client exceptionnel. Les outils de diagnostic ont considérablement amélioré nos capacités de soins aux patients.",
                 "rating": 5,
                 "is_featured": False,
             },
             {
                 "name": "Lisa Thompson",
-                "position": "Pharmacy Manager",
-                "company": "HealthPlus Pharmacy Chain",
-                "content": "We have been ordering from this supplier for over 3 years. Reliable, competitive pricing, and fast delivery every time.",
+                "position": "Responsable de pharmacie",
+                "company": "Chaîne de pharmacies HealthPlus",
+                "content": "Nous commandons auprès de ce fournisseur depuis plus de 3 ans. Fiable, prix compétitifs et livraison rapide à chaque fois.",
                 "rating": 5,
                 "is_featured": False,
             },
@@ -146,32 +148,32 @@ class Command(BaseCommand):
                 name=test_data["name"], defaults=test_data
             )
 
-        self.stdout.write(f"Created {len(testimonials_data)} testimonials")
+        self.stdout.write(f"{len(testimonials_data)} témoignages créés")
 
         # Create sample contact messages
         messages_data = [
             {
-                "name": "John Smith",
-                "email": "john.smith@hospital.com",
-                "phone": "+1-555-0101",
+                "name": "Jean Bertrand",
+                "email": "jean.bertrand@hopital.com",
+                "phone": "+33 1 55 01 01 01",
                 "inquiry_type": "general",
-                "subject": "Interested in bulk pricing",
-                "message": "We are looking to purchase diagnostic equipment for our new wing. Could you provide information on bulk discounts?",
+                "subject": "Intéressé par les tarifs en gros",
+                "message": "Nous cherchons à acheter des équipements de diagnostic pour notre nouvelle aile. Pourriez-vous fournir des informations sur les remises en gros ?",
             },
             {
-                "name": "Sarah Johnson",
-                "email": "sarah.j@clinic.com",
-                "phone": "+1-555-0102",
+                "name": "Sophie Leroy",
+                "email": "sophie.l@clinique.com",
+                "phone": "+33 1 55 01 01 02",
                 "inquiry_type": "technical",
-                "subject": "Equipment installation question",
-                "message": "Do you provide installation services for the ultrasound machines? What are the requirements?",
+                "subject": "Question sur l'installation d'équipement",
+                "message": "Proposez-vous des services d'installation pour les appareils d'échographie ? Quelles sont les exigences ?",
             },
             {
-                "name": "David Lee",
-                "email": "dlee@pharmacy.com",
+                "name": "David Moreau",
+                "email": "dmoreau@pharmacie.com",
                 "inquiry_type": "partnership",
-                "subject": "Partnership opportunity",
-                "message": "Our pharmacy chain is interested in establishing a long-term partnership. Please contact us to discuss.",
+                "subject": "Opportunité de partenariat",
+                "message": "Notre chaîne de pharmacies est intéressée par l'établissement d'un partenariat à long terme. Veuillez nous contacter pour en discuter.",
             },
         ]
 
@@ -180,5 +182,7 @@ class Command(BaseCommand):
                 email=msg_data["email"], subject=msg_data["subject"], defaults=msg_data
             )
 
-        self.stdout.write(f"Created {len(messages_data)} contact messages")
-        self.stdout.write(self.style.SUCCESS("Successfully seeded contact data!"))
+        self.stdout.write(f"{len(messages_data)} messages de contact créés")
+        self.stdout.write(
+            self.style.SUCCESS("Données de contact initialisées avec succès !")
+        )

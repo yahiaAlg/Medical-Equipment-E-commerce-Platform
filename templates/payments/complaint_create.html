@@ -1,7 +1,8 @@
+<!-- complaint_create.html -->
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}Submit Complaint - Fennec Med{% endblock %}
+{% block title %}Soumettre une réclamation - Fennec Med{% endblock %}
 
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'css/complaint.css' %}">
@@ -12,14 +13,14 @@
   <div class="complaint-container">
     <div class="complaint-card">
       <div class="complaint-header">
-        <h1>Submit a Complaint</h1>
-        <p>We're here to help resolve any issues you may have</p>
+        <h1>Soumettre une réclamation</h1>
+        <p>Nous sommes là pour vous aider à résoudre tout problème</p>
       </div>
 
       <div class="order-info-box">
-        <p><strong>Order:</strong> {{ order.order_id }}</p>
-        <p><strong>Order Date:</strong> {{ order.created_at|date:"M d, Y" }}</p>
-        <p><strong>Total:</strong> {{ order.total_amount|floatformat:2 }} DZD</p>
+        <p><strong>Commande :</strong> {{ order.order_id }}</p>
+        <p><strong>Date de commande :</strong> {{ order.created_at|date:"d M Y" }}</p>
+        <p><strong>Total :</strong> {{ order.total_amount|floatformat:2 }} DZD</p>
       </div>
 
       <form method="post" enctype="multipart/form-data">
@@ -39,7 +40,7 @@
           {% if form.custom_reason.errors %}
             <div class="error-message">{{ form.custom_reason.errors }}</div>
           {% endif %}
-          <p class="help-text">Only fill this if you selected "Other" as the reason</p>
+          <p class="help-text">Remplissez uniquement si vous avez sélectionné "Autre" comme raison</p>
         </div>
 
         <div class="form-group">
@@ -48,21 +49,21 @@
           {% if form.description.errors %}
             <div class="error-message">{{ form.description.errors }}</div>
           {% endif %}
-          <p class="help-text">Please provide as much detail as possible</p>
+          <p class="help-text">Veuillez fournir autant de détails que possible</p>
         </div>
 
         <div class="form-group">
-          <label>Attachments (Optional)</label>
+          <label>Pièces jointes (Optionnel)</label>
           <div class="file-upload-group">
             <i class="fas fa-paperclip"></i>
-            <p><strong>Upload supporting files</strong></p>
-            <p class="help-text">Images, videos, or PDFs (max 10MB each)</p>
+            <p><strong>Télécharger des fichiers justificatifs</strong></p>
+            <p class="help-text">Images, vidéos ou PDF (max 10 Mo chacun)</p>
             <input type="file" name="attachments" multiple accept="image/*,video/*,application/pdf" class="form-control mt-2">
           </div>
         </div>
 
         <button type="submit" class="submit-button">
-          <i class="fas fa-paper-plane"></i> Submit Complaint
+          <i class="fas fa-paper-plane"></i> Soumettre la réclamation
         </button>
       </form>
     </div>

@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% load static %}
 
-{% block title %}Medical Specialties - Fennec Med{% endblock %}
+{% block title %}Spécialités médicales - Fennec Med{% endblock %}
 
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'css/specialties.css' %}">
@@ -11,8 +11,8 @@
 <!-- Services Header -->
 <div class="services-header">
   <div class="services-header-content">
-    <h1>Our Medical Specialties</h1>
-    <p>Quality medical supplies and equipment tailored to your specialty needs</p>
+    <h1>Nos spécialités médicales</h1>
+    <p>Fournitures et équipements médicaux de qualité adaptés aux besoins de votre spécialité</p>
 
     <!-- Search and Filter -->
     <div class="search-filter-section">
@@ -21,19 +21,19 @@
           <input
             type="text"
             name="q"
-            placeholder="Search Services..."
+            placeholder="Rechercher des services..."
             class="search-input"
             value="{{ query|default:'' }}"
           />
           <button type="submit" class="search-btn">
-            <img src="{% static 'images/specialties-search.png' %}" alt="Search" />
+            <img src="{% static 'images/specialties-search.png' %}" alt="Rechercher" />
           </button>
         </form>
       </div>
 
       <div class="filter-tabs">
-        <a href="{% url 'products:list' %}" class="filter-tab {% if not current_filters.category %}active{% endif %}">All</a>
-        <a href="{% url 'products:list' %}?availability=in_stock" class="filter-tab {% if current_filters.availability == 'in_stock' %}active{% endif %}">In Stock</a>
+        <a href="{% url 'products:list' %}" class="filter-tab {% if not current_filters.category %}active{% endif %}">Tout</a>
+        <a href="{% url 'products:list' %}?availability=in_stock" class="filter-tab {% if current_filters.availability == 'in_stock' %}active{% endif %}">En stock</a>
         {% for category in categories|slice:":3" %}
         <a href="{% url 'products:category' category.slug %}" class="filter-tab">{{ category.name }}</a>
         {% endfor %}
@@ -50,35 +50,35 @@
       <div class="service-card">
         <div class="service-icon">
           {% if category.image %}
-            <img src="{{ category.image.url }}" alt="{{ category.name }} Icon" />
+            <img src="{{ category.image.url }}" alt="Icône {{ category.name }}" />
           {% else %}
-            <img src="{% static 'images/specialties-'|add:category.slug|add:'.png' %}" alt="{{ category.name }} Icon" />
+            <img src="{% static 'images/specialties-'|add:category.slug|add:'.png' %}" alt="Icône {{ category.name }}" />
           {% endif %}
         </div>
         <h3>{{ category.name }}</h3>
         <p class="service-description">
-          {{ category.description|default:"Quality medical equipment and supplies"|truncatewords:10 }}
+          {{ category.description|default:"Équipements et fournitures médicales de qualité"|truncatewords:10 }}
         </p>
         <p class="service-count">
-          {{ category.products.count }} Product{{ category.products.count|pluralize }}
+          {{ category.products.count }} Produit{{ category.products.count|pluralize }}
         </p>
         <div class="service-rating">
           <span class="rating-stars">★★★★★</span>
           <span class="rating-text">4.9/5</span>
         </div>
         <button class="service-btn">
-          <a href="{% url 'products:list' %}?category={{ category.slug }}">Browse</a>
+          <a href="{% url 'products:list' %}?category={{ category.slug }}">Parcourir</a>
         </button>
       </div>
       {% empty %}
-      <p>No categories available at the moment.</p>
+      <p>Aucune catégorie disponible pour le moment.</p>
       {% endfor %}
     </div>
 
     <!-- Load More Button -->
     {% if page_obj.has_next %}
     <div class="load-more-section">
-      <a href="?page={{ page_obj.next_page_number }}" class="load-more-btn">Load More</a>
+      <a href="?page={{ page_obj.next_page_number }}" class="load-more-btn">Charger plus</a>
     </div>
     {% endif %}
   </div>

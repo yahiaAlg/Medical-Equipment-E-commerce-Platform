@@ -18,15 +18,15 @@ class UserProfileAdmin(admin.ModelAdmin):
 
     fieldsets = (
         (
-            "User Information",
+            "Informations utilisateur",
             {"fields": ("user", "user_type", "avatar", "date_of_birth")},
         ),
         (
-            "Contact Details",
+            "Coordonnées",
             {"fields": ("phone", "address", "city", "state", "zip_code", "country")},
         ),
         (
-            "Timestamps",
+            "Horodatage",
             {"fields": ("created_at", "updated_at"), "classes": ("collapse",)},
         ),
     )
@@ -55,9 +55,9 @@ class PharmacyProfileAdmin(admin.ModelAdmin):
     list_editable = ("verified",)
 
     fieldsets = (
-        ("User", {"fields": ("user",)}),
+        ("Utilisateur", {"fields": ("user",)}),
         (
-            "Pharmacy Information",
+            "Informations pharmacie",
             {
                 "fields": (
                     "pharmacy_name",
@@ -67,7 +67,7 @@ class PharmacyProfileAdmin(admin.ModelAdmin):
                 )
             },
         ),
-        ("Verification", {"fields": ("verified", "verification_documents")}),
+        ("Vérification", {"fields": ("verified", "verification_documents")}),
     )
 
     def get_queryset(self, request):
@@ -95,10 +95,13 @@ class ClinicProfileAdmin(admin.ModelAdmin):
     readonly_fields = ("user",)
 
     fieldsets = (
-        ("User", {"fields": ("user",)}),
-        ("Clinic Information", {"fields": ("clinic_name", "department", "position")}),
+        ("Utilisateur", {"fields": ("user",)}),
         (
-            "Employment Details",
+            "Informations clinique",
+            {"fields": ("clinic_name", "department", "position")},
+        ),
+        (
+            "Détails d'emploi",
             {"fields": ("employee_id", "supervisor_email", "budget_limit")},
         ),
     )
@@ -129,9 +132,9 @@ class DoctorProfileAdmin(admin.ModelAdmin):
     list_editable = ("verified",)
 
     fieldsets = (
-        ("User", {"fields": ("user",)}),
+        ("Utilisateur", {"fields": ("user",)}),
         (
-            "Professional Information",
+            "Informations professionnelles",
             {
                 "fields": (
                     "medical_license",
@@ -141,7 +144,7 @@ class DoctorProfileAdmin(admin.ModelAdmin):
                 )
             },
         ),
-        ("Credentials & Verification", {"fields": ("credentials", "verified")}),
+        ("Diplômes et vérification", {"fields": ("credentials", "verified")}),
     )
 
     def get_queryset(self, request):

@@ -2,7 +2,7 @@
 {% load static %}
 
 {% block title %}
-{% if current_filters.category %}{{ current_filters.category|title }} Products{% else %}All Products{% endif %} - Fennec Med
+{% if current_filters.category %}Produits {{ current_filters.category|title }}{% else %}Tous les produits{% endif %} - Fennec Med
 {% endblock %}
 
 {% block extra_css %}
@@ -14,21 +14,21 @@
 <!-- Services Header -->
 <div class="services-header">
   <div class="services-header-content">
-    <h1>{% if current_filters.category %}{{ current_filters.category|title }}{% else %}All{% endif %} Medical Products</h1>
-    <p>Quality medical supplies and equipment tailored to your needs</p>
+    <h1>Produits médicaux {% if current_filters.category %}{{ current_filters.category|title }}{% endif %}</h1>
+    <p>Fournitures et équipements médicaux de qualité adaptés à vos besoins</p>
 
     <div class="search-filter-section">
       <div class="search-container">
         <form method="get" action="{% url 'products:search' %}">
-          <input type="text" name="q" placeholder="Search Products..." class="search-input" />
+          <input type="text" name="q" placeholder="Rechercher des produits..." class="search-input" />
           <button type="submit" class="search-btn">
-            <img src="{% static 'images/specialties-search.png' %}" alt="Search" />
+            <img src="{% static 'images/specialties-search.png' %}" alt="Rechercher" />
           </button>
         </form>
       </div>
 
       <div class="filter-tabs">
-        <a href="{% url 'products:list' %}" class="filter-tab {% if not current_filters.category %}active{% endif %}">All</a>
+        <a href="{% url 'products:list' %}" class="filter-tab {% if not current_filters.category %}active{% endif %}">Tout</a>
         {% for category in categories|slice:":4" %}
         <a href="{% url 'products:list' %}?category={{ category.slug }}" class="filter-tab {% if current_filters.category == category.slug %}active{% endif %}">{{ category.name }}</a>
         {% endfor %}
@@ -40,10 +40,10 @@
 <div class="main-container">
   <aside class="sidebar">
     <div class="filter-section">
-      <h3>Filter By</h3>
+      <h3>Filtrer par</h3>
 
       <div class="filter-group">
-        <h4>Categories</h4>
+        <h4>Catégories</h4>
         <div class="filter-options">
           {% for category in categories %}
           <label>
@@ -55,7 +55,7 @@
       </div>
 
       <div class="filter-group">
-        <h4>Brands</h4>
+        <h4>Marques</h4>
         <div class="filter-options">
           {% for brand in brands|slice:":5" %}
           <label>
@@ -67,21 +67,21 @@
       </div>
 
       <div class="filter-group">
-        <h4>Availability</h4>
+        <h4>Disponibilité</h4>
         <div class="filter-options">
           <label>
             <input type="checkbox" onchange="location.href='{% url 'products:list' %}?availability=in_stock'" {% if current_filters.availability == 'in_stock' %}checked{% endif %} />
-            In Stock
+            En stock
           </label>
           <label>
             <input type="checkbox" onchange="location.href='{% url 'products:list' %}?availability=pre_order'" {% if current_filters.availability == 'pre_order' %}checked{% endif %} />
-            Pre-order
+            Précommande
           </label>
         </div>
       </div>
 
       <div class="filter-group">
-        <h4>Price Range</h4>
+        <h4>Plage de prix</h4>
         <div class="price-range-container">
           <div class="price-inputs">
             <input type="number" id="price-min" class="price-input" 
@@ -106,11 +106,11 @@
                 max="{{ max_price_all }}" 
                 value="{{ current_filters.price_max|default:max_price_all }}"
                 step="{{ price_step }}">
-          <button class="apply-price-filter">Apply</button>
+          <button class="apply-price-filter">Appliquer</button>
         </div>
       </div>
 
-      <button class="apply-filters" onclick="location.href='{% url 'products:list' %}'">Clear Filters</button>
+      <button class="apply-filters" onclick="location.href='{% url 'products:list' %}'">Effacer les filtres</button>
     </div>
   </aside>
 
@@ -118,11 +118,11 @@
     <div class="product-sort">
       <div class="sort-options">
         <select onchange="location.href='?sort=' + this.value + '{% if current_filters.category %}&category={{ current_filters.category }}{% endif %}'">
-          <option value="name" {% if current_filters.sort == 'name' %}selected{% endif %}>Default</option>
-          <option value="price_low" {% if current_filters.sort == 'price_low' %}selected{% endif %}>Price: Low to High</option>
-          <option value="price_high" {% if current_filters.sort == 'price_high' %}selected{% endif %}>Price: High to Low</option>
-          <option value="rating" {% if current_filters.sort == 'rating' %}selected{% endif %}>Top Rated</option>
-          <option value="newest" {% if current_filters.sort == 'newest' %}selected{% endif %}>Newest</option>
+          <option value="name" {% if current_filters.sort == 'name' %}selected{% endif %}>Par défaut</option>
+          <option value="price_low" {% if current_filters.sort == 'price_low' %}selected{% endif %}>Prix : Croissant</option>
+          <option value="price_high" {% if current_filters.sort == 'price_high' %}selected{% endif %}>Prix : Décroissant</option>
+          <option value="rating" {% if current_filters.sort == 'rating' %}selected{% endif %}>Mieux notés</option>
+          <option value="newest" {% if current_filters.sort == 'newest' %}selected{% endif %}>Plus récents</option>
         </select>
       </div>
     </div>
@@ -173,17 +173,17 @@
               <form class="add-to-cart-form">
                 {% csrf_token %}
                 <input type="hidden" name="product_id" value="{{ product.id }}">
-                <button type="submit" class="add-to-cart">Add to Cart</button>
+                <button type="submit" class="add-to-cart">Ajouter au panier</button>
               </form>
             </div>
         </div>
       {% empty %}
-        <p>No products available in this category.</p>
+        <p>Aucun produit disponible dans cette catégorie.</p>
       {% endfor %}
     </div>
 
     {% if page_obj.has_next %}
-    <button class="load-more" onclick="location.href='?page={{ page_obj.next_page_number }}{% if current_filters.category %}&category={{ current_filters.category }}{% endif %}'">Load More</button>
+    <button class="load-more" onclick="location.href='?page={{ page_obj.next_page_number }}{% if current_filters.category %}&category={{ current_filters.category }}{% endif %}'">Charger plus</button>
     {% endif %}
   </main>
 </div>
@@ -221,7 +221,7 @@
               .then(response => response.json())
               .then(data => {
                   if (data.success) {
-                      button.innerText = 'Added!';
+                      button.innerText = 'Ajouté !';
                       button.style.backgroundColor = '#28a745';
 
                       // Update cart count in navbar if element exists
@@ -235,7 +235,7 @@
                           button.style.backgroundColor = '';
                       }, 2000);
                   } else {
-                      button.innerText = 'Error!';
+                      button.innerText = 'Erreur !';
                       button.style.backgroundColor = '#dc3545';
                       setTimeout(() => {
                           button.innerText = originalText;
@@ -244,8 +244,8 @@
                   }
               })
               .catch(error => {
-                  console.error('Error:', error);
-                  button.innerText = 'Error!';
+                  console.error('Erreur :', error);
+                  button.innerText = 'Erreur !';
                   button.style.backgroundColor = '#dc3545';
                   setTimeout(() => {
                       button.innerText = originalText;

@@ -8,22 +8,24 @@ class ContactForm(forms.ModelForm):
     class Meta:
         model = ContactMessage
         labels = {
-            "name": "Full Name",
-            "email": "Email Address",
-            "phone": "Phone Number",
-            "inquiry_type": "Type of Inquiry",
-            "subject": "Subject",
-            "message": "Your Message",
+            "name": "Nom complet",
+            "email": "Adresse e-mail",
+            "phone": "Numéro de téléphone",
+            "inquiry_type": "Type de demande",
+            "subject": "Sujet",
+            "message": "Votre message",
         }
         fields = ["name", "email", "phone", "inquiry_type", "subject", "message"]
         widgets = {
-            "name": forms.TextInput(attrs={"placeholder": "Full Name"}),
-            "email": forms.EmailInput(attrs={"placeholder": "Email Address"}),
-            "phone": forms.TextInput(attrs={"placeholder": "Phone Number"}),
-            "subject": forms.TextInput(attrs={"placeholder": "Subject"}),
-            "message": forms.Textarea(attrs={"rows": 5, "placeholder": "Your Message"}),
+            "name": forms.TextInput(attrs={"placeholder": "Nom complet"}),
+            "email": forms.EmailInput(attrs={"placeholder": "Adresse e-mail"}),
+            "phone": forms.TextInput(attrs={"placeholder": "Numéro de téléphone"}),
+            "subject": forms.TextInput(attrs={"placeholder": "Sujet"}),
+            "message": forms.Textarea(
+                attrs={"rows": 5, "placeholder": "Votre message"}
+            ),
             "inquiry_type": forms.Select(
-                attrs={"placeholder": "Type of Inquiry", "class": "form-select"}
+                attrs={"placeholder": "Type de demande", "class": "form-select"}
             ),
         }
 
@@ -41,7 +43,7 @@ class ContactForm(forms.ModelForm):
             ),
             "subject",
             "message",
-            Submit("submit", "Send Message", css_class="btn btn-primary btn-lg"),
+            Submit("submit", "Envoyer le message", css_class="btn btn-primary btn-lg"),
         )
 
         # Add Bootstrap classes

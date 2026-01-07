@@ -25,13 +25,15 @@ class CartItemInline(admin.TabularInline):
     extra = 0
     readonly_fields = ("added_at", "get_total_price")
     fields = ("product", "variant", "quantity", "added_at", "get_total_price")
+    verbose_name = "Article"
+    verbose_name_plural = "Articles"
 
     def get_total_price(self, obj):
         if obj.pk:
             return f"{obj.get_total_price()} DZD"
         return "-"
 
-    get_total_price.short_description = "Total Price"
+    get_total_price.short_description = "Prix total"
 
 
 @admin.register(Cart)
@@ -55,7 +57,7 @@ class CartAdmin(admin.ModelAdmin):
     def display_total_price(self, obj):
         return f"{obj.get_total_price()} DZD"
 
-    display_total_price.short_description = "Total Price"
+    display_total_price.short_description = "Prix total"
 
     def get_queryset(self, request):
         return (
@@ -83,7 +85,7 @@ class CartItemAdmin(admin.ModelAdmin):
     def display_total_price(self, obj):
         return f"{obj.get_total_price()} DZD"
 
-    display_total_price.short_description = "Total Price"
+    display_total_price.short_description = "Prix total"
 
     def get_queryset(self, request):
         return (
@@ -106,13 +108,15 @@ class OrderItemInline(admin.TabularInline):
     extra = 0
     readonly_fields = ("get_total_price",)
     fields = ("product", "quantity", "price", "get_total_price")
+    verbose_name = "Article"
+    verbose_name_plural = "Articles"
 
     def get_total_price(self, obj):
         if obj.pk:
             return f"{obj.get_total_price()} DZD"
         return "-"
 
-    get_total_price.short_description = "Total Price"
+    get_total_price.short_description = "Prix total"
 
 
 @admin.register(Order)
@@ -148,11 +152,11 @@ class OrderAdmin(admin.ModelAdmin):
 
     fieldsets = (
         (
-            "Order Information",
+            "Informations de commande",
             {"fields": ("order_id", "user", "status", "tracking_number")},
         ),
         (
-            "Shipping",
+            "Livraison",
             {
                 "fields": (
                     "shipping_type",
@@ -165,11 +169,11 @@ class OrderAdmin(admin.ModelAdmin):
             },
         ),
         (
-            "Pricing",
+            "Tarification",
             {"fields": ("subtotal", "tax_amount", "shipping_cost", "total_amount")},
         ),
         (
-            "Timestamps",
+            "Dates",
             {
                 "fields": (
                     "created_at",
@@ -196,7 +200,7 @@ class OrderAdmin(admin.ModelAdmin):
     def display_total_amount(self, obj):
         return f"{obj.total_amount} DZD"
 
-    display_total_amount.short_description = "Total Amount"
+    display_total_amount.short_description = "Montant total"
 
     def mark_as_confirmed(self, request, queryset):
         from django.utils import timezone
@@ -204,39 +208,41 @@ class OrderAdmin(admin.ModelAdmin):
         updated = queryset.filter(status="pending_confirmation").update(
             status="confirmed", confirmed_at=timezone.now()
         )
-        self.message_user(request, f"{updated} order(s) confirmed.")
+        self.message_user(request, f"{updated} commande(s) confirmée(s).")
 
-    mark_as_confirmed.short_description = "Confirm orders"
+    mark_as_confirmed.short_description = "Confirmer les commandes"
 
     def mark_as_paid(self, request, queryset):
         from django.utils import timezone
 
         updated = queryset.update(status="paid", paid_at=timezone.now())
-        self.message_user(request, f"{updated} order(s) marked as paid.")
+        self.message_user(request, f"{updated} commande(s) marquée(s) comme payée(s).")
 
-    mark_as_paid.short_description = "Mark as Paid"
+    mark_as_paid.short_description = "Marquer comme payée"
 
     def mark_as_processing(self, request, queryset):
         updated = queryset.update(status="processing")
-        self.message_user(request, f"{updated} order(s) marked as processing.")
+        self.message_user(request, f"{updated} commande(s) marquée(s) en traitement.")
 
-    mark_as_processing.short_description = "Mark as Processing"
+    mark_as_processing.short_description = "Marquer en traitement"
 
     def mark_as_shipped(self, request, queryset):
         from django.utils import timezone
 
         updated = queryset.update(status="shipped", shipped_at=timezone.now())
-        self.message_user(request, f"{updated} order(s) marked as shipped.")
+        self.message_user(
+            request, f"{updated} commande(s) marquée(s) comme expédiée(s)."
+        )
 
-    mark_as_shipped.short_description = "Mark as Shipped"
+    mark_as_shipped.short_description = "Marquer comme expédiée"
 
     def mark_as_delivered(self, request, queryset):
         from django.utils import timezone
 
         updated = queryset.update(status="delivered", delivered_at=timezone.now())
-        self.message_user(request, f"{updated} order(s) marked as delivered.")
+        self.message_user(request, f"{updated} commande(s) marquée(s) comme livrée(s).")
 
-    mark_as_delivered.short_description = "Mark as Delivered"
+    mark_as_delivered.short_description = "Marquer comme livrée"
 
     def get_queryset(self, request):
         return (
@@ -256,7 +262,7 @@ class OrderItemAdmin(admin.ModelAdmin):
     def display_total_price(self, obj):
         return f"{obj.get_total_price()} DZD"
 
-    display_total_price.short_description = "Total Price"
+    display_total_price.short_description = "Prix total"
 
     def get_queryset(self, request):
         return super().get_queryset(request).select_related("order", "product")
@@ -266,6 +272,8 @@ class OrderNoteAttachmentInline(admin.TabularInline):
     model = OrderNoteAttachment
     extra = 0
     readonly_fields = ("uploaded_at",)
+    verbose_name = "Pièce jointe"
+    verbose_name_plural = "Pièces jointes"
 
 
 @admin.register(OrderNote)
@@ -321,18 +329,18 @@ class PaymentProofAdmin(admin.ModelAdmin):
         updated = queryset.update(
             verified=True, verified_by=request.user, verified_at=timezone.now()
         )
-        self.message_user(request, f"{updated} payment(s) approved.")
+        self.message_user(request, f"{updated} paiement(s) approuvé(s).")
 
-    approve_payments.short_description = "Approve selected payments"
+    approve_payments.short_description = "Approuver les paiements sélectionnés"
 
     def reject_payments(self, request, queryset):
         self.message_user(
             request,
-            "Please reject payments individually with a reason.",
+            "Veuillez rejeter les paiements individuellement avec un motif.",
             level="warning",
         )
 
-    reject_payments.short_description = "Reject selected payments"
+    reject_payments.short_description = "Rejeter les paiements sélectionnés"
 
 
 @admin.register(PaymentReceipt)
@@ -353,6 +361,8 @@ class ComplaintAttachmentInline(admin.TabularInline):
     model = ComplaintAttachment
     extra = 0
     readonly_fields = ("uploaded_at",)
+    verbose_name = "Pièce jointe"
+    verbose_name_plural = "Pièces jointes"
 
 
 @admin.register(Complaint)
@@ -372,12 +382,12 @@ class ComplaintAdmin(admin.ModelAdmin):
 
     fieldsets = (
         (
-            "Complaint Info",
+            "Informations de réclamation",
             {"fields": ("complaint_number", "user", "order", "invoice", "status")},
         ),
-        ("Details", {"fields": ("reason", "custom_reason", "description")}),
+        ("Détails", {"fields": ("reason", "custom_reason", "description")}),
         (
-            "Admin Response",
+            "Réponse administrateur",
             {
                 "fields": (
                     "admin_notes",
@@ -388,7 +398,7 @@ class ComplaintAdmin(admin.ModelAdmin):
             },
         ),
         (
-            "Timestamps",
+            "Dates",
             {"fields": ("created_at", "updated_at"), "classes": ("collapse",)},
         ),
     )

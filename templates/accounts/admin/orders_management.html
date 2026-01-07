@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}Orders Management - Admin{% endblock %}
+{% block title %}Gestion des commandes - Admin{% endblock %}
 
 {% block extra_css %}
   <link rel="stylesheet" href="{% static 'css/admin/orders_management.css' %}">
@@ -10,15 +10,15 @@
 {% block content %}
 <div class="admin-header">
   <div class="container">
-    <h1><i class="fas fa-shopping-bag me-2"></i>Orders Management</h1>
-    <p class="mb-0">Track and manage all customer orders</p>
+    <h1><i class="fas fa-shopping-bag me-2"></i>Gestion des commandes</h1>
+    <p class="mb-0">Suivre et gérer toutes les commandes clients</p>
   </div>
 </div>
 
 <div class="container mb-5">
   <div class="mb-3">
     <a href="{% url 'accounts:admin_dashboard' %}" class="btn btn-outline-secondary">
-      <i class="fas fa-arrow-left me-2"></i>Back to Dashboard
+      <i class="fas fa-arrow-left me-2"></i>Retour au tableau de bord
     </a>
   </div>
 
@@ -26,23 +26,23 @@
   <div class="stat-row">
     <div class="mini-stat">
       <div class="number">{{ order_stats.total }}</div>
-      <div class="label">Total Orders</div>
+      <div class="label">Total commandes</div>
     </div>
     <div class="mini-stat">
       <div class="number">{{ order_stats.awaiting_payment }}</div>
-      <div class="label">Awaiting Payment</div>
+      <div class="label">En attente de paiement</div>
     </div>
     <div class="mini-stat">
       <div class="number">{{ order_stats.paid }}</div>
-      <div class="label">Paid</div>
+      <div class="label">Payées</div>
     </div>
     <div class="mini-stat">
       <div class="number">{{ order_stats.shipped }}</div>
-      <div class="label">Shipped</div>
+      <div class="label">Expédiées</div>
     </div>
     <div class="mini-stat">
       <div class="number">{{ order_stats.delivered }}</div>
-      <div class="label">Delivered</div>
+      <div class="label">Livrées</div>
     </div>
   </div>
 
@@ -50,28 +50,28 @@
   <div class="filter-bar">
     <form method="get" class="row g-3">
       <div class="col-md-4">
-        <label class="form-label">Status</label>
+        <label class="form-label">Statut</label>
         <select name="status" class="form-select">
-          <option value="all" {% if status_filter == 'all' %}selected{% endif %}>All Orders</option>
-          <option value="awaiting_payment" {% if status_filter == 'awaiting_payment' %}selected{% endif %}>Awaiting Payment</option>
-          <option value="payment_under_review" {% if status_filter == 'payment_under_review' %}selected{% endif %}>Under Review</option>
-          <option value="paid" {% if status_filter == 'paid' %}selected{% endif %}>Paid</option>
-          <option value="processing" {% if status_filter == 'processing' %}selected{% endif %}>Processing</option>
-          <option value="shipped" {% if status_filter == 'shipped' %}selected{% endif %}>Shipped</option>
-          <option value="delivered" {% if status_filter == 'delivered' %}selected{% endif %}>Delivered</option>
-          <option value="cancelled" {% if status_filter == 'cancelled' %}selected{% endif %}>Cancelled</option>
-          <option value="refund_pending" {% if status_filter == 'refund_pending' %}selected{% endif %}>Refund Pending</option>
-          <option value="refunded" {% if status_filter == 'refunded' %}selected{% endif %}>Refunded</option>
+          <option value="all" {% if status_filter == 'all' %}selected{% endif %}>Toutes les commandes</option>
+          <option value="awaiting_payment" {% if status_filter == 'awaiting_payment' %}selected{% endif %}>En attente de paiement</option>
+          <option value="payment_under_review" {% if status_filter == 'payment_under_review' %}selected{% endif %}>En cours d'examen</option>
+          <option value="paid" {% if status_filter == 'paid' %}selected{% endif %}>Payées</option>
+          <option value="processing" {% if status_filter == 'processing' %}selected{% endif %}>En cours de traitement</option>
+          <option value="shipped" {% if status_filter == 'shipped' %}selected{% endif %}>Expédiées</option>
+          <option value="delivered" {% if status_filter == 'delivered' %}selected{% endif %}>Livrées</option>
+          <option value="cancelled" {% if status_filter == 'cancelled' %}selected{% endif %}>Annulées</option>
+          <option value="refund_pending" {% if status_filter == 'refund_pending' %}selected{% endif %}>Remboursement en attente</option>
+          <option value="refunded" {% if status_filter == 'refunded' %}selected{% endif %}>Remboursées</option>
         </select>
       </div>
       <div class="col-md-6">
-        <label class="form-label">Search</label>
+        <label class="form-label">Rechercher</label>
         <input type="text" name="search" class="form-control" 
-               placeholder="Order ID, username, email..." value="{{ search }}">
+               placeholder="ID commande, nom d'utilisateur, email..." value="{{ search }}">
       </div>
       <div class="col-md-2 d-flex align-items-end">
         <button type="submit" class="btn btn-primary w-100">
-          <i class="fas fa-search me-2"></i>Filter
+          <i class="fas fa-search me-2"></i>Filtrer
         </button>
       </div>
     </form>
@@ -80,19 +80,19 @@
   <!-- Orders Table -->
   <div class="table-container">
     <div class="d-flex justify-content-between align-items-center mb-3">
-      <h5 class="mb-0">Orders List ({{ orders.count }})</h5>
+      <h5 class="mb-0">Liste des commandes ({{ orders.count }})</h5>
     </div>
 
     <div class="table-responsive">
       <table class="table table-hover">
         <thead>
           <tr>
-            <th>Order ID</th>
-            <th>Customer</th>
+            <th>ID commande</th>
+            <th>Client</th>
             <th>Date</th>
-            <th>Items</th>
+            <th>Articles</th>
             <th>Total</th>
-            <th>Status</th>
+            <th>Statut</th>
             <th>Actions</th>
           </tr>
         </thead>
@@ -104,8 +104,8 @@
               {{ order.user.username }}
               <br><small class="text-muted">{{ order.user.email }}</small>
             </td>
-            <td>{{ order.created_at|date:"M d, Y H:i" }}</td>
-            <td>{{ order.items.count }} items</td>
+            <td>{{ order.created_at|date:"d M Y H:i" }}</td>
+            <td>{{ order.items.count }} articles</td>
             <td><strong>{{ order.total_amount }} DZD</strong></td>
             <td>
               <span class="status-badge status-{{ order.status }}">
@@ -115,12 +115,12 @@
             <td>
               <div class="btn-group" role="group">
                 <a href="{% url 'accounts:admin_order_detail' order.order_id %}" class="btn btn-sm btn-outline-info">
-                  <i class="fas fa-eye"></i> View Details
+                  <i class="fas fa-eye"></i> Voir détails
                 </a>
                 
                 {% if order.status == 'pending_confirmation' %}
                 <a href="{% url 'accounts:admin_confirm_order' order.order_id %}" class="btn btn-sm btn-warning">
-                  <i class="fas fa-check-circle"></i> Confirm
+                  <i class="fas fa-check-circle"></i> Confirmer
                 </a>
                 {% elif order.can_update_status %}
                 <button type="button" class="btn btn-sm btn-outline-primary dropdown-toggle" 
@@ -128,43 +128,43 @@
                   Actions
                 </button>
                 <ul class="dropdown-menu">
-                  <li><h6 class="dropdown-header">Change Status</h6></li>
+                  <li><h6 class="dropdown-header">Changer le statut</h6></li>
                   <li>
                     <a class="dropdown-item" href="#" onclick="updateOrderStatus('{{ order.order_id }}', 'paid')">
-                      <i class="fas fa-check-circle text-success"></i> Mark as Paid
+                      <i class="fas fa-check-circle text-success"></i> Marquer comme payée
                     </a>
                   </li>
                   <li>
                     <a class="dropdown-item" href="#" onclick="updateOrderStatus('{{ order.order_id }}', 'processing')">
-                      <i class="fas fa-cog text-info"></i> Mark as Processing
+                      <i class="fas fa-cog text-info"></i> Marquer en traitement
                     </a>
                   </li>
                   <li>
                     <a class="dropdown-item" href="#" onclick="updateOrderStatus('{{ order.order_id }}', 'shipped')">
-                      <i class="fas fa-shipping-fast text-primary"></i> Mark as Shipped
+                      <i class="fas fa-shipping-fast text-primary"></i> Marquer comme expédiée
                     </a>
                   </li>
                   <li>
                     <a class="dropdown-item" href="#" onclick="updateOrderStatus('{{ order.order_id }}', 'delivered')">
-                      <i class="fas fa-box-open text-success"></i> Mark as Delivered
+                      <i class="fas fa-box-open text-success"></i> Marquer comme livrée
                     </a>
                   </li>
                   <li><hr class="dropdown-divider"></li>
                   <li>
                     <a class="dropdown-item" href="{% url 'accounts:admin_initiate_refund' order.order_id %}">
-                      <i class="fas fa-undo text-warning"></i> Initiate Refund
+                      <i class="fas fa-undo text-warning"></i> Initier un remboursement
                     </a>
                   </li>
                 </ul>
                 {% else %}
-                <span class="badge bg-secondary">Actions Disabled</span>
+                <span class="badge bg-secondary">Actions désactivées</span>
                 {% endif %}
               </div>
             </td>
           </tr>
           {% empty %}
           <tr>
-            <td colspan="7" class="text-center text-muted py-4">No orders found</td>
+            <td colspan="7" class="text-center text-muted py-4">Aucune commande trouvée</td>
           </tr>
           {% endfor %}
         </tbody>
@@ -175,7 +175,7 @@
 
 <script>
 function updateOrderStatus(orderId, status) {
-  if (confirm('Are you sure you want to update this order status?')) {
+  if (confirm('Êtes-vous sûr de vouloir mettre à jour le statut de cette commande ?')) {
     const form = document.createElement('form');
     form.method = 'POST';
     form.action = `/accounts/admin/order/${orderId}/update-status/`;

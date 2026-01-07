@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% load static %}
 
-{% block title %}Search Results - Fennec Med{% endblock %}
+{% block title %}Résultats de recherche - Fennec Med{% endblock %}
 
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'css/searchResults.css' %}">
@@ -11,13 +11,13 @@
 <!-- Search Header -->
 <div class="search-header">
   <div class="search-header-content">
-    <h1>Search Results</h1>
+    <h1>Résultats de recherche</h1>
     <div class="search-container">
       <form method="get" action="{% url 'products:search' %}">
         <input
           type="text"
           name="q"
-          placeholder="Search medical supplies..."
+          placeholder="Rechercher des fournitures médicales..."
           class="search-input"
           value="{{ query }}"
         />
@@ -29,7 +29,7 @@
         </button>
       </form>
     </div>
-    <p class="search-info">Showing {{ total_results }} result{{ total_results|pluralize }} for "{{ query }}"</p>
+    <p class="search-info">Affichage de {{ total_results }} résultat{{ total_results|pluralize }} pour "{{ query }}"</p>
   </div>
 </div>
 
@@ -37,10 +37,10 @@
 <div class="results-section">
   <div class="results-container">
     <aside class="filters-sidebar">
-      <h3>Filter Results</h3>
+      <h3>Filtrer les résultats</h3>
 
       <div class="filter-group">
-        <h4>Category</h4>
+        <h4>Catégorie</h4>
         <div class="filter-options">
           {% for category in categories %}
           <label>
@@ -52,16 +52,16 @@
       </div>
 
       <div class="filter-group">
-        <h4>Price Range</h4>
+        <h4>Plage de prix</h4>
         <div class="filter-options">
-          <label><input type="checkbox" name="price" value="0-50" /> Under $50</label>
-          <label><input type="checkbox" name="price" value="50-200" /> $50 - $200</label>
-          <label><input type="checkbox" name="price" value="200+" /> Over $200</label>
+          <label><input type="checkbox" name="price" value="0-50" /> Moins de 50 $</label>
+          <label><input type="checkbox" name="price" value="50-200" /> 50 $ - 200 $</label>
+          <label><input type="checkbox" name="price" value="200+" /> Plus de 200 $</label>
         </div>
       </div>
 
       <div class="filter-group">
-        <h4>Brand</h4>
+        <h4>Marque</h4>
         <div class="filter-options">
           {% for brand in brands %}
           <label>
@@ -73,29 +73,29 @@
       </div>
 
       <div class="filter-group">
-        <h4>Availability</h4>
+        <h4>Disponibilité</h4>
         <div class="filter-options">
-          <label><input type="checkbox" name="availability" value="in_stock" /> In Stock</label>
-          <label><input type="checkbox" name="availability" value="pre_order" /> Pre-order</label>
+          <label><input type="checkbox" name="availability" value="in_stock" /> En stock</label>
+          <label><input type="checkbox" name="availability" value="pre_order" /> Précommande</label>
         </div>
       </div>
 
-      <button class="clear-filters-btn" onclick="window.location.href='{% url 'products:search' %}?q={{ query }}'">Clear All Filters</button>
+      <button class="clear-filters-btn" onclick="window.location.href='{% url 'products:search' %}?q={{ query }}'">Effacer tous les filtres</button>
     </aside>
 
     <div class="results-content">
       <div class="results-header">
         <div class="results-count">
-          <span>{{ page_obj.paginator.count }} Products Found</span>
+          <span>{{ page_obj.paginator.count }} Produits trouvés</span>
         </div>
         <div class="sort-options">
-          <label for="sort">Sort by:</label>
+          <label for="sort">Trier par :</label>
           <select id="sort" class="sort-select" onchange="window.location.href='?q={{ query }}&sort=' + this.value">
-            <option value="name" {% if current_filters.sort == 'name' %}selected{% endif %}>Relevance</option>
-            <option value="price_low" {% if current_filters.sort == 'price_low' %}selected{% endif %}>Price: Low to High</option>
-            <option value="price_high" {% if current_filters.sort == 'price_high' %}selected{% endif %}>Price: High to Low</option>
-            <option value="rating" {% if current_filters.sort == 'rating' %}selected{% endif %}>Customer Rating</option>
-            <option value="newest" {% if current_filters.sort == 'newest' %}selected{% endif %}>Newest First</option>
+            <option value="name" {% if current_filters.sort == 'name' %}selected{% endif %}>Pertinence</option>
+            <option value="price_low" {% if current_filters.sort == 'price_low' %}selected{% endif %}>Prix : Croissant</option>
+            <option value="price_high" {% if current_filters.sort == 'price_high' %}selected{% endif %}>Prix : Décroissant</option>
+            <option value="rating" {% if current_filters.sort == 'rating' %}selected{% endif %}>Note client</option>
+            <option value="newest" {% if current_filters.sort == 'newest' %}selected{% endif %}>Plus récents</option>
           </select>
         </div>
       </div>
@@ -110,9 +110,9 @@
             <img src="{% static 'images/placeholder.png' %}" alt="{{ product.name }}" />
             {% endif %}
             {% if product.featured %}
-            <div class="product-badge">Best Seller</div>
+            <div class="product-badge">Meilleure vente</div>
             {% elif product.trending %}
-            <div class="product-badge">Trending</div>
+            <div class="product-badge">Tendance</div>
             {% endif %}
           </div>
           <div class="product-info">
@@ -120,7 +120,7 @@
             <p class="product-category">{{ product.category.name }}</p>
             <div class="product-rating">
               <span class="stars">★★★★★</span>
-              <span class="rating-text">({{ product.get_average_rating|floatformat:1 }}) {{ product.get_review_count }} reviews</span>
+              <span class="rating-text">({{ product.get_average_rating|floatformat:1 }}) {{ product.get_review_count }} avis</span>
             </div>
             <p class="product-description">{{ product.short_description|truncatewords:15 }}</p>
             <div class="product-price">
@@ -130,22 +130,22 @@
               {% endif %}
             </div>
             <div class="product-actions">
-              <button class="add-to-cart-btn">Add to Cart</button>
+              <button class="add-to-cart-btn">Ajouter au panier</button>
               <button class="save-btn" onclick="toggleWishlist({{ product.id }})">♡</button>
             </div>
           </div>
         </div>
         {% empty %}
-        <p>No products found matching your search.</p>
+        <p>Aucun produit trouvé correspondant à votre recherche.</p>
         {% endfor %}
       </div>
 
       {% if page_obj.has_other_pages %}
       <div class="pagination">
         {% if page_obj.has_previous %}
-        <a href="?q={{ query }}&page={{ page_obj.previous_page_number }}" class="page-btn prev">Previous</a>
+        <a href="?q={{ query }}&page={{ page_obj.previous_page_number }}" class="page-btn prev">Précédent</a>
         {% else %}
-        <button class="page-btn prev" disabled>Previous</button>
+        <button class="page-btn prev" disabled>Précédent</button>
         {% endif %}
 
         {% for num in page_obj.paginator.page_range %}
@@ -153,9 +153,9 @@
         {% endfor %}
 
         {% if page_obj.has_next %}
-        <a href="?q={{ query }}&page={{ page_obj.next_page_number }}" class="page-btn next">Next</a>
+        <a href="?q={{ query }}&page={{ page_obj.next_page_number }}" class="page-btn next">Suivant</a>
         {% else %}
-        <button class="page-btn next" disabled>Next</button>
+        <button class="page-btn next" disabled>Suivant</button>
         {% endif %}
       </div>
       {% endif %}

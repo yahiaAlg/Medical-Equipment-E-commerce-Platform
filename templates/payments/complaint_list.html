@@ -1,7 +1,8 @@
+<!-- complaint_list.html -->
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}My Complaints - Fennec Med{% endblock %}
+{% block title %}Mes réclamations - Fennec Med{% endblock %}
 
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'css/complaint_list.css' %}">
@@ -12,10 +13,10 @@
   <div class="complaints-container">
     <div class="section-header">
       <a href="{% url "accounts:dashboard" %}" class="btn btn-outline-secondary mb-3">
-          <i class="fas fa-arrow-left"></i> Back to Dashboard
+          <i class="fas fa-arrow-left"></i> Retour au tableau de bord
       </a>
-      <h1>My Complaints</h1>
-      <p>Track and manage your submitted complaints</p>
+      <h1>Mes réclamations</h1>
+      <p>Suivez et gérez vos réclamations soumises</p>
     </div>
 
     {% if complaints %}
@@ -44,23 +45,23 @@
         <div class="complaint-meta">
           <span class="meta-item">
             <i class="fas fa-shopping-bag"></i>
-            Order: {{ complaint.order.order_id }}
+            Commande : {{ complaint.order.order_id }}
           </span>
           <span class="meta-item">
             <i class="fas fa-calendar"></i>
-            {{ complaint.created_at|date:"M d, Y" }}
+            {{ complaint.created_at|date:"d M Y" }}
           </span>
         </div>
 
         <a href="{% url 'payments:complaint_detail' complaint.id %}" class="btn-view-complaint">
-          View Details
+          Voir les détails
         </a>
       </div>
       {% endfor %}
     {% else %}
       <div class="empty-state">
         <i class="fas fa-clipboard-list"></i>
-        <p>No complaints found</p>
+        <p>Aucune réclamation trouvée</p>
       </div>
     {% endif %}
   </div>

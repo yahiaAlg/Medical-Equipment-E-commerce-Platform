@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}Login - Fennec Med{% endblock %}
+{% block title %}Connexion - Fennec Med{% endblock %}
 
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'css/login.css' %}">
@@ -10,8 +10,8 @@
 {% block content %}
 <div class="auth-container">
   <div class="auth-form">
-    <h2>Login to Your Account</h2>
-    <p>Welcome back! Please enter your details to login.</p>
+    <h2>Connexion à votre compte</h2>
+    <p>Bienvenue ! Veuillez saisir vos identifiants pour vous connecter.</p>
     
     {% if form.non_field_errors %}
       <div class="alert alert-danger" style="background: #f8d7da; color: #721c24; padding: 1rem; border-radius: 5px; margin-bottom: 1rem;">
@@ -27,7 +27,7 @@
           type="text"
           id="{{ form.username.id_for_label }}"
           name="{{ form.username.name }}"
-          placeholder="Username"
+          placeholder="Nom d'utilisateur"
           required
           {% if form.username.value %}value="{{ form.username.value }}"{% endif %}
         />
@@ -43,7 +43,7 @@
           type="password"
           id="{{ form.password.id_for_label }}"
           name="{{ form.password.name }}"
-          placeholder="Password"
+          placeholder="Mot de passe"
           required
         />
         {% if form.password.errors %}
@@ -54,14 +54,14 @@
       </div>
       
       <div class="form-group">
-        <a href="{% url 'accounts:password_reset' %}" class="forgot-password">Forgot Password?</a>
+        <a href="{% url 'accounts:password_reset' %}" class="forgot-password">Mot de passe oublié ?</a>
       </div>
       
-      <button type="submit" class="submit-btn">Login</button>
+      <button type="submit" class="submit-btn">Se connecter</button>
     </form>
     
     <p class="signup-link">
-      Don't have an account? <a href="{% url 'accounts:register' %}">Sign Up</a>
+      Vous n'avez pas de compte ? <a href="{% url 'accounts:register' %}">S'inscrire</a>
     </p>
   </div>
 </div>

@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}Shopping Cart - Fennec Med{% endblock %}
+{% block title %}Panier - Fennec Med{% endblock %}
 
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'css/cart.css' %}">
@@ -11,8 +11,8 @@
 <!-- Cart Header -->
 <div class="cart-header">
   <div class="cart-header-content">
-    <h1>Shopping Cart</h1>
-    <p>Review your medical supplies and equipment</p>
+    <h1>Panier</h1>
+    <p>Vérifiez vos fournitures et équipements médicaux</p>
   </div>
 </div>
 
@@ -38,7 +38,7 @@
               <p class="item-category">{{ item.product.category.name }}</p>
               {% if item.variant %}
               <p class="item-variant">
-                <strong>{{ item.variant.variant_title }}:</strong> {{ item.variant.variant_value }}
+                <strong>{{ item.variant.variant_title }} :</strong> {{ item.variant.variant_value }}
               </p>
               {% endif %}
               <p class="item-description">
@@ -59,20 +59,20 @@
                       {% endif %}>+</button>
             </div>
             <div class="item-price">
-              <span class="price">DZD {{ item.get_unit_price|floatformat:2 }}</span>
-              <span class="item-subtotal">DZD {{ item.get_total_price|floatformat:2 }}</span>
+              <span class="price">{{ item.get_unit_price|floatformat:2 }} DZD</span>
+              <span class="item-subtotal">{{ item.get_total_price|floatformat:2 }} DZD</span>
             </div>
             <div class="item-actions">
               <button class="remove-btn" onclick="removeItem({{ item.id }})">
-                <i class="fas fa-trash"></i> Remove
+                <i class="fas fa-trash"></i> Supprimer
               </button>
             </div>
           </div>
         {% endfor %}
       {% else %}
         <div style="text-align: center; padding: 3rem;">
-          <p style="font-size: 1.2rem; color: #666;">Your cart is empty</p>
-          <a href="{% url 'products:list' %}" class="btn btn-call" style="margin-top: 1rem;">Start Shopping</a>
+          <p style="font-size: 1.2rem; color: #666;">Votre panier est vide</p>
+          <a href="{% url 'products:list' %}" class="btn btn-call" style="margin-top: 1rem;">Commencer vos achats</a>
         </div>
       {% endif %}
     </div>
@@ -80,41 +80,41 @@
     {% if cart_items %}
     <div class="cart-summary">
       <div class="summary-card">
-        <h3>Order Summary</h3>
+        <h3>Récapitulatif de la commande</h3>
         <div class="summary-row">
-          <span>Subtotal ({{ cart.get_total_items }} item{{ cart.get_total_items|pluralize }})</span>
-          <span>DZD {{ cart.get_total_price|floatformat:2 }}</span>
+          <span>Sous-total ({{ cart.get_total_items }} article{{ cart.get_total_items|pluralize }})</span>
+          <span>{{ cart.get_total_price|floatformat:2 }} DZD</span>
         </div>
 
         <div class="summary-row">
-          <span>Tax ({% widthratio tva_rate 1 100 as tax_percentage %}{{ tax_percentage|floatformat:0 }}%)</span>
-          <span>DZD {{ tax_amount|floatformat:2 }}</span>
+          <span>Taxe ({% widthratio tva_rate 1 100 as tax_percentage %}{{ tax_percentage|floatformat:0 }}%)</span>
+          <span>{{ tax_amount|floatformat:2 }} DZD</span>
         </div>
         <div class="summary-divider"></div>
         <div class="summary-row total">
           <span>Total</span>
-          <span>DZD {{ cart_total|floatformat:2 }}</span>
+          <span>{{ cart_total|floatformat:2 }} DZD</span>
         </div>
 
         <button class="checkout-btn" onclick="location.href='{% url 'payments:checkout' %}'">
-          Proceed to Checkout
+          Procéder au paiement
         </button>
         <button class="continue-shopping-btn" onclick="location.href='{% url 'products:list' %}'">
-          Continue Shopping
+          Continuer vos achats
         </button>
       </div>
 
       <div class="promo-card">
-        <h4>Have a Promo Code?</h4>
+        <h4>Vous avez un code promo ?</h4>
         <form method="post" action="#" class="promo-input-group">
           {% csrf_token %}
           <input
             type="text"
             name="promo_code"
-            placeholder="Enter promo code"
+            placeholder="Entrez le code promo"
             class="promo-input"
           />
-          <button type="submit" class="apply-btn">Apply</button>
+          <button type="submit" class="apply-btn">Appliquer</button>
         </form>
       </div>
     </div>
@@ -161,17 +161,17 @@ function updateQuantity(itemId, newQuantity) {
         if (data.success) {
             location.reload();
         } else {
-            alert('Error updating cart: ' + data.message);
+            alert('Erreur lors de la mise à jour du panier : ' + data.message);
         }
     })
     .catch(error => {
-        console.error('Error:', error);
-        alert('An error occurred while updating the cart');
+        console.error('Erreur:', error);
+        alert('Une erreur s\'est produite lors de la mise à jour du panier');
     });
 }
 
 function removeItem(itemId) {
-    if (confirm('Remove this item from your cart?')) {
+    if (confirm('Retirer cet article de votre panier ?')) {
         location.href = '{% url "payments:remove_from_cart" 0 %}'.replace('0', itemId);
     }
 }
@@ -190,7 +190,7 @@ function saveForLater(itemId) {
         if (data.success) {
             location.reload();
         } else {
-            alert('Error: ' + data.message);
+            alert('Erreur : ' + data.message);
         }
     });
 }

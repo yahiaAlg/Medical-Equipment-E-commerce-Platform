@@ -1,7 +1,8 @@
+!-- invoice_detail.html -->
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}Invoice {{ invoice.invoice_number }} - Fennec Med{% endblock %}
+{% block title %}Facture {{ invoice.invoice_number }} - Fennec Med{% endblock %}
 
 {% block extra_css %}
   <link rel="stylesheet" href="{% static 'css/invoice_detail.css' %}">
@@ -14,13 +15,13 @@
       <div class="invoice-header-section">
         <div class="company-info">
           <h1>Fennec Med</h1>
-          <p>Medical Equipment & Supplies</p>
-          <p>Algeria</p>
+          <p>Équipements et fournitures médicales</p>
+          <p>Algérie</p>
         </div>
         <div class="invoice-meta">
-          <h2>INVOICE</h2>
+          <h2>FACTURE</h2>
           <p><strong>{{ invoice.invoice_number }}</strong></p>
-          <p>Date: {{ invoice.created_at|date:"M d, Y" }}</p>
+          <p>Date : {{ invoice.created_at|date:"d M Y" }}</p>
           <span class="status-badge status-{{ invoice.status }}">
             {{ invoice.get_status_display }}
           </span>
@@ -29,18 +30,18 @@
 
       <div class="billing-section">
         <div class="billing-info">
-          <h3>Bill To:</h3>
+          <h3>Facturer à :</h3>
           <p><strong>{{ invoice.order.user.get_full_name|default:invoice.order.user.username }}</strong></p>
           <p>{{ invoice.order.shipping_address }}</p>
           <p>{{ invoice.order.shipping_city }}, {{ invoice.order.shipping_state }}</p>
           <p>{{ invoice.order.shipping_zip }}</p>
         </div>
         <div class="billing-info">
-          <h3>Order Details:</h3>
-          <p>Order ID: <strong>{{ invoice.order.order_id }}</strong></p>
-          <p>Order Date: {{ invoice.order.created_at|date:"M d, Y" }}</p>
+          <h3>Détails de la commande :</h3>
+          <p>N° de commande : <strong>{{ invoice.order.order_id }}</strong></p>
+          <p>Date de commande : {{ invoice.order.created_at|date:"d M Y" }}</p>
           {% if invoice.paid_at %}
-            <p>Paid: {{ invoice.paid_at|date:"M d, Y" }}</p>
+            <p>Payée le : {{ invoice.paid_at|date:"d M Y" }}</p>
           {% endif %}
         </div>
       </div>
@@ -48,9 +49,9 @@
       <table class="items-table">
         <thead>
           <tr>
-            <th>Item</th>
-            <th>Quantity</th>
-            <th>Unit Price</th>
+            <th>Article</th>
+            <th>Quantité</th>
+            <th>Prix unitaire</th>
             <th>Total</th>
           </tr>
         </thead>
@@ -68,26 +69,26 @@
 
       <div class="totals-section">
         <div class="total-row">
-          <span>Subtotal:</span>
+          <span>Sous-total :</span>
           <span>{{ invoice.subtotal|floatformat:2 }} DZD</span>
         </div>
         <div class="total-row">
-          <span>Tax ({% widthratio tva_rate 1 100 as tax_percentage %}{{ tax_percentage|floatformat:0 }}%):</span>
+          <span>Taxe ({% widthratio tva_rate 1 100 as tax_percentage %}{{ tax_percentage|floatformat:0 }}%) :</span>
           <span>{{ invoice.tax_amount|floatformat:2 }} DZD</span>
         </div>
         <div class="total-row">
-          <span>Shipping:</span>
+          <span>Livraison :</span>
           <span>{{ invoice.order.shipping_cost|floatformat:2 }} DZD</span>
         </div>
         <div class="total-row final">
-          <span>Total:</span>
+          <span>Total :</span>
           <span>{{ invoice.total_amount|floatformat:2 }} DZD</span>
         </div>
       </div>
 
       {% if invoice.status == 'unpaid' or invoice.status == 'payment_rejected' %}
       <div class="payment-instructions">
-        <h3><i class="fas fa-info-circle"></i> Payment Instructions</h3>
+        <h3><i class="fas fa-info-circle"></i> Instructions de paiement</h3>
         <pre>{{ invoice.payment_instructions }}</pre>
       </div>
       {% endif %}
@@ -95,16 +96,16 @@
       <div class="action-buttons">
         {% if invoice.status == 'unpaid' or invoice.status == 'payment_rejected' %}
           <a href="{% url 'payments:upload_payment_proof' invoice.id %}" class="btn-primary-action">
-            <i class="fas fa-upload"></i> Upload Payment Proof
+            <i class="fas fa-upload"></i> Télécharger le justificatif de paiement
           </a>
         {% endif %}
         {% if invoice.status == 'paid' %}
           <a href="{% url 'payments:payment_receipt' invoice.id %}" class="btn-primary-action">
-            <i class="fas fa-receipt"></i> View Receipt
+            <i class="fas fa-receipt"></i> Voir le reçu
           </a>
         {% endif %}
         <a href="{% url 'payments:invoice_list' %}" class="btn-secondary-action">
-          <i class="fas fa-arrow-left"></i> Back to Invoices
+          <i class="fas fa-arrow-left"></i> Retour aux factures
         </a>
       </div>
     </div>

@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Account Activated</title>
+    <title>Compte activé</title>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -132,32 +132,32 @@
                 <img src="{{ site_info.logo.url }}" alt="{{ site_info.site_name }}" style="max-height: 60px;">
             </div>
             {% endif %}
-            <h1>🎉 Account Activated!</h1>
+            <h1>🎉 Compte activé !</h1>
         </div>
         <div class="content">
-            <h2>Hello {{ user.username }},</h2>
-            <p>Great news! Your account has been activated by an administrator at <strong>{{ site_info.site_name }}</strong>.</p>
+            <h2>Bonjour {{ user.username }},</h2>
+            <p>Excellente nouvelle ! Votre compte a été activé par un administrateur de <strong>{{ site_info.site_name }}</strong>.</p>
             
-            <div class="status-badge">✓ Account Active</div>
+            <div class="status-badge">✓ Compte actif</div>
             
-            <p>You now have full access to your account and can enjoy all the features and services we offer.</p>
+            <p>Vous avez désormais un accès complet à votre compte et pouvez profiter de tous les services que nous proposons.</p>
             
             <div class="feature-list">
-                <p><strong>What you can do now:</strong></p>
+                <p><strong>Ce que vous pouvez faire maintenant :</strong></p>
                 <ul>
-                    <li>Browse and purchase quality medical supplies</li>
-                    <li>Manage your wishlist</li>
-                    <li>Track your orders</li>
-                    <li>Update your profile settings</li>
+                    <li>Parcourir et acheter des fournitures médicales de qualité</li>
+                    <li>Gérer votre liste de souhaits</li>
+                    <li>Suivre vos commandes</li>
+                    <li>Mettre à jour les paramètres de votre profil</li>
                 </ul>
             </div>
             
             <center>
-                <a href="{{ site_url }}" class="cta-button">Visit Our Website</a>
+                <a href="{{ site_url }}" class="cta-button">Visiter notre site</a>
             </center>
             
             <p style="margin-top: 30px; font-size: 14px; color: #6c757d;">
-                If you have any questions or need assistance, please don't hesitate to contact our support team.
+                Si vous avez des questions ou besoin d'assistance, n'hésitez pas à contacter notre équipe d'assistance.
             </p>
         </div>
         <div class="footer">
@@ -200,8 +200,8 @@
             
             <div class="divider"></div>
             
-            <p style="font-size: 12px; margin-top: 15px;">This is an automated message. Please do not reply to this email.</p>
-            <p style="font-size: 12px;">&copy; {{ current_year }} {{ site_info.site_name }}. All rights reserved.</p>
+            <p style="font-size: 12px; margin-top: 15px;">Ceci est un message automatique. Veuillez ne pas répondre à cet e-mail.</p>
+            <p style="font-size: 12px;">&copy; {{ current_year }} {{ site_info.site_name }}. Tous droits réservés.</p>
         </div>
     </div>
 </body>

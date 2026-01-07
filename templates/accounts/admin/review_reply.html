@@ -1,7 +1,8 @@
+<!-- review_reply.html -->
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}Reply to Review - Admin{% endblock %}
+{% block title %}Répondre à l'avis - Admin{% endblock %}
 
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
@@ -14,7 +15,7 @@
             <div class="col-lg-8">
                 <div class="card">
                     <div class="card-header bg-primary text-white">
-                        <h4 class="mb-0"><i class="fas fa-reply me-2"></i>Reply to Review</h4>
+                        <h4 class="mb-0"><i class="fas fa-reply me-2"></i>Répondre à l'avis</h4>
                     </div>
                     <div class="card-body">
                         <!-- Original Review -->
@@ -27,7 +28,7 @@
                                     {% endfor %}
                                 </span>
                             </div>
-                            <p><strong>By:</strong> {{ review.user.username }} on {{ review.created_at|date:"M d, Y" }}</p>
+                            <p><strong>Par :</strong> {{ review.user.username }} le {{ review.created_at|date:"d M Y" }}</p>
                             <h6>{{ review.title }}</h6>
                             <p class="mb-0">{{ review.comment }}</p>
                         </div>
@@ -36,23 +37,23 @@
                         <form method="post">
                             {% csrf_token %}
                             <div class="mb-3">
-                                <label class="form-label">Rating *</label>
+                                <label class="form-label">Note *</label>
                                 {{ form.rating }}
                             </div>
                             <div class="mb-3">
-                                <label class="form-label">Reply Title *</label>
+                                <label class="form-label">Titre de la réponse *</label>
                                 {{ form.title }}
                             </div>
                             <div class="mb-3">
-                                <label class="form-label">Your Reply *</label>
+                                <label class="form-label">Votre réponse *</label>
                                 {{ form.comment }}
-                                <small class="text-muted d-block mt-1">Your reply will be tagged with @{{ review.user.username }}</small>
+                                <small class="text-muted d-block mt-1">Votre réponse sera identifiée avec @{{ review.user.username }}</small>
                             </div>
                             <div class="d-flex gap-2">
                                 <button type="submit" class="btn btn-primary">
-                                    <i class="fas fa-paper-plane me-2"></i>Post Reply
+                                    <i class="fas fa-paper-plane me-2"></i>Publier la réponse
                                 </button>
-                                <a href="{% url 'accounts:admin_reviews_list' %}" class="btn btn-secondary">Cancel</a>
+                                <a href="{% url 'accounts:admin_reviews_list' %}" class="btn btn-secondary">Annuler</a>
                             </div>
                         </form>
                     </div>

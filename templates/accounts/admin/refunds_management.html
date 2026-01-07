@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}Refunds Management - Admin{% endblock %}
+{% block title %}Gestion des remboursements - Admin{% endblock %}
 
 {% block extra_css %}
   <link rel="stylesheet" href="{% static 'css/admin/refunds_management.css' %}">
@@ -10,15 +10,15 @@
 {% block content %}
 <div class="admin-header">
   <div class="container">
-    <h1><i class="fas fa-undo me-2"></i>Refunds Management</h1>
-    <p class="mb-0">Process and track customer refunds</p>
+    <h1><i class="fas fa-undo me-2"></i>Gestion des remboursements</h1>
+    <p class="mb-0">Traiter et suivre les remboursements clients</p>
   </div>
 </div>
 
 <div class="container mb-5">
   <div class="mb-3">
     <a href="{% url 'accounts:admin_dashboard' %}" class="btn btn-outline-secondary">
-      <i class="fas fa-arrow-left me-2"></i>Back to Dashboard
+      <i class="fas fa-arrow-left me-2"></i>Retour au tableau de bord
     </a>
   </div>
 
@@ -26,23 +26,23 @@
   <div class="stat-row">
     <div class="mini-stat">
       <div class="number">{{ refund_stats.total }}</div>
-      <div class="label">Total Refunds</div>
+      <div class="label">Total remboursements</div>
     </div>
     <div class="mini-stat">
       <div class="number">{{ refund_stats.pending }}</div>
-      <div class="label">Pending</div>
+      <div class="label">En attente</div>
     </div>
     <div class="mini-stat">
       <div class="number">{{ refund_stats.approved }}</div>
-      <div class="label">Approved</div>
+      <div class="label">Approuvés</div>
     </div>
     <div class="mini-stat">
       <div class="number">{{ refund_stats.completed }}</div>
-      <div class="label">Completed</div>
+      <div class="label">Finalisés</div>
     </div>
     <div class="mini-stat">
       <div class="number">{{ refund_stats.total_amount|floatformat:2 }} DZD</div>
-      <div class="label">Total Refunded</div>
+      <div class="label">Total remboursé</div>
     </div>
   </div>
 
@@ -50,19 +50,19 @@
   <div class="filter-bar">
     <form method="get" class="row g-3">
       <div class="col-md-10">
-        <label class="form-label">Status</label>
+        <label class="form-label">Statut</label>
         <select name="status" class="form-select">
-          <option value="all" {% if status_filter == 'all' %}selected{% endif %}>All Refunds</option>
-          <option value="refund_pending" {% if status_filter == 'refund_pending' %}selected{% endif %}>Pending</option>
-          <option value="refund_approved" {% if status_filter == 'refund_approved' %}selected{% endif %}>Approved</option>
-          <option value="refund_processing" {% if status_filter == 'refund_processing' %}selected{% endif %}>Processing</option>
-          <option value="refund_completed" {% if status_filter == 'refund_completed' %}selected{% endif %}>Completed</option>
-          <option value="refund_rejected" {% if status_filter == 'refund_rejected' %}selected{% endif %}>Rejected</option>
+          <option value="all" {% if status_filter == 'all' %}selected{% endif %}>Tous les remboursements</option>
+          <option value="refund_pending" {% if status_filter == 'refund_pending' %}selected{% endif %}>En attente</option>
+          <option value="refund_approved" {% if status_filter == 'refund_approved' %}selected{% endif %}>Approuvés</option>
+          <option value="refund_processing" {% if status_filter == 'refund_processing' %}selected{% endif %}>En traitement</option>
+          <option value="refund_completed" {% if status_filter == 'refund_completed' %}selected{% endif %}>Finalisés</option>
+          <option value="refund_rejected" {% if status_filter == 'refund_rejected' %}selected{% endif %}>Rejetés</option>
         </select>
       </div>
       <div class="col-md-2 d-flex align-items-end">
         <button type="submit" class="btn btn-primary w-100">
-          <i class="fas fa-search me-2"></i>Filter
+          <i class="fas fa-search me-2"></i>Filtrer
         </button>
       </div>
     </form>
@@ -71,20 +71,20 @@
   <!-- Refunds Table -->
   <div class="table-container">
     <div class="d-flex justify-content-between align-items-center mb-3">
-      <h5 class="mb-0">Refunds List ({{ refunds.count }})</h5>
+      <h5 class="mb-0">Liste des remboursements ({{ refunds.count }})</h5>
     </div>
 
     <div class="table-responsive">
       <table class="table table-hover">
         <thead>
           <tr>
-            <th>Refund #</th>
-            <th>Order #</th>
-            <th>Customer</th>
-            <th>Amount</th>
-            <th>Reason</th>
+            <th>N° remboursement</th>
+            <th>N° commande</th>
+            <th>Client</th>
+            <th>Montant</th>
+            <th>Motif</th>
             <th>Date</th>
-            <th>Status</th>
+            <th>Statut</th>
             <th>Actions</th>
           </tr>
         </thead>
@@ -101,7 +101,7 @@
             <td>
               <small>{{ refund.reason|truncatewords:10 }}</small>
             </td>
-            <td>{{ refund.created_at|date:"M d, Y" }}</td>
+            <td>{{ refund.created_at|date:"d M Y" }}</td>
             <td>
               <span class="status-badge status-{{ refund.status }}">
                 {{ refund.get_status_display }}
@@ -111,11 +111,11 @@
               {% if refund.status in 'refund_approved,refund_processing' %}
               <a href="{% url 'accounts:admin_upload_refund_proof' refund.id %}" 
                  class="btn btn-sm btn-primary">
-                <i class="fas fa-upload"></i> Upload Proof
+                <i class="fas fa-upload"></i> Télécharger preuve
               </a>
               {% elif refund.status == 'refund_completed' %}
               <span class="badge bg-success">
-                <i class="fas fa-check"></i> Completed
+                <i class="fas fa-check"></i> Finalisé
               </span>
               {% else %}
               <span class="badge bg-secondary">{{ refund.get_status_display }}</span>
@@ -124,7 +124,7 @@
           </tr>
           {% empty %}
           <tr>
-            <td colspan="8" class="text-center text-muted py-4">No refunds found</td>
+            <td colspan="8" class="text-center text-muted py-4">Aucun remboursement trouvé</td>
           </tr>
           {% endfor %}
         </tbody>

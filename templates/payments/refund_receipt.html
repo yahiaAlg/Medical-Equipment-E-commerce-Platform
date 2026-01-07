@@ -1,7 +1,8 @@
+<!-- refund_receipt.html -->
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}Refund Receipt - Fennec Med{% endblock %}
+{% block title %}Reçu de remboursement - Fennec Med{% endblock %}
 
 {% block extra_css %}
   <link rel="stylesheet" href="{% static 'css/refund_receipt.css' %}">
@@ -13,54 +14,54 @@
     <div class="refund-paper">
       <div class="refund-header">
         <a href="{% url "accounts:dashboard" %}" class="btn btn-outline-secondary mb-3">
-            <i class="fas fa-arrow-left"></i> Back to Invoices
+            <i class="fas fa-arrow-left"></i> Retour aux factures
         </a>
         <div class="refund-icon">
           <i class="fas fa-undo-alt"></i>
         </div>
-        <h1>Refund Receipt</h1>
+        <h1>Reçu de remboursement</h1>
         <p class="receipt-number">{{ receipt.receipt_number }}</p>
       </div>
 
       <div class="refund-info">
         <div class="info-item">
-          <span class="info-label">Refund Number</span>
+          <span class="info-label">Numéro de remboursement</span>
           <span class="info-value">{{ refund.refund_number }}</span>
         </div>
         <div class="info-item">
-          <span class="info-label">Order Number</span>
+          <span class="info-label">Numéro de commande</span>
           <span class="info-value">{{ refund.order.order_id }}</span>
         </div>
         <div class="info-item">
-          <span class="info-label">Refund Date</span>
-          <span class="info-value">{{ receipt.refund_date|date:"M d, Y" }}</span>
+          <span class="info-label">Date de remboursement</span>
+          <span class="info-value">{{ receipt.refund_date|date:"d M Y" }}</span>
         </div>
         <div class="info-item">
-          <span class="info-label">Refund Method</span>
+          <span class="info-label">Mode de remboursement</span>
           <span class="info-value">{{ receipt.get_refund_method_display }}</span>
         </div>
       </div>
 
       <div class="amount-refunded-section">
-        <h2>Amount Refunded</h2>
+        <h2>Montant remboursé</h2>
         <div class="amount-refunded">{{ receipt.amount_refunded|floatformat:2 }} DZD</div>
       </div>
 
       <div class="refund-reason-box">
-        <h3><i class="fas fa-info-circle"></i> Refund Reason</h3>
+        <h3><i class="fas fa-info-circle"></i> Motif du remboursement</h3>
         <p>{{ refund.reason }}</p>
       </div>
 
       {% if receipt.refund_proof.proof_file %}
       <div class="refund-proof-box">
-        <h3><i class="fas fa-file-invoice-dollar"></i> Refund Proof Document</h3>
+        <h3><i class="fas fa-file-invoice-dollar"></i> Document justificatif du remboursement</h3>
         <a href="{{ receipt.refund_proof.proof_file.url }}" target="_blank" class="proof-file-link">
           <i class="fas fa-download"></i>
-          View Refund Proof
+          Voir le justificatif
         </a>
         {% if receipt.refund_proof.transaction_reference %}
         <p class="mt-3 mb-0 text-muted">
-          <small>Transaction Reference: {{ receipt.refund_proof.transaction_reference }}</small>
+          <small>Référence de transaction : {{ receipt.refund_proof.transaction_reference }}</small>
         </p>
         {% endif %}
       </div>
@@ -68,39 +69,39 @@
 
       <div class="refund-details">
         <div class="detail-row">
-          <span class="detail-label">Customer Name</span>
+          <span class="detail-label">Nom du client</span>
           <span class="detail-value">{{ refund.order.user.get_full_name|default:refund.order.user.username }}</span>
         </div>
         <div class="detail-row">
-          <span class="detail-label">Original Order Date</span>
-          <span class="detail-value">{{ refund.order.created_at|date:"M d, Y" }}</span>
+          <span class="detail-label">Date de commande initiale</span>
+          <span class="detail-value">{{ refund.order.created_at|date:"d M Y" }}</span>
         </div>
         <div class="detail-row">
-          <span class="detail-label">Refund Initiated</span>
-          <span class="detail-value">{{ refund.created_at|date:"M d, Y" }}</span>
+          <span class="detail-label">Remboursement initié le</span>
+          <span class="detail-value">{{ refund.created_at|date:"d M Y" }}</span>
         </div>
         <div class="detail-row">
-          <span class="detail-label">Refund Completed</span>
-          <span class="detail-value">{{ refund.completed_at|date:"M d, Y" }}</span>
+          <span class="detail-label">Remboursement effectué le</span>
+          <span class="detail-value">{{ refund.completed_at|date:"d M Y" }}</span>
         </div>
         <div class="detail-row">
-          <span class="detail-label">Receipt Generated</span>
-          <span class="detail-value">{{ receipt.generated_at|date:"M d, Y h:i A" }}</span>
+          <span class="detail-label">Reçu généré le</span>
+          <span class="detail-value">{{ receipt.generated_at|date:"d M Y H:i" }}</span>
         </div>
       </div>
 
       <div class="refund-footer">
-        <p><strong>Your refund has been processed successfully.</strong></p>
-        <p>This is an official refund receipt from Fennec Med</p>
-        <p>For any questions, please contact our support team</p>
+        <p><strong>Votre remboursement a été traité avec succès.</strong></p>
+        <p>Ceci est un reçu de remboursement officiel de Fennec Med</p>
+        <p>Pour toute question, veuillez contacter notre équipe d'assistance</p>
       </div>
 
       <div class="action-buttons">
         <button onclick="window.print()" class="btn-print">
-          <i class="fas fa-print"></i> Print Receipt
+          <i class="fas fa-print"></i> Imprimer le reçu
         </button>
         <a href="{% url 'accounts:dashboard' %}" class="btn-back">
-          <i class="fas fa-arrow-left"></i> Back to Dashboard
+          <i class="fas fa-arrow-left"></i> Retour au tableau de bord
         </a>
       </div>
     </div>

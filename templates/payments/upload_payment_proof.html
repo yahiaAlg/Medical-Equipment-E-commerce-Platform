@@ -1,7 +1,8 @@
+<!-- upload_payment_proof.html -->
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}Upload Payment Proof - Fennec Med{% endblock %}
+{% block title %}Télécharger le justificatif de paiement - Fennec Med{% endblock %}
 
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'css/upload_payment_proof.css' %}">
@@ -12,14 +13,14 @@
   <div class="upload-container">
     <div class="upload-card">
       <div class="upload-header">
-        <h1>Upload Payment Proof</h1>
-        <p>Submit proof of your payment for verification</p>
+        <h1>Télécharger le justificatif de paiement</h1>
+        <p>Soumettez la preuve de votre paiement pour vérification</p>
       </div>
 
       <div class="invoice-info-box">
-        <p><strong>Invoice:</strong> {{ invoice.invoice_number }}</p>
-        <p><strong>Amount:</strong> {{ invoice.total_amount|floatformat:2 }} DZD</p>
-        <p><strong>Order:</strong> {{ invoice.order.order_id }}</p>
+        <p><strong>Facture :</strong> {{ invoice.invoice_number }}</p>
+        <p><strong>Montant :</strong> {{ invoice.total_amount|floatformat:2 }} DZD</p>
+        <p><strong>Commande :</strong> {{ invoice.order.order_id }}</p>
       </div>
 
       <form method="post" enctype="multipart/form-data">
@@ -37,8 +38,8 @@
           <label for="{{ form.proof_file.id_for_label }}">{{ form.proof_file.label }}</label>
           <div class="file-upload-area" onclick="document.getElementById('{{ form.proof_file.id_for_label }}').click()">
             <i class="fas fa-cloud-upload-alt"></i>
-            <p><strong>Click to upload</strong> or drag and drop</p>
-            <p class="help-text">PNG, JPG or PDF (max. 5MB)</p>
+            <p><strong>Cliquez pour télécharger</strong> ou glissez-déposez</p>
+            <p class="help-text">PNG, JPG ou PDF (max. 5 Mo)</p>
           </div>
           {{ form.proof_file }}
           {% if form.proof_file.errors %}
@@ -52,7 +53,7 @@
           {% if form.transaction_reference.errors %}
             <div class="error-message">{{ form.transaction_reference.errors }}</div>
           {% endif %}
-          <p class="help-text">Enter the transaction ID or reference number from your payment</p>
+          <p class="help-text">Entrez l'ID de transaction ou le numéro de référence de votre paiement</p>
         </div>
 
         <div class="form-group">
@@ -64,7 +65,7 @@
         </div>
 
         <button type="submit" class="submit-button">
-          <i class="fas fa-paper-plane"></i> Submit Payment Proof
+          <i class="fas fa-paper-plane"></i> Soumettre le justificatif
         </button>
       </form>
     </div>

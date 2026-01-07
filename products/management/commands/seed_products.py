@@ -15,10 +15,10 @@ from decimal import Decimal
 
 
 class Command(BaseCommand):
-    help = "Seeds products, categories, brands, images, and variants"
+    help = "Génère les produits, catégories, marques, images et variantes"
 
     def download_image(self, url):
-        """Helper to download image from URL"""
+        """Télécharge une image depuis une URL"""
         try:
             response = requests.get(url, timeout=10)
             if response.status_code == 200:
@@ -28,57 +28,57 @@ class Command(BaseCommand):
         return None
 
     def handle(self, *args, **kwargs):
-        self.stdout.write("Seeding products...")
+        self.stdout.write("Génération des produits...")
 
-        # Create Categories based on HTML pages
+        # Créer les catégories basées sur les pages HTML
         categories_data = [
             {
-                "name": "Cardiology",
-                "description": "Cardiovascular care equipment and supplies",
+                "name": "Cardiologie",
+                "description": "Équipements et fournitures de soins cardiovasculaires",
             },
             {
-                "name": "Neurology",
-                "description": "Neurological diagnostic and treatment equipment",
+                "name": "Neurologie",
+                "description": "Équipements de diagnostic et de traitement neurologiques",
             },
             {
-                "name": "Orthopedics",
-                "description": "Bone, joint and muscle care equipment",
+                "name": "Orthopédie",
+                "description": "Équipements de soins des os, articulations et muscles",
             },
             {
-                "name": "Pediatrics",
-                "description": "Specialized equipment for children and adolescents",
+                "name": "Pédiatrie",
+                "description": "Équipements spécialisés pour enfants et adolescents",
             },
             {
-                "name": "Dermatology",
-                "description": "Skin, hair and nail care equipment",
+                "name": "Dermatologie",
+                "description": "Équipements de soins de la peau, cheveux et ongles",
             },
             {
-                "name": "Ophthalmology",
-                "description": "Eye care and vision equipment",
+                "name": "Ophtalmologie",
+                "description": "Équipements de soins oculaires et de vision",
             },
             {
-                "name": "Surgery",
-                "description": "Surgical instruments and equipment",
+                "name": "Chirurgie",
+                "description": "Instruments et équipements chirurgicaux",
             },
             {
-                "name": "Gastroenterology",
-                "description": "Digestive system diagnostic and treatment equipment",
+                "name": "Gastro-entérologie",
+                "description": "Équipements de diagnostic et traitement du système digestif",
             },
             {
-                "name": "Laboratory",
-                "description": "Diagnostic testing and analysis equipment",
+                "name": "Laboratoire",
+                "description": "Équipements de tests diagnostiques et d'analyse",
             },
             {
-                "name": "Gynecology",
-                "description": "Women's health and reproductive care equipment",
+                "name": "Gynécologie",
+                "description": "Équipements de santé féminine et de soins reproductifs",
             },
             {
-                "name": "Pneumology",
-                "description": "Respiratory and lung disease equipment",
+                "name": "Pneumologie",
+                "description": "Équipements pour les maladies respiratoires et pulmonaires",
             },
             {
-                "name": "Dentistry",
-                "description": "Dental care and oral health equipment",
+                "name": "Dentisterie",
+                "description": "Équipements de soins dentaires et de santé bucco-dentaire",
             },
         ]
 
@@ -89,9 +89,9 @@ class Command(BaseCommand):
             )
             categories[cat_data["name"]] = cat
             if created:
-                self.stdout.write(f"Created category: {cat.name}")
+                self.stdout.write(f"Catégorie créée : {cat.name}")
 
-        # Create Brands
+        # Créer les marques
         brands_data = [
             "3M Littmann",
             "Accu-Chek",
@@ -107,114 +107,118 @@ class Command(BaseCommand):
         for brand_name in brands_data:
             brand, created = Brand.objects.get_or_create(
                 name=brand_name,
-                defaults={"description": f"Leading manufacturer of medical equipment"},
+                defaults={"description": f"Fabricant leader d'équipements médicaux"},
             )
             brands.append(brand)
 
-        # Create Products based on HTML pages
+        # Créer les produits basés sur les pages HTML
         products_data = [
-            # Cardiology Products
+            # Produits de cardiologie
             {
-                "name": "ECG Electrodes",
-                "categories": ["Cardiology"],  # Changed to list
+                "name": "Électrodes ECG",
+                "categories": ["Cardiologie"],
                 "price": 2600,
                 "specialty": "cardiology",
-                "description": "Disposable, pre-gelled electrodes for cardiac monitoring",
+                "description": "Électrodes jetables pré-gélifiées pour surveillance cardiaque",
                 "variants": [
-                    {"title": "Pack Size", "value": "50 Pack", "cost": 0},
-                    {"title": "Pack Size", "value": "100 Pack", "cost": 1500},
-                    {"title": "Pack Size", "value": "200 Pack", "cost": 2800},
+                    {"title": "Taille du pack", "value": "Pack de 50", "cost": 0},
+                    {"title": "Taille du pack", "value": "Pack de 100", "cost": 1500},
+                    {"title": "Taille du pack", "value": "Pack de 200", "cost": 2800},
                 ],
             },
             {
-                "name": "Blood Lancets",
-                "categories": ["Cardiology", "Laboratory"],  # Can have multiple
+                "name": "Lancettes de sang",
+                "categories": ["Cardiologie", "Laboratoire"],
                 "price": 4000,
                 "specialty": "cardiology",
-                "description": "Sterile, single-use lancets for blood sampling",
+                "description": "Lancettes stériles à usage unique pour prélèvement sanguin",
                 "variants": [
-                    {"title": "Gauge", "value": "28G", "cost": 0},
-                    {"title": "Gauge", "value": "30G", "cost": 200},
-                    {"title": "Quantity", "value": "100 pcs", "cost": 0},
-                    {"title": "Quantity", "value": "200 pcs", "cost": 1800},
+                    {"title": "Calibre", "value": "28G", "cost": 0},
+                    {"title": "Calibre", "value": "30G", "cost": 200},
+                    {"title": "Quantité", "value": "100 pcs", "cost": 0},
+                    {"title": "Quantité", "value": "200 pcs", "cost": 1800},
                 ],
             },
             {
                 "name": "CardioAspirine",
-                "categories": ["Cardiology"],
+                "categories": ["Cardiologie"],
                 "price": 200,
                 "specialty": "cardiology",
-                "description": "Low-dose aspirin for cardiovascular protection and blood thinning",
+                "description": "Aspirine à faible dose pour la protection cardiovasculaire et l'anticoagulation",
                 "variants": [
                     {"title": "Dosage", "value": "75mg", "cost": 0},
                     {"title": "Dosage", "value": "100mg", "cost": 50},
-                    {"title": "Pack Size", "value": "30 tablets", "cost": 0},
-                    {"title": "Pack Size", "value": "60 tablets", "cost": 150},
+                    {"title": "Taille du pack", "value": "30 comprimés", "cost": 0},
+                    {"title": "Taille du pack", "value": "60 comprimés", "cost": 150},
                 ],
             },
-            # Dentistry Products
+            # Produits de dentisterie
             {
                 "name": "Ledermix",
-                "categories": ["Dentistry"],
+                "categories": ["Dentisterie"],
                 "price": 2000,
                 "specialty": "general",
-                "description": "Prescription dental paste containing triamcinolone acetonide and chlortetracycline HCl",
+                "description": "Pâte dentaire sur ordonnance contenant acétonide de triamcinolone et chlortétracycline HCl",
                 "variants": [
-                    {"title": "Size", "value": "5g tube", "cost": 0},
-                    {"title": "Size", "value": "10g tube", "cost": 800},
+                    {"title": "Taille", "value": "Tube de 5g", "cost": 0},
+                    {"title": "Taille", "value": "Tube de 10g", "cost": 800},
                 ],
             },
             {
                 "name": "Oraqix",
-                "categories": ["Dentistry"],
+                "categories": ["Dentisterie"],
                 "price": 4000,
                 "specialty": "general",
-                "description": "Periodontal gel containing lidocaine and prilocaine for local anesthesia",
+                "description": "Gel parodontal contenant lidocaïne et prilocaïne pour anesthésie locale",
                 "variants": [
-                    {"title": "Volume", "value": "1.7g cartridge", "cost": 0},
-                    {"title": "Pack", "value": "Single", "cost": 0},
-                    {"title": "Pack", "value": "Box of 20", "cost": 15000},
+                    {"title": "Volume", "value": "Cartouche de 1,7g", "cost": 0},
+                    {"title": "Pack", "value": "Unitaire", "cost": 0},
+                    {"title": "Pack", "value": "Boîte de 20", "cost": 15000},
                 ],
             },
             {
-                "name": "Dental Scalers",
-                "categories": ["Dentistry", "Surgery"],
+                "name": "Détartreurs dentaires",
+                "categories": ["Dentisterie", "Chirurgie"],
                 "price": 3000,
                 "specialty": "general",
-                "description": "Set of dental instruments for removing plaque and tartar from teeth",
+                "description": "Ensemble d'instruments dentaires pour éliminer la plaque et le tartre des dents",
                 "variants": [
-                    {"title": "Set Type", "value": "Basic (3 pieces)", "cost": 0},
                     {
-                        "title": "Set Type",
-                        "value": "Professional (6 pieces)",
+                        "title": "Type d'ensemble",
+                        "value": "Basique (3 pièces)",
+                        "cost": 0,
+                    },
+                    {
+                        "title": "Type d'ensemble",
+                        "value": "Professionnel (6 pièces)",
                         "cost": 2000,
                     },
                     {
-                        "title": "Set Type",
-                        "value": "Complete (12 pieces)",
+                        "title": "Type d'ensemble",
+                        "value": "Complet (12 pièces)",
                         "cost": 4500,
                     },
                 ],
             },
-            # Dermatology Products
+            # Produits de dermatologie
             {
                 "name": "Canestene DERM",
-                "categories": ["Dermatology"],
+                "categories": ["Dermatologie"],
                 "price": 1150,
                 "specialty": "dermatology",
-                "description": "Antifungal cream for treating skin infections like athlete's foot, ringworm, and fungal skin irritations",
+                "description": "Crème antifongique pour traiter les infections cutanées comme le pied d'athlète, la teigne et les irritations cutanées fongiques",
                 "variants": [
-                    {"title": "Size", "value": "15g", "cost": 0},
-                    {"title": "Size", "value": "30g", "cost": 600},
-                    {"title": "Size", "value": "50g", "cost": 1000},
+                    {"title": "Taille", "value": "15g", "cost": 0},
+                    {"title": "Taille", "value": "30g", "cost": 600},
+                    {"title": "Taille", "value": "50g", "cost": 1000},
                 ],
             },
             {
                 "name": "Dermo Cuivre",
-                "categories": ["Dermatology"],
+                "categories": ["Dermatologie"],
                 "price": 1400,
                 "specialty": "dermatology",
-                "description": "Skin repair ointment for treating minor wounds, burns, and skin irritations",
+                "description": "Pommade réparatrice pour traiter les plaies mineures, brûlures et irritations cutanées",
                 "variants": [
                     {"title": "Volume", "value": "20ml", "cost": 0},
                     {"title": "Volume", "value": "50ml", "cost": 800},
@@ -222,134 +226,138 @@ class Command(BaseCommand):
             },
             {
                 "name": "Biafine",
-                "categories": ["Dermatology"],
+                "categories": ["Dermatologie"],
                 "price": 1700,
                 "specialty": "dermatology",
-                "description": "Soothing and protective skin care cream for irritated or damaged skin",
+                "description": "Crème de soins cutanés apaisante et protectrice pour peaux irritées ou abîmées",
                 "variants": [
-                    {"title": "Size", "value": "93g tube", "cost": 0},
-                    {"title": "Size", "value": "186g tube", "cost": 1500},
+                    {"title": "Taille", "value": "Tube de 93g", "cost": 0},
+                    {"title": "Taille", "value": "Tube de 186g", "cost": 1500},
                 ],
             },
-            # Gastroenterology Products
+            # Produits de gastro-entérologie
             {
                 "name": "Spascol LP",
-                "categories": ["Gastroenterology"],
+                "categories": ["Gastro-entérologie"],
                 "price": 1150,
                 "specialty": "general",
-                "description": "Muscle relaxant medication for treating muscle spasms and pain",
+                "description": "Médicament myorelaxant pour traiter les spasmes musculaires et la douleur",
                 "variants": [
-                    {"title": "Pack Size", "value": "20 tablets", "cost": 0},
-                    {"title": "Pack Size", "value": "40 tablets", "cost": 900},
+                    {"title": "Taille du pack", "value": "20 comprimés", "cost": 0},
+                    {"title": "Taille du pack", "value": "40 comprimés", "cost": 900},
                 ],
             },
             {
                 "name": "Gastricalm",
-                "categories": ["Gastroenterology"],
+                "categories": ["Gastro-entérologie"],
                 "price": 850,
                 "specialty": "general",
-                "description": "Medication for treating stomach acid and heartburn",
+                "description": "Médicament pour traiter l'acidité gastrique et les brûlures d'estomac",
                 "variants": [
-                    {"title": "Form", "value": "Tablets", "cost": 0},
-                    {"title": "Form", "value": "Suspension", "cost": 200},
+                    {"title": "Forme", "value": "Comprimés", "cost": 0},
+                    {"title": "Forme", "value": "Suspension", "cost": 200},
                 ],
             },
             {
-                "name": "Anatomical Stomach Model",
-                "categories": ["Gastroenterology"],
+                "name": "Modèle anatomique d'estomac",
+                "categories": ["Gastro-entérologie"],
                 "price": 4500,
                 "specialty": "general",
-                "description": "Educational model of the human stomach",
+                "description": "Modèle pédagogique de l'estomac humain",
                 "variants": [
-                    {"title": "Size", "value": "Standard", "cost": 0},
-                    {"title": "Size", "value": "Large (Teaching)", "cost": 2000},
+                    {"title": "Taille", "value": "Standard", "cost": 0},
+                    {"title": "Taille", "value": "Grand (Enseignement)", "cost": 2000},
                 ],
             },
-            # Gynecology Products
+            # Produits de gynécologie
             {
                 "name": "Femaferrin",
-                "categories": ["Gynecology"],
+                "categories": ["Gynécologie"],
                 "price": 2000,
                 "specialty": "general",
-                "description": "Iron supplement tablets for treating iron deficiency",
+                "description": "Comprimés de supplément de fer pour traiter la carence en fer",
                 "variants": [
-                    {"title": "Pack", "value": "30 tablets", "cost": 0},
-                    {"title": "Pack", "value": "60 tablets", "cost": 1700},
-                    {"title": "Pack", "value": "90 tablets", "cost": 2400},
+                    {"title": "Pack", "value": "30 comprimés", "cost": 0},
+                    {"title": "Pack", "value": "60 comprimés", "cost": 1700},
+                    {"title": "Pack", "value": "90 comprimés", "cost": 2400},
                 ],
             },
             {
-                "name": "Quality Suction Handle with Bottle",
-                "categories": ["Gynecology", "Surgery"],
+                "name": "Poignée d'aspiration de qualité avec bouteille",
+                "categories": ["Gynécologie", "Chirurgie"],
                 "price": 3000,
                 "specialty": "general",
-                "description": "Manual suction device with collection bottle",
+                "description": "Dispositif d'aspiration manuel avec bouteille de collecte",
                 "variants": [
-                    {"title": "Bottle Size", "value": "500ml", "cost": 0},
-                    {"title": "Bottle Size", "value": "1000ml", "cost": 800},
+                    {"title": "Taille de bouteille", "value": "500ml", "cost": 0},
+                    {"title": "Taille de bouteille", "value": "1000ml", "cost": 800},
                 ],
             },
             {
-                "name": "Anatomical Model (Female Reproductive System)",
-                "categories": ["Gynecology"],
+                "name": "Modèle anatomique (Système reproducteur féminin)",
+                "categories": ["Gynécologie"],
                 "price": 4500,
                 "specialty": "general",
-                "description": "Educational model of female reproductive anatomy",
+                "description": "Modèle pédagogique de l'anatomie reproductive féminine",
                 "variants": [
                     {"title": "Type", "value": "Standard", "cost": 0},
                     {
                         "title": "Type",
-                        "value": "Detailed (with pathologies)",
+                        "value": "Détaillé (avec pathologies)",
                         "cost": 2500,
                     },
                 ],
             },
-            # Laboratory Products
+            # Produits de laboratoire
             {
-                "name": "Microcentrifuge Tubes (1.5 ml)",
-                "categories": ["Laboratory"],
+                "name": "Tubes microcentrifuge (1,5 ml)",
+                "categories": ["Laboratoire"],
                 "price": 3000,
                 "specialty": "general",
-                "description": "Rack of 96 blue-capped microcentrifuge tubes",
+                "description": "Rack de 96 tubes microcentrifuge à bouchon bleu",
                 "variants": [
-                    {"title": "Quantity", "value": "96 tubes (1 rack)", "cost": 0},
-                    {"title": "Quantity", "value": "480 tubes (5 racks)", "cost": 2500},
-                    {"title": "Color", "value": "Blue", "cost": 0},
-                    {"title": "Color", "value": "Clear", "cost": 0},
-                    {"title": "Color", "value": "Assorted", "cost": 200},
+                    {"title": "Quantité", "value": "96 tubes (1 rack)", "cost": 0},
+                    {"title": "Quantité", "value": "480 tubes (5 racks)", "cost": 2500},
+                    {"title": "Couleur", "value": "Bleu", "cost": 0},
+                    {"title": "Couleur", "value": "Transparent", "cost": 0},
+                    {"title": "Couleur", "value": "Assortis", "cost": 200},
                 ],
             },
             {
-                "name": "Laboratory Glassware Set",
-                "categories": ["Laboratory"],
+                "name": "Ensemble de verrerie de laboratoire",
+                "categories": ["Laboratoire"],
                 "price": 2250,
                 "specialty": "general",
-                "description": "Set including beaker, graduated cylinder, and Erlenmeyer flask",
+                "description": "Ensemble comprenant bécher, éprouvette graduée et fiole Erlenmeyer",
                 "variants": [
-                    {"title": "Set", "value": "Basic (3 pieces)", "cost": 0},
-                    {"title": "Set", "value": "Standard (6 pieces)", "cost": 1500},
-                    {"title": "Set", "value": "Professional (12 pieces)", "cost": 3000},
+                    {"title": "Ensemble", "value": "Basique (3 pièces)", "cost": 0},
+                    {"title": "Ensemble", "value": "Standard (6 pièces)", "cost": 1500},
+                    {
+                        "title": "Ensemble",
+                        "value": "Professionnel (12 pièces)",
+                        "cost": 3000,
+                    },
                 ],
             },
             {
-                "name": "Wash Bottle (500 ml)",
-                "categories": ["Laboratory"],
+                "name": "Pissette (500 ml)",
+                "categories": ["Laboratoire"],
                 "price": 550,
                 "specialty": "general",
-                "description": "Plastic wash bottle with squeezer top",
+                "description": "Pissette en plastique avec embout presseur",
                 "variants": [
                     {"title": "Volume", "value": "250ml", "cost": -200},
                     {"title": "Volume", "value": "500ml", "cost": 0},
                     {"title": "Volume", "value": "1000ml", "cost": 300},
                 ],
             },
-            # Neurology Products
+            # Produits de neurologie
             {
-                "name": "Reflex Hammer",
-                "categories": ["Neurology"],
+                "name": "Marteau à réflexes",
+                "categories": ["Neurologie"],
                 "price": 2000,
                 "specialty": "neurology",
-                "description": "Tool for testing patient reflexes",
+                "description": "Outil pour tester les réflexes du patient",
                 "variants": [
                     {"title": "Type", "value": "Taylor", "cost": 0},
                     {"title": "Type", "value": "Buck", "cost": 300},
@@ -357,35 +365,35 @@ class Command(BaseCommand):
                 ],
             },
             {
-                "name": "Lumbar Puncture Tray",
-                "categories": ["Neurology", "Surgery"],
+                "name": "Plateau de ponction lombaire",
+                "categories": ["Neurologie", "Chirurgie"],
                 "price": 20000,
                 "specialty": "neurology",
-                "description": "Sterile kit for performing spinal taps and cerebrospinal fluid analysis",
+                "description": "Kit stérile pour effectuer des ponctions rachidiennes et analyses du liquide céphalorachidien",
                 "variants": [
-                    {"title": "Needle Size", "value": "20G", "cost": 0},
-                    {"title": "Needle Size", "value": "22G", "cost": 500},
-                    {"title": "Needle Size", "value": "25G", "cost": 1000},
+                    {"title": "Taille d'aiguille", "value": "20G", "cost": 0},
+                    {"title": "Taille d'aiguille", "value": "22G", "cost": 500},
+                    {"title": "Taille d'aiguille", "value": "25G", "cost": 1000},
                 ],
             },
             {
                 "name": "Neurobion Forte",
-                "categories": ["Neurology"],
+                "categories": ["Neurologie"],
                 "price": 1500,
                 "specialty": "neurology",
-                "description": "Vitamin B complex supplement that helps relieve tingling, numbness, and weakness",
+                "description": "Supplément de complexe vitaminique B qui aide à soulager les picotements, engourdissements et faiblesses",
                 "variants": [
-                    {"title": "Pack", "value": "30 tablets", "cost": 0},
-                    {"title": "Pack", "value": "60 tablets", "cost": 1300},
+                    {"title": "Pack", "value": "30 comprimés", "cost": 0},
+                    {"title": "Pack", "value": "60 comprimés", "cost": 1300},
                 ],
             },
-            # Ophthalmology Products
+            # Produits d'ophtalmologie
             {
                 "name": "Vibac",
-                "categories": ["Ophthalmology", "Surgery"],
+                "categories": ["Ophtalmologie", "Chirurgie"],
                 "price": 750,
                 "specialty": "ophthalmology",
-                "description": "Antiseptic solution for skin disinfection",
+                "description": "Solution antiseptique pour désinfection cutanée",
                 "variants": [
                     {"title": "Volume", "value": "100ml", "cost": 0},
                     {"title": "Volume", "value": "250ml", "cost": 500},
@@ -394,180 +402,188 @@ class Command(BaseCommand):
             },
             {
                 "name": "Vabysmo",
-                "categories": ["Ophthalmology"],
+                "categories": ["Ophtalmologie"],
                 "price": 20000,
                 "specialty": "ophthalmology",
-                "description": "Injection solution containing 120 mg of active ingredient",
+                "description": "Solution injectable contenant 120 mg de principe actif",
                 "variants": [
-                    {"title": "Pack", "value": "Single vial", "cost": 0},
-                    {"title": "Pack", "value": "3-pack", "cost": 5000},
+                    {"title": "Pack", "value": "Flacon unique", "cost": 0},
+                    {"title": "Pack", "value": "Pack de 3", "cost": 5000},
                 ],
             },
             {
                 "name": "Ophthavet",
-                "categories": ["Ophthalmology"],
+                "categories": ["Ophtalmologie"],
                 "price": 2250,
                 "specialty": "ophthalmology",
-                "description": "Ophthalmic solution for eye care",
+                "description": "Solution ophtalmique pour soins oculaires",
                 "variants": [
                     {"title": "Volume", "value": "5ml", "cost": 0},
                     {"title": "Volume", "value": "10ml", "cost": 1000},
                 ],
             },
-            # Orthopedics Products
+            # Produits d'orthopédie
             {
                 "name": "Alvityl Chondroflex",
-                "categories": ["Orthopedics"],
+                "categories": ["Orthopédie"],
                 "price": 3250,
                 "specialty": "orthopedics",
-                "description": "Joint health supplement with chondroitin and glucosamine for maintaining cartilage and joint function",
+                "description": "Supplément pour la santé articulaire avec chondroïtine et glucosamine pour maintenir le cartilage et la fonction articulaire",
                 "variants": [
-                    {"title": "Pack", "value": "30 tablets", "cost": 0},
-                    {"title": "Pack", "value": "60 tablets", "cost": 2800},
-                    {"title": "Pack", "value": "90 tablets", "cost": 4200},
+                    {"title": "Pack", "value": "30 comprimés", "cost": 0},
+                    {"title": "Pack", "value": "60 comprimés", "cost": 2800},
+                    {"title": "Pack", "value": "90 comprimés", "cost": 4200},
                 ],
             },
             {
                 "name": "Structoflex",
-                "categories": ["Orthopedics"],
+                "categories": ["Orthopédie"],
                 "price": 4000,
                 "specialty": "orthopedics",
-                "description": "Joint supplement containing chondroitin sulfate for supporting joint mobility and cartilage health",
+                "description": "Supplément articulaire contenant du sulfate de chondroïtine pour soutenir la mobilité articulaire et la santé du cartilage",
                 "variants": [
-                    {"title": "Form", "value": "Tablets", "cost": 0},
-                    {"title": "Form", "value": "Capsules", "cost": 300},
-                    {"title": "Pack", "value": "30 count", "cost": 0},
-                    {"title": "Pack", "value": "60 count", "cost": 3500},
+                    {"title": "Forme", "value": "Comprimés", "cost": 0},
+                    {"title": "Forme", "value": "Capsules", "cost": 300},
+                    {"title": "Pack", "value": "30 unités", "cost": 0},
+                    {"title": "Pack", "value": "60 unités", "cost": 3500},
                 ],
             },
             {
                 "name": "Salusan Ortho",
-                "categories": ["Orthopedics"],
+                "categories": ["Orthopédie"],
                 "price": 2750,
                 "specialty": "orthopedics",
-                "description": "Orthopedic health supplement with collagen and vitamins to support bones and joints",
+                "description": "Supplément pour la santé orthopédique avec collagène et vitamines pour soutenir les os et les articulations",
                 "variants": [
                     {"title": "Pack", "value": "30 sachets", "cost": 0},
                     {"title": "Pack", "value": "60 sachets", "cost": 2400},
                 ],
             },
-            # Pediatrics Products
+            # Produits de pédiatrie
             {
                 "name": "EfferalganMed Pédiatrique (Paracétamol 30 mg/ml)",
-                "categories": ["Pediatrics"],
+                "categories": ["Pédiatrie"],
                 "price": 550,
                 "specialty": "pediatrics",
-                "description": "Pediatric paracetamol solution for pain and fever relief in children aged 4 to 32 kg",
+                "description": "Solution pédiatrique de paracétamol pour soulager la douleur et la fièvre chez les enfants de 4 à 32 kg",
                 "variants": [
-                    {"title": "Volume", "value": "90ml bottle", "cost": 0},
-                    {"title": "Volume", "value": "150ml bottle", "cost": 400},
+                    {"title": "Volume", "value": "Flacon de 90ml", "cost": 0},
+                    {"title": "Volume", "value": "Flacon de 150ml", "cost": 400},
                 ],
             },
             {
                 "name": "Melilax",
-                "categories": ["Pediatrics"],
+                "categories": ["Pédiatrie"],
                 "price": 1600,
                 "specialty": "pediatrics",
-                "description": "Herbal laxative supplement for gentle relief of occasional constipation",
+                "description": "Supplément laxatif à base de plantes pour un soulagement doux de la constipation occasionnelle",
                 "variants": [
                     {
-                        "title": "Form",
-                        "value": "Pediatric microenemas (6x5g)",
+                        "title": "Forme",
+                        "value": "Microlavements pédiatriques (6x5g)",
                         "cost": 0,
                     },
                     {
-                        "title": "Form",
-                        "value": "Adult microenemas (6x10g)",
+                        "title": "Forme",
+                        "value": "Microlavements adultes (6x10g)",
                         "cost": 500,
                     },
                 ],
             },
             {
-                "name": "Doliprane (Paracetamol)",
-                "categories": ["Pediatrics"],
+                "name": "Doliprane (Paracétamol)",
+                "categories": ["Pédiatrie"],
                 "price": 1000,
                 "specialty": "pediatrics",
-                "description": "Pain reliever and fever reducer containing paracetamol (acetaminophen)",
+                "description": "Analgésique et antipyrétique contenant du paracétamol (acétaminophène)",
                 "variants": [
-                    {"title": "Strength", "value": "100mg suppositories", "cost": 0},
-                    {"title": "Strength", "value": "200mg suppositories", "cost": 200},
-                    {"title": "Strength", "value": "300mg suppositories", "cost": 300},
+                    {"title": "Dosage", "value": "Suppositoires 100mg", "cost": 0},
+                    {"title": "Dosage", "value": "Suppositoires 200mg", "cost": 200},
+                    {"title": "Dosage", "value": "Suppositoires 300mg", "cost": 300},
                 ],
             },
-            # Pneumology Products
+            # Produits de pneumologie
             {
                 "name": "Deslor (Desloratadine 5 mg)",
-                "categories": ["Pneumology"],
+                "categories": ["Pneumologie"],
                 "price": 1500,
                 "specialty": "general",
-                "description": "Antihistamine tablets for allergy relief",
+                "description": "Comprimés antihistaminiques pour le soulagement des allergies",
                 "variants": [
-                    {"title": "Pack", "value": "10 tablets", "cost": 0},
-                    {"title": "Pack", "value": "20 tablets", "cost": 1300},
-                    {"title": "Pack", "value": "30 tablets", "cost": 1800},
+                    {"title": "Pack", "value": "10 comprimés", "cost": 0},
+                    {"title": "Pack", "value": "20 comprimés", "cost": 1300},
+                    {"title": "Pack", "value": "30 comprimés", "cost": 1800},
                 ],
             },
             {
-                "name": "Peak Flow Meter",
-                "categories": ["Pneumology"],
+                "name": "Débitmètre de pointe",
+                "categories": ["Pneumologie"],
                 "price": 2250,
                 "specialty": "general",
-                "description": "Device for measuring respiratory flow rate",
+                "description": "Appareil pour mesurer le débit respiratoire",
                 "variants": [
                     {"title": "Type", "value": "Standard", "cost": 0},
-                    {"title": "Type", "value": "Digital", "cost": 1500},
+                    {"title": "Type", "value": "Numérique", "cost": 1500},
                 ],
             },
             {
-                "name": "Nebulizer",
-                "categories": ["Pneumology", "Pediatrics"],
+                "name": "Nébuliseur",
+                "categories": ["Pneumologie", "Pédiatrie"],
                 "price": 4500,
                 "specialty": "general",
-                "description": "Electronic device for administering medication in mist form",
+                "description": "Appareil électronique pour administrer des médicaments sous forme de brouillard",
                 "variants": [
-                    {"title": "Type", "value": "Compressor", "cost": 0},
-                    {"title": "Type", "value": "Ultrasonic", "cost": 2000},
-                    {"title": "Type", "value": "Mesh", "cost": 3500},
+                    {"title": "Type", "value": "Compresseur", "cost": 0},
+                    {"title": "Type", "value": "Ultrasonique", "cost": 2000},
+                    {"title": "Type", "value": "Maille", "cost": 3500},
                 ],
             },
-            # Surgery Products
+            # Produits de chirurgie
             {
-                "name": "Surgical Instrument Set",
-                "categories": ["Surgery"],
+                "name": "Ensemble d'instruments chirurgicaux",
+                "categories": ["Chirurgie"],
                 "price": 7500,
                 "specialty": "general",
-                "description": "Basic set of surgical instruments including forceps, scissors, and scalpel handles",
+                "description": "Ensemble de base d'instruments chirurgicaux comprenant pinces, ciseaux et manches de scalpel",
                 "variants": [
-                    {"title": "Set", "value": "Minor Surgery (10 pcs)", "cost": 0},
-                    {"title": "Set", "value": "General Surgery (25 pcs)", "cost": 5000},
-                    {"title": "Set", "value": "Complete (50 pcs)", "cost": 12000},
+                    {
+                        "title": "Ensemble",
+                        "value": "Chirurgie mineure (10 pcs)",
+                        "cost": 0,
+                    },
+                    {
+                        "title": "Ensemble",
+                        "value": "Chirurgie générale (25 pcs)",
+                        "cost": 5000,
+                    },
+                    {"title": "Ensemble", "value": "Complet (50 pcs)", "cost": 12000},
                 ],
             },
             {
-                "name": "Disposable Surgical Gloves",
-                "categories": ["Surgery", "Laboratory"],
+                "name": "Gants chirurgicaux jetables",
+                "categories": ["Chirurgie", "Laboratoire"],
                 "price": 1750,
                 "specialty": "general",
-                "description": "Box of sterile latex or nitrile examination gloves",
+                "description": "Boîte de gants d'examen stériles en latex ou nitrile",
                 "variants": [
-                    {"title": "Material", "value": "Latex", "cost": 0},
-                    {"title": "Material", "value": "Nitrile", "cost": 300},
-                    {"title": "Size", "value": "Small", "cost": 0},
-                    {"title": "Size", "value": "Medium", "cost": 0},
-                    {"title": "Size", "value": "Large", "cost": 0},
-                    {"title": "Size", "value": "X-Large", "cost": 0},
+                    {"title": "Matériau", "value": "Latex", "cost": 0},
+                    {"title": "Matériau", "value": "Nitrile", "cost": 300},
+                    {"title": "Taille", "value": "Petit", "cost": 0},
+                    {"title": "Taille", "value": "Moyen", "cost": 0},
+                    {"title": "Taille", "value": "Grand", "cost": 0},
+                    {"title": "Taille", "value": "Très grand", "cost": 0},
                 ],
             },
             {
-                "name": "Medical Tape",
-                "categories": ["Surgery"],
+                "name": "Ruban médical",
+                "categories": ["Chirurgie"],
                 "price": 350,
                 "specialty": "general",
-                "description": "Roll of hypoallergenic medical tape",
+                "description": "Rouleau de ruban médical hypoallergénique",
                 "variants": [
-                    {"title": "Width", "value": "1.25cm x 5m", "cost": 0},
-                    {"title": "Width", "value": "2.5cm x 5m", "cost": 100},
-                    {"title": "Width", "value": "5cm x 5m", "cost": 250},
+                    {"title": "Largeur", "value": "1,25cm x 5m", "cost": 0},
+                    {"title": "Largeur", "value": "2,5cm x 5m", "cost": 100},
+                    {"title": "Largeur", "value": "5cm x 5m", "cost": 250},
                 ],
             },
         ]
@@ -585,25 +601,25 @@ class Command(BaseCommand):
                     "specialty": prod_data["specialty"],
                     "availability_status": "in_stock",
                     "short_description": prod_data["description"],
-                    "description": f'{prod_data["description"]}. Professional-grade quality for medical use. Meets all medical standards and regulations.',
-                    "specifications": "Professional medical grade\nWarranty: 1-2 years\nCertifications: Medical standards compliant",
-                    "warranty": "Standard manufacturer warranty",
+                    "description": f'{prod_data["description"]}. Qualité professionnelle pour usage médical. Conforme à toutes les normes et réglementations médicales.',
+                    "specifications": "Qualité médicale professionnelle\nGarantie : 1-2 ans\nCertifications : Conforme aux normes médicales",
+                    "warranty": "Garantie constructeur standard",
                     "featured": random.choice([True, False]),
                     "trending": random.choice([True, False]),
                 },
             )
 
             if created:
-                self.stdout.write(f"Created product: {product.name}")
+                self.stdout.write(f"Produit créé : {product.name}")
 
-                # Add categories (M2M relationship)
+                # Ajouter les catégories (relation M2M)
                 for cat_name in prod_data["categories"]:
                     product.categories.add(categories[cat_name])
                 self.stdout.write(
-                    f"  Added categories: {', '.join(prod_data['categories'])}"
+                    f"  Catégories ajoutées : {', '.join(prod_data['categories'])}"
                 )
 
-                # Add placeholder images
+                # Ajouter des images de placeholder
                 for img_num in range(3):
                     image_url = f"https://source.unsplash.com/800x600/?medical,{prod_data['categories'][0].lower()}&sig={idx}{img_num}"
 
@@ -619,7 +635,7 @@ class Command(BaseCommand):
                             is_primary=(img_num == 0),
                         )
 
-                # Add product variants
+                # Ajouter les variantes de produits
                 if "variants" in prod_data:
                     for order, variant_data in enumerate(prod_data["variants"]):
                         ProductVariant.objects.create(
@@ -632,21 +648,21 @@ class Command(BaseCommand):
                             display_order=order,
                         )
                     self.stdout.write(
-                        f"  Added {len(prod_data['variants'])} variants for {product.name}"
+                        f"  {len(prod_data['variants'])} variantes ajoutées pour {product.name}"
                     )
 
-        # Create sample reviews
+        # Créer des avis d'exemple
         users = User.objects.all()
         if users.exists():
             products = Product.objects.all()[:15]
             review_titles = [
-                "Excellent quality",
-                "Great product",
-                "Highly recommended",
-                "Perfect for our clinic",
-                "Professional grade equipment",
-                "Very satisfied",
-                "Good value for money",
+                "Excellente qualité",
+                "Très bon produit",
+                "Hautement recommandé",
+                "Parfait pour notre clinique",
+                "Équipement de qualité professionnelle",
+                "Très satisfait",
+                "Bon rapport qualité-prix",
             ]
 
             for product in products:
@@ -657,11 +673,11 @@ class Command(BaseCommand):
                     defaults={
                         "rating": random.randint(4, 5),
                         "title": random.choice(review_titles),
-                        "comment": "Very satisfied with this purchase. High quality and reliable.",
+                        "comment": "Très satisfait de cet achat. Haute qualité et fiable.",
                         "verified_purchase": True,
                     },
                 )
 
         self.stdout.write(
-            self.style.SUCCESS("Successfully seeded products with variants!")
+            self.style.SUCCESS("Produits avec variantes générés avec succès !")
         )

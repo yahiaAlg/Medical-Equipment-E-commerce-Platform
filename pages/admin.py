@@ -46,12 +46,12 @@ class TestimonialAdmin(admin.ModelAdmin):
 class SiteInformationAdmin(admin.ModelAdmin):
     fieldsets = (
         (
-            "Basic Information",
+            "Informations de base",
             {"fields": ("site_name", "tagline", "description", "logo", "tva_rate")},
         ),
-        ("Contact Information", {"fields": ("phone", "fax", "email", "address")}),
+        ("Coordonnées", {"fields": ("phone", "fax", "email", "address")}),
         (
-            "Social Media",
+            "Réseaux sociaux",
             {
                 "fields": (
                     "facebook_url",
@@ -63,7 +63,7 @@ class SiteInformationAdmin(admin.ModelAdmin):
             },
         ),
         (
-            "About Page Content",
+            "Contenu de la page À propos",
             {
                 "fields": (
                     "about_hero_title",
@@ -75,7 +75,7 @@ class SiteInformationAdmin(admin.ModelAdmin):
                 )
             },
         ),
-        ("Map", {"fields": ("map_embed_url",)}),
+        ("Carte", {"fields": ("map_embed_url",)}),
     )
 
     def has_add_permission(self, request):
@@ -104,10 +104,16 @@ class TeamMemberAdmin(admin.ModelAdmin):
     list_editable = ["order", "is_active", "show_on_about_page"]
 
     fieldsets = (
-        ("Basic Information", {"fields": ("name", "position", "role", "bio", "image")}),
         (
-            "Contact Information",
+            "Informations de base",
+            {"fields": ("name", "position", "role", "bio", "image")},
+        ),
+        (
+            "Coordonnées",
             {"fields": ("email", "phone", "linkedin_url"), "classes": ("collapse",)},
         ),
-        ("Display Options", {"fields": ("order", "is_active", "show_on_about_page")}),
+        (
+            "Options d'affichage",
+            {"fields": ("order", "is_active", "show_on_about_page")},
+        ),
     )

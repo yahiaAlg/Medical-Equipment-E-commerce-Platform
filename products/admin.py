@@ -18,7 +18,10 @@ class CategoryAdmin(admin.ModelAdmin):
     prepopulated_fields = {"slug": ("name",)}
 
     fieldsets = (
-        ("Category Information", {"fields": ("name", "slug", "description", "image")}),
+        (
+            "Informations sur la catégorie",
+            {"fields": ("name", "slug", "description", "image")},
+        ),
     )
 
 
@@ -27,7 +30,9 @@ class BrandAdmin(admin.ModelAdmin):
     list_display = ("name",)
     search_fields = ("name", "description")
 
-    fieldsets = (("Brand Information", {"fields": ("name", "logo", "description")}),)
+    fieldsets = (
+        ("Informations sur la marque", {"fields": ("name", "logo", "description")}),
+    )
 
 
 class ProductVariantInline(admin.TabularInline):
@@ -69,7 +74,7 @@ class ProductQuestionInline(admin.TabularInline):
 class ProductAdmin(admin.ModelAdmin):
     list_display = (
         "name",
-        "get_categories",  # Updated
+        "get_categories",
         "brand",
         "price",
         "bulk_price",
@@ -79,7 +84,7 @@ class ProductAdmin(admin.ModelAdmin):
         "trending",
     )
     list_filter = (
-        "categories",  # Updated
+        "categories",
         "brand",
         "specialty",
         "availability_status",
@@ -103,13 +108,13 @@ class ProductAdmin(admin.ModelAdmin):
         ProductReviewInline,
         ProductQuestionInline,
     ]
-    filter_horizontal = ("categories",)  # Added
+    filter_horizontal = ("categories",)
 
     fieldsets = (
         (
-            "Basic Information",
+            "Informations de base",
             {"fields": ("name", "slug", "categories", "brand", "sku")},
-        ),  # Updated
+        ),
         (
             "Description",
             {
@@ -122,7 +127,7 @@ class ProductAdmin(admin.ModelAdmin):
             },
         ),
         (
-            "Pricing & Inventory",
+            "Prix et inventaire",
             {
                 "fields": (
                     "price",
@@ -138,16 +143,16 @@ class ProductAdmin(admin.ModelAdmin):
             "SEO",
             {"fields": ("meta_title", "meta_description"), "classes": ("collapse",)},
         ),
-        ("Features & Status", {"fields": ("featured", "trending")}),
+        ("Caractéristiques et statut", {"fields": ("featured", "trending")}),
         (
-            "Reviews",
+            "Avis",
             {
                 "fields": ("get_average_rating", "get_review_count"),
                 "classes": ("collapse",),
             },
         ),
         (
-            "Timestamps",
+            "Horodatage",
             {"fields": ("created_at", "updated_at"), "classes": ("collapse",)},
         ),
     )
@@ -161,32 +166,34 @@ class ProductAdmin(admin.ModelAdmin):
 
     def mark_as_featured(self, request, queryset):
         updated = queryset.update(featured=True)
-        self.message_user(request, f"{updated} product(s) marked as featured.")
+        self.message_user(request, f"{updated} produit(s) marqué(s) en vedette.")
 
-    mark_as_featured.short_description = "Mark as Featured"
+    mark_as_featured.short_description = "Marquer en vedette"
 
     def mark_as_trending(self, request, queryset):
         updated = queryset.update(trending=True)
-        self.message_user(request, f"{updated} product(s) marked as trending.")
+        self.message_user(request, f"{updated} produit(s) marqué(s) en tendance.")
 
-    mark_as_trending.short_description = "Mark as Trending"
+    mark_as_trending.short_description = "Marquer en tendance"
 
     def mark_in_stock(self, request, queryset):
         updated = queryset.update(availability_status="in_stock")
-        self.message_user(request, f"{updated} product(s) marked as in stock.")
+        self.message_user(request, f"{updated} produit(s) marqué(s) en stock.")
 
-    mark_in_stock.short_description = "Mark as In Stock"
+    mark_in_stock.short_description = "Marquer en stock"
 
     def mark_out_of_stock(self, request, queryset):
         updated = queryset.update(availability_status="out_of_stock")
-        self.message_user(request, f"{updated} product(s) marked as out of stock.")
+        self.message_user(
+            request, f"{updated} produit(s) marqué(s) en rupture de stock."
+        )
 
-    mark_out_of_stock.short_description = "Mark as Out of Stock"
+    mark_out_of_stock.short_description = "Marquer en rupture de stock"
 
     def get_categories(self, obj):
         return ", ".join([c.name for c in obj.categories.all()])
 
-    get_categories.short_description = "Categories"
+    get_categories.short_description = "Catégories"
 
     def get_queryset(self, request):
         return (
@@ -208,14 +215,14 @@ class ProductVariantAdmin(admin.ModelAdmin):
         "is_active",
         "display_order",
     )
-    list_filter = ("is_active", "variant_title", "product__categories")  # Changed here
+    list_filter = ("is_active", "variant_title", "product__categories")
     search_fields = ("product__name", "variant_title", "variant_value")
     list_editable = ("is_active", "display_order", "stock_quantity")
     ordering = ("product", "display_order", "variant_title")
 
     fieldsets = (
         (
-            "Variant Information",
+            "Informations sur la variante",
             {
                 "fields": (
                     "product",
@@ -226,7 +233,7 @@ class ProductVariantAdmin(admin.ModelAdmin):
             },
         ),
         (
-            "Inventory & Display",
+            "Inventaire et affichage",
             {"fields": ("stock_quantity", "is_active", "display_order")},
         ),
     )
@@ -235,22 +242,22 @@ class ProductVariantAdmin(admin.ModelAdmin):
 
     def activate_variants(self, request, queryset):
         updated = queryset.update(is_active=True)
-        self.message_user(request, f"{updated} variant(s) activated.")
+        self.message_user(request, f"{updated} variante(s) activée(s).")
 
-    activate_variants.short_description = "Activate selected variants"
+    activate_variants.short_description = "Activer les variantes sélectionnées"
 
     def deactivate_variants(self, request, queryset):
         updated = queryset.update(is_active=False)
-        self.message_user(request, f"{updated} variant(s) deactivated.")
+        self.message_user(request, f"{updated} variante(s) désactivée(s).")
 
-    deactivate_variants.short_description = "Deactivate selected variants"
+    deactivate_variants.short_description = "Désactiver les variantes sélectionnées"
 
     def get_queryset(self, request):
         return (
             super()
             .get_queryset(request)
             .select_related("product", "product__brand")
-            .prefetch_related("product__categories")  # Changed here too
+            .prefetch_related("product__categories")
         )
 
 
@@ -282,11 +289,11 @@ class ProductReviewAdmin(admin.ModelAdmin):
 
     fieldsets = (
         (
-            "Review Information",
+            "Informations sur l'avis",
             {"fields": ("product", "user", "rating", "verified_purchase")},
         ),
-        ("Review Content", {"fields": ("title", "comment")}),
-        ("Timestamp", {"fields": ("created_at",)}),
+        ("Contenu de l'avis", {"fields": ("title", "comment")}),
+        ("Horodatage", {"fields": ("created_at",)}),
     )
 
     def get_queryset(self, request):
@@ -311,7 +318,7 @@ class ProductQuestionAdmin(admin.ModelAdmin):
 
     fieldsets = (
         ("Question", {"fields": ("product", "user", "question", "created_at")}),
-        ("Answer", {"fields": ("answer", "answered_by", "answered_at")}),
+        ("Réponse", {"fields": ("answer", "answered_by", "answered_at")}),
     )
 
     def question_preview(self, obj):
@@ -324,7 +331,7 @@ class ProductQuestionAdmin(admin.ModelAdmin):
             return obj.answer[:50] + "..." if len(obj.answer) > 50 else obj.answer
         return "-"
 
-    answer_preview.short_description = "Answer"
+    answer_preview.short_description = "Réponse"
 
     def get_queryset(self, request):
         return (
@@ -343,7 +350,7 @@ class WishlistAdmin(admin.ModelAdmin):
     def product_count(self, obj):
         return obj.products.count()
 
-    product_count.short_description = "Number of Products"
+    product_count.short_description = "Nombre de produits"
 
     def get_queryset(self, request):
         return (

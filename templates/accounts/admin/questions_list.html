@@ -1,7 +1,8 @@
+<!-- questions_list.html -->
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}Manage Questions - Admin{% endblock %}
+{% block title %}Gérer les questions - Admin{% endblock %}
 
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
@@ -11,9 +12,9 @@
 <section class="py-5">
     <div class="container">
         <div class="d-flex justify-content-between align-items-center mb-4">
-            <h2><i class="fas fa-question-circle me-2"></i>Product Questions</h2>
+            <h2><i class="fas fa-question-circle me-2"></i>Questions sur les produits</h2>
             <a href="{% url 'accounts:admin_dashboard' %}" class="btn btn-outline-secondary">
-                <i class="fas fa-arrow-left me-2"></i>Back to Dashboard
+                <i class="fas fa-arrow-left me-2"></i>Retour au tableau de bord
             </a>
         </div>
 
@@ -21,9 +22,9 @@
         <div class="card mb-4">
             <div class="card-body">
                 <div class="btn-group" role="group">
-                    <a href="?status=all" class="btn btn-outline-primary {% if status_filter == 'all' %}active{% endif %}">All</a>
-                    <a href="?status=unanswered" class="btn btn-outline-warning {% if status_filter == 'unanswered' %}active{% endif %}">Unanswered</a>
-                    <a href="?status=answered" class="btn btn-outline-success {% if status_filter == 'answered' %}active{% endif %}">Answered</a>
+                    <a href="?status=all" class="btn btn-outline-primary {% if status_filter == 'all' %}active{% endif %}">Toutes</a>
+                    <a href="?status=unanswered" class="btn btn-outline-warning {% if status_filter == 'unanswered' %}active{% endif %}">Sans réponse</a>
+                    <a href="?status=answered" class="btn btn-outline-success {% if status_filter == 'answered' %}active{% endif %}">Répondues</a>
                 </div>
             </div>
         </div>
@@ -40,24 +41,24 @@
                                 <h5 class="mb-1">
                                     <a href="{% url 'products:detail' question.product.slug %}">{{ question.product.name }}</a>
                                 </h5>
-                                <p class="mb-2"><strong>Q:</strong> {{ question.question }}</p>
+                                <p class="mb-2"><strong>Q :</strong> {{ question.question }}</p>
                                 {% if question.answer %}
                                 <div class="alert alert-success mb-2">
-                                    <strong>A:</strong> {{ question.answer }}
-                                    <br><small class="text-muted">Answered by {{ question.answered_by.username }} on {{ question.answered_at|date:"M d, Y" }}</small>
+                                    <strong>R :</strong> {{ question.answer }}
+                                    <br><small class="text-muted">Répondu par {{ question.answered_by.username }} le {{ question.answered_at|date:"d M Y" }}</small>
                                 </div>
                                 {% else %}
-                                <span class="badge bg-warning">Unanswered</span>
+                                <span class="badge bg-warning">Sans réponse</span>
                                 {% endif %}
-                                <small class="text-muted">Asked by {{ question.user.username }} on {{ question.created_at|date:"M d, Y" }}</small>
+                                <small class="text-muted">Posée par {{ question.user.username }} le {{ question.created_at|date:"d M Y" }}</small>
                             </div>
                             <div class="d-flex gap-2 ms-3">
                                 <a href="{% url 'accounts:admin_question_reply' question.id %}" class="btn btn-sm btn-primary">
-                                    <i class="fas fa-reply"></i> Answer
+                                    <i class="fas fa-reply"></i> Répondre
                                 </a>
                                 <form method="post" action="{% url 'accounts:admin_question_delete' question.id %}" class="d-inline">
                                     {% csrf_token %}
-                                    <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Delete this question?')">
+                                    <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Supprimer cette question ?')">
                                         <i class="fas fa-trash"></i>
                                     </button>
                                 </form>
@@ -69,7 +70,7 @@
                 {% else %}
                 <div class="text-center py-5">
                     <i class="fas fa-question-circle fa-4x mb-3 text-muted"></i>
-                    <p class="text-muted">No questions</p>
+                    <p class="text-muted">Aucune question</p>
                 </div>
                 {% endif %}
             </div>

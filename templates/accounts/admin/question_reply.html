@@ -1,7 +1,8 @@
+<!-- question_reply.html -->
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}Answer Question - Admin{% endblock %}
+{% block title %}Répondre à la question - Admin{% endblock %}
 
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
@@ -14,14 +15,14 @@
             <div class="col-lg-8">
                 <div class="card">
                     <div class="card-header bg-primary text-white">
-                        <h4 class="mb-0"><i class="fas fa-reply me-2"></i>Answer Question</h4>
+                        <h4 class="mb-0"><i class="fas fa-reply me-2"></i>Répondre à la question</h4>
                     </div>
                     <div class="card-body">
                         <!-- Question Details -->
                         <div class="alert alert-light border">
                             <h5>{{ question.product.name }}</h5>
-                            <p><strong>Asked by:</strong> {{ question.user.username }} on {{ question.created_at|date:"M d, Y" }}</p>
-                            <p><strong>Question:</strong></p>
+                            <p><strong>Posée par :</strong> {{ question.user.username }} le {{ question.created_at|date:"d M Y" }}</p>
+                            <p><strong>Question :</strong></p>
                             <p class="mb-0">{{ question.question }}</p>
                         </div>
 
@@ -29,14 +30,14 @@
                         <form method="post">
                             {% csrf_token %}
                             <div class="mb-3">
-                                <label class="form-label">Your Answer *</label>
+                                <label class="form-label">Votre réponse *</label>
                                 {{ form.answer }}
                             </div>
                             <div class="d-flex gap-2">
                                 <button type="submit" class="btn btn-primary">
-                                    <i class="fas fa-check me-2"></i>Submit Answer
+                                    <i class="fas fa-check me-2"></i>Soumettre la réponse
                                 </button>
-                                <a href="{% url 'accounts:admin_questions_list' %}" class="btn btn-secondary">Cancel</a>
+                                <a href="{% url 'accounts:admin_questions_list' %}" class="btn btn-secondary">Annuler</a>
                             </div>
                         </form>
                     </div>

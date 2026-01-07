@@ -1,7 +1,8 @@
+<!-- user_detail.html -->
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}User Details - {{ user_obj.username }}{% endblock %}
+{% block title %}Détails utilisateur - {{ user_obj.username }}{% endblock %}
 
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'css/admin/user_detail.css' %}">
@@ -10,23 +11,23 @@
 {% block content %}
 <div class="admin-header">
   <div class="container">
-    <h1><i class="fas fa-user me-2"></i>User Details</h1>
-    <p class="mb-0">View and manage user information</p>
+    <h1><i class="fas fa-user me-2"></i>Détails de l'utilisateur</h1>
+    <p class="mb-0">Consulter et gérer les informations utilisateur</p>
   </div>
 </div>
 
 <div class="container mb-5">
   <div class="mb-3">
     <a href="{% url 'accounts:admin_users_management' %}" class="btn btn-outline-secondary">
-      <i class="fas fa-arrow-left me-2"></i>Back to Users
+      <i class="fas fa-arrow-left me-2"></i>Retour aux utilisateurs
     </a>
     {% if not user_obj.is_superuser %}
     <button type="button" class="btn btn-warning" onclick="toggleUserStatus({{ user_obj.id }})">
       <i class="fas fa-toggle-on me-2"></i>
-      {% if user_obj.is_active %}Deactivate{% else %}Activate{% endif %} User
+      {% if user_obj.is_active %}Désactiver{% else %}Activer{% endif %} l'utilisateur
     </button>
     <button type="button" class="btn btn-danger" onclick="deleteUser({{ user_obj.id }}, '{{ user_obj.username }}')">
-      <i class="fas fa-trash me-2"></i>Delete User
+      <i class="fas fa-trash me-2"></i>Supprimer l'utilisateur
     </button>
     {% endif %}
   </div>
@@ -47,7 +48,7 @@
         <p class="text-muted">@{{ user_obj.username }}</p>
         
         <span class="status-badge {% if user_obj.is_active %}status-active{% else %}status-inactive{% endif %}">
-          {% if user_obj.is_active %}Active{% else %}Inactive{% endif %}
+          {% if user_obj.is_active %}Actif{% else %}Inactif{% endif %}
         </span>
         
         <div class="mt-3">
@@ -57,14 +58,14 @@
 
       <!-- User Statistics -->
       <div class="info-card">
-        <h5>Statistics</h5>
+        <h5>Statistiques</h5>
         <div class="stat-box mb-3">
           <div class="number">{{ total_orders }}</div>
-          <div class="label">Total Orders</div>
+          <div class="label">Total commandes</div>
         </div>
         <div class="stat-box">
           <div class="number">{{ total_spent|floatformat:2 }} DZD</div>
-          <div class="label">Total Spent</div>
+          <div class="label">Total dépensé</div>
         </div>
       </div>
     </div>
@@ -72,79 +73,79 @@
     <!-- User Information -->
     <div class="col-lg-8 mb-4">
       <div class="info-card">
-        <h5><i class="fas fa-info-circle me-2"></i>Account Information</h5>
+        <h5><i class="fas fa-info-circle me-2"></i>Informations du compte</h5>
         <div class="info-row">
-          <span class="info-label">Email:</span>
+          <span class="info-label">Email :</span>
           <span class="info-value">{{ user_obj.email }}</span>
         </div>
         <div class="info-row">
-          <span class="info-label">Username:</span>
+          <span class="info-label">Nom d'utilisateur :</span>
           <span class="info-value">{{ user_obj.username }}</span>
         </div>
         <div class="info-row">
-          <span class="info-label">First Name:</span>
-          <span class="info-value">{{ user_obj.first_name|default:"Not provided" }}</span>
+          <span class="info-label">Prénom :</span>
+          <span class="info-value">{{ user_obj.first_name|default:"Non fourni" }}</span>
         </div>
         <div class="info-row">
-          <span class="info-label">Last Name:</span>
-          <span class="info-value">{{ user_obj.last_name|default:"Not provided" }}</span>
+          <span class="info-label">Nom :</span>
+          <span class="info-value">{{ user_obj.last_name|default:"Non fourni" }}</span>
         </div>
         <div class="info-row">
-          <span class="info-label">Date Joined:</span>
-          <span class="info-value">{{ user_obj.date_joined|date:"F d, Y H:i" }}</span>
+          <span class="info-label">Date d'inscription :</span>
+          <span class="info-value">{{ user_obj.date_joined|date:"d F Y H:i" }}</span>
         </div>
         <div class="info-row">
-          <span class="info-label">Last Login:</span>
-          <span class="info-value">{{ user_obj.last_login|date:"F d, Y H:i"|default:"Never" }}</span>
+          <span class="info-label">Dernière connexion :</span>
+          <span class="info-value">{{ user_obj.last_login|date:"d F Y H:i"|default:"Jamais" }}</span>
         </div>
       </div>
 
       <div class="info-card">
-        <h5><i class="fas fa-user-circle me-2"></i>Profile Details</h5>
+        <h5><i class="fas fa-user-circle me-2"></i>Détails du profil</h5>
         <div class="info-row">
-          <span class="info-label">Phone:</span>
-          <span class="info-value">{{ user_profile.phone|default:"Not provided" }}</span>
+          <span class="info-label">Téléphone :</span>
+          <span class="info-value">{{ user_profile.phone|default:"Non fourni" }}</span>
         </div>
         <div class="info-row">
-          <span class="info-label">Date of Birth:</span>
-          <span class="info-value">{{ user_profile.date_of_birth|date:"F d, Y"|default:"Not provided" }}</span>
+          <span class="info-label">Date de naissance :</span>
+          <span class="info-value">{{ user_profile.date_of_birth|date:"d F Y"|default:"Non fourni" }}</span>
         </div>
         <div class="info-row">
-          <span class="info-label">Address:</span>
-          <span class="info-value">{{ user_profile.address|default:"Not provided" }}</span>
+          <span class="info-label">Adresse :</span>
+          <span class="info-value">{{ user_profile.address|default:"Non fourni" }}</span>
         </div>
         <div class="info-row">
-          <span class="info-label">City:</span>
-          <span class="info-value">{{ user_profile.city|default:"Not provided" }}</span>
+          <span class="info-label">Ville :</span>
+          <span class="info-value">{{ user_profile.city|default:"Non fourni" }}</span>
         </div>
         <div class="info-row">
-          <span class="info-label">State:</span>
-          <span class="info-value">{{ user_profile.state|default:"Not provided" }}</span>
+          <span class="info-label">Wilaya :</span>
+          <span class="info-value">{{ user_profile.state|default:"Non fourni" }}</span>
         </div>
         <div class="info-row">
-          <span class="info-label">Country:</span>
-          <span class="info-value">{{ user_profile.country|default:"Not provided" }}</span>
+          <span class="info-label">Pays :</span>
+          <span class="info-value">{{ user_profile.country|default:"Non fourni" }}</span>
         </div>
       </div>
 
       <!-- Recent Orders -->
       <div class="info-card">
-        <h5><i class="fas fa-shopping-cart me-2"></i>Recent Orders</h5>
+        <h5><i class="fas fa-shopping-cart me-2"></i>Commandes récentes</h5>
         <div class="table-responsive">
           <table class="table table-hover">
             <thead>
               <tr>
-                <th>Order ID</th>
+                <th>ID commande</th>
                 <th>Date</th>
                 <th>Total</th>
-                <th>Status</th>
+                <th>Statut</th>
               </tr>
             </thead>
             <tbody>
               {% for order in orders %}
               <tr>
                 <td><strong>{{ order.order_id }}</strong></td>
-                <td>{{ order.created_at|date:"M d, Y" }}</td>
+                <td>{{ order.created_at|date:"d M Y" }}</td>
                 <td>{{ order.total_amount }} DZD</td>
                 <td>
                   <span class="badge bg-secondary">{{ order.get_status_display }}</span>
@@ -152,7 +153,7 @@
               </tr>
               {% empty %}
               <tr>
-                <td colspan="4" class="text-center text-muted">No orders yet</td>
+                <td colspan="4" class="text-center text-muted">Aucune commande</td>
               </tr>
               {% endfor %}
             </tbody>
@@ -165,7 +166,7 @@
 
 <script>
 function toggleUserStatus(userId) {
-  if (confirm('Are you sure you want to toggle this user\'s status?')) {
+  if (confirm('Êtes-vous sûr de vouloir changer le statut de cet utilisateur ?')) {
     fetch(`/accounts/admin/user/${userId}/toggle/`, {
       method: 'POST',
       headers: {
@@ -183,7 +184,7 @@ function toggleUserStatus(userId) {
 }
 
 function deleteUser(userId, username) {
-  if (confirm(`Are you sure you want to delete user "${username}"? This action cannot be undone.`)) {
+  if (confirm(`Êtes-vous sûr de vouloir supprimer l'utilisateur "${username}" ? Cette action est irréversible.`)) {
     const form = document.createElement('form');
     form.method = 'POST';
     form.action = `/accounts/admin/user/${userId}/delete/`;

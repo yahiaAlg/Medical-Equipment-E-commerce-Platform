@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}Verify Payment - Fennec Med{% endblock %}
+{% block title %}Vérifier le paiement - Fennec Med{% endblock %}
 
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'css/admin/payment_verify.css' %}">
@@ -12,11 +12,11 @@
   <div class="container">
     <div class="d-flex justify-content-between align-items-center">
       <div>
-        <h1><i class="fas fa-check-circle me-2"></i>Payment Verification</h1>
-        <p class="mb-0">Review and verify payment proof</p>
+        <h1><i class="fas fa-check-circle me-2"></i>Vérification du paiement</h1>
+        <p class="mb-0">Examiner et vérifier la preuve de paiement</p>
       </div>
       <a href="{% url 'accounts:admin_payments_list' %}" class="btn btn-light">
-        <i class="fas fa-arrow-left me-2"></i>Back to Payments
+        <i class="fas fa-arrow-left me-2"></i>Retour aux paiements
       </a>
     </div>
   </div>
@@ -27,62 +27,62 @@
     <!-- Payment Details -->
     <div class="col-lg-6 mb-4">
       <div class="card-custom">
-        <h5 class="mb-4"><i class="fas fa-info-circle me-2"></i>Payment Details</h5>
+        <h5 class="mb-4"><i class="fas fa-info-circle me-2"></i>Détails du paiement</h5>
         
         <div class="info-row">
-          <span class="info-label">Invoice Number:</span>
+          <span class="info-label">Numéro de facture :</span>
           <span class="info-value">{{ payment.invoice.invoice_number }}</span>
         </div>
         
         <div class="info-row">
-          <span class="info-label">Order ID:</span>
+          <span class="info-label">ID commande :</span>
           <span class="info-value">{{ payment.invoice.order.order_id }}</span>
         </div>
         
         <div class="info-row">
-          <span class="info-label">Customer:</span>
+          <span class="info-label">Client :</span>
           <span class="info-value">{{ payment.invoice.order.user.get_full_name|default:payment.invoice.order.user.username }}</span>
         </div>
         
         <div class="info-row">
-          <span class="info-label">Email:</span>
+          <span class="info-label">Email :</span>
           <span class="info-value">{{ payment.invoice.order.user.email }}</span>
         </div>
         
         <div class="info-row">
-          <span class="info-label">Amount:</span>
+          <span class="info-label">Montant :</span>
           <span class="info-value"><strong>{{ payment.invoice.total_amount }} DZD</strong></span>
         </div>
         
         <div class="info-row">
-          <span class="info-label">Payment Method:</span>
+          <span class="info-label">Méthode de paiement :</span>
           <span class="info-value">{{ payment.get_payment_method_display }}</span>
         </div>
         
         <div class="info-row">
-          <span class="info-label">Transaction Ref:</span>
+          <span class="info-label">Référence transaction :</span>
           <span class="info-value">{{ payment.transaction_reference|default:"N/A" }}</span>
         </div>
         
         <div class="info-row">
-          <span class="info-label">Uploaded:</span>
-          <span class="info-value">{{ payment.uploaded_at|date:"M d, Y H:i" }}</span>
+          <span class="info-label">Téléchargé le :</span>
+          <span class="info-value">{{ payment.uploaded_at|date:"d M Y H:i" }}</span>
         </div>
         
         <div class="info-row">
-          <span class="info-label">Status:</span>
+          <span class="info-label">Statut :</span>
           <span class="info-value">
             {% if payment.verified %}
               <span class="status-badge bg-success text-white">
-                <i class="fas fa-check-circle"></i> Verified
+                <i class="fas fa-check-circle"></i> Vérifié
               </span>
             {% elif payment.rejection_reason %}
               <span class="status-badge bg-danger text-white">
-                <i class="fas fa-times-circle"></i> Rejected
+                <i class="fas fa-times-circle"></i> Rejeté
               </span>
             {% else %}
               <span class="status-badge bg-warning text-dark">
-                <i class="fas fa-clock"></i> Pending
+                <i class="fas fa-clock"></i> En attente
               </span>
             {% endif %}
           </span>
@@ -90,22 +90,22 @@
         
         {% if payment.notes %}
         <div class="mt-3">
-          <strong>Customer Notes:</strong>
+          <strong>Notes du client :</strong>
           <p class="text-muted mb-0">{{ payment.notes }}</p>
         </div>
         {% endif %}
         
         {% if payment.rejection_reason %}
         <div class="mt-3 alert alert-danger">
-          <strong>Rejection Reason:</strong>
+          <strong>Motif de rejet :</strong>
           <p class="mb-0">{{ payment.rejection_reason }}</p>
         </div>
         {% endif %}
         
         {% if payment.verified %}
         <div class="mt-3 alert alert-success">
-          <strong>Verified by:</strong> {{ payment.verified_by.username }}<br>
-          <strong>Verified at:</strong> {{ payment.verified_at|date:"M d, Y H:i" }}
+          <strong>Vérifié par :</strong> {{ payment.verified_by.username }}<br>
+          <strong>Vérifié le :</strong> {{ payment.verified_at|date:"d M Y H:i" }}
         </div>
         {% endif %}
       </div>
@@ -114,24 +114,24 @@
     <!-- Payment Proof -->
     <div class="col-lg-6 mb-4">
       <div class="card-custom">
-        <h5 class="mb-4"><i class="fas fa-file-image me-2"></i>Payment Proof</h5>
+        <h5 class="mb-4"><i class="fas fa-file-image me-2"></i>Preuve de paiement</h5>
         
         <div class="proof-viewer">
           {% if payment.proof_file.url|slice:"-4:" == ".pdf" %}
             <a href="{{ payment.proof_file.url }}" target="_blank" class="btn btn-lg btn-primary">
               <i class="fas fa-file-pdf fa-3x d-block mb-2"></i>
-              Open PDF Document
+              Ouvrir le document PDF
             </a>
           {% else %}
             <a href="{{ payment.proof_file.url }}" target="_blank">
-              <img src="{{ payment.proof_file.url }}" alt="Payment Proof">
+              <img src="{{ payment.proof_file.url }}" alt="Preuve de paiement">
             </a>
           {% endif %}
         </div>
         
         <div class="mt-3 text-center">
           <a href="{{ payment.proof_file.url }}" download class="btn btn-outline-primary">
-            <i class="fas fa-download me-2"></i>Download Proof
+            <i class="fas fa-download me-2"></i>Télécharger la preuve
           </a>
         </div>
       </div>
@@ -139,7 +139,7 @@
       <!-- Verification Form -->
       {% if not payment.verified and not payment.rejection_reason %}
       <div class="card-custom">
-        <h5 class="mb-4"><i class="fas fa-tasks me-2"></i>Verification Action</h5>
+        <h5 class="mb-4"><i class="fas fa-tasks me-2"></i>Action de vérification</h5>
         
         <form method="post">
           {% csrf_token %}
@@ -148,28 +148,28 @@
             <div class="form-check mb-2">
               <input class="form-check-input" type="radio" name="action" value="approve" id="approve" required>
               <label class="form-check-label" for="approve">
-                <i class="fas fa-check-circle text-success"></i> Approve Payment
+                <i class="fas fa-check-circle text-success"></i> Approuver le paiement
               </label>
             </div>
             <div class="form-check">
               <input class="form-check-input" type="radio" name="action" value="reject" id="reject" required>
               <label class="form-check-label" for="reject">
-                <i class="fas fa-times-circle text-danger"></i> Reject Payment
+                <i class="fas fa-times-circle text-danger"></i> Rejeter le paiement
               </label>
             </div>
           </div>
           
           <div class="mb-3" id="rejection-reason-field" style="display: none;">
-            <label class="form-label"><strong>Rejection Reason *</strong></label>
-            <textarea name="rejection_reason" class="form-control" rows="4" placeholder="Explain why this payment is being rejected..."></textarea>
+            <label class="form-label"><strong>Motif de rejet *</strong></label>
+            <textarea name="rejection_reason" class="form-control" rows="4" placeholder="Expliquez pourquoi ce paiement est rejeté..."></textarea>
           </div>
           
           <div class="d-grid gap-2">
             <button type="submit" class="btn btn-primary btn-lg">
-              <i class="fas fa-check me-2"></i>Submit Decision
+              <i class="fas fa-check me-2"></i>Soumettre la décision
             </button>
             <a href="{% url 'accounts:admin_payments_list' %}" class="btn btn-outline-secondary">
-              Cancel
+              Annuler
             </a>
           </div>
         </form>

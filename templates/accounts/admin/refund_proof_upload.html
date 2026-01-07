@@ -1,7 +1,8 @@
+<!-- refund_proof_upload.html -->
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}Upload Refund Proof - Fennec Med{% endblock %}
+{% block title %}Télécharger preuve remboursement - Fennec Med{% endblock %}
 
 {% block extra_css %}
   <link rel="stylesheet" href="{% static 'css/admin/refund_proof_upload.css' %}">
@@ -12,11 +13,11 @@
   <div class="container">
     <div class="d-flex justify-content-between align-items-center">
       <div>
-        <h1><i class="fas fa-upload me-2"></i>Upload Refund Proof</h1>
-        <p class="mb-0">Complete refund process for {{ refund.refund_number }}</p>
+        <h1><i class="fas fa-upload me-2"></i>Télécharger preuve de remboursement</h1>
+        <p class="mb-0">Finaliser le remboursement pour {{ refund.refund_number }}</p>
       </div>
       <a href="{% url 'accounts:admin_refunds_management' %}" class="btn btn-light">
-        <i class="fas fa-arrow-left me-2"></i>Back to Refunds
+        <i class="fas fa-arrow-left me-2"></i>Retour aux remboursements
       </a>
     </div>
   </div>
@@ -27,15 +28,15 @@
     <!-- Refund Details -->
     <div class="col-lg-5 mb-4">
       <div class="card-custom">
-        <h5 class="mb-4"><i class="fas fa-info-circle me-2"></i>Refund Information</h5>
+        <h5 class="mb-4"><i class="fas fa-info-circle me-2"></i>Informations du remboursement</h5>
         
         <div class="info-row">
-          <span class="info-label">Refund Number:</span>
+          <span class="info-label">Numéro remboursement :</span>
           <span class="info-value">{{ refund.refund_number }}</span>
         </div>
         
         <div class="info-row">
-          <span class="info-label">Order ID:</span>
+          <span class="info-label">ID commande :</span>
           <span class="info-value">
             <a href="{% url 'accounts:admin_orders_management' %}?search={{ refund.order.order_id }}">
               {{ refund.order.order_id }}
@@ -44,7 +45,7 @@
         </div>
         
         <div class="info-row">
-          <span class="info-label">Customer:</span>
+          <span class="info-label">Client :</span>
           <span class="info-value">
             <a href="{% url 'accounts:admin_user_detail' refund.order.user.id %}">
               {{ refund.order.user.get_full_name|default:refund.order.user.username }}
@@ -53,35 +54,35 @@
         </div>
         
         <div class="info-row">
-          <span class="info-label">Email:</span>
+          <span class="info-label">Email :</span>
           <span class="info-value">{{ refund.order.user.email }}</span>
         </div>
         
         <div class="info-row">
-          <span class="info-label">Refund Amount:</span>
+          <span class="info-label">Montant remboursement :</span>
           <span class="info-value"><strong>{{ refund.amount }} DZD</strong></span>
         </div>
         
         <div class="info-row">
-          <span class="info-label">Status:</span>
+          <span class="info-label">Statut :</span>
           <span class="info-value">
             <span class="badge bg-warning">{{ refund.get_status_display }}</span>
           </span>
         </div>
         
         <div class="info-row">
-          <span class="info-label">Created:</span>
-          <span class="info-value">{{ refund.created_at|date:"M d, Y H:i" }}</span>
+          <span class="info-label">Créé le :</span>
+          <span class="info-value">{{ refund.created_at|date:"d M Y H:i" }}</span>
         </div>
         
         <div class="info-row">
-          <span class="info-label">Approved By:</span>
+          <span class="info-label">Approuvé par :</span>
           <span class="info-value">{{ refund.approved_by.username }}</span>
         </div>
       </div>
       
       <div class="alert alert-info">
-        <h6><i class="fas fa-info-circle me-2"></i>Refund Reason</h6>
+        <h6><i class="fas fa-info-circle me-2"></i>Motif du remboursement</h6>
         <p class="mb-0">{{ refund.reason }}</p>
       </div>
     </div>
@@ -89,61 +90,61 @@
     <!-- Upload Form -->
     <div class="col-lg-7 mb-4">
       <div class="card-custom">
-        <h5 class="mb-4"><i class="fas fa-file-upload me-2"></i>Upload Refund Proof</h5>
+        <h5 class="mb-4"><i class="fas fa-file-upload me-2"></i>Télécharger preuve de remboursement</h5>
         
         <form method="post" enctype="multipart/form-data">
           {% csrf_token %}
           
           <div class="mb-4">
-            <label class="form-label"><strong>Refund Method *</strong></label>
+            <label class="form-label"><strong>Méthode de remboursement *</strong></label>
             {{ form.refund_method }}
-            <small class="form-text text-muted">Select the method used for refunding</small>
+            <small class="form-text text-muted">Sélectionnez la méthode utilisée pour le remboursement</small>
           </div>
           
           <div class="mb-4">
-            <label class="form-label"><strong>Proof Document *</strong></label>
+            <label class="form-label"><strong>Document justificatif *</strong></label>
             <div class="upload-area">
               <div class="upload-icon">
                 <i class="fas fa-cloud-upload-alt"></i>
               </div>
               {{ form.proof_file }}
               <p class="text-muted mb-0 mt-2">
-                <small>Upload image (JPG, PNG) or PDF. Max size: 5MB</small>
+                <small>Télécharger image (JPG, PNG) ou PDF. Taille max : 5 Mo</small>
               </p>
             </div>
           </div>
           
           <div class="mb-4">
-            <label class="form-label"><strong>Transaction Reference</strong></label>
+            <label class="form-label"><strong>Référence transaction</strong></label>
             {{ form.transaction_reference }}
-            <small class="form-text text-muted">Transaction ID or reference number from payment system</small>
+            <small class="form-text text-muted">ID de transaction ou numéro de référence du système de paiement</small>
           </div>
           
           <div class="mb-4">
             <label class="form-label"><strong>Notes</strong></label>
             {{ form.notes }}
-            <small class="form-text text-muted">Any additional information about the refund</small>
+            <small class="form-text text-muted">Informations complémentaires sur le remboursement</small>
           </div>
           
           <div class="alert alert-success">
-            <h6><i class="fas fa-check-circle me-2"></i>What Happens Next?</h6>
+            <h6><i class="fas fa-check-circle me-2"></i>Que va-t-il se passer ensuite ?</h6>
             <p class="mb-0 small">
-              After uploading refund proof:
+              Après le téléchargement de la preuve de remboursement :
               <ul class="mb-0">
-                <li>Refund status will change to "Completed"</li>
-                <li>Customer will receive notification with receipt</li>
-                <li>Order status will update to "Refunded"</li>
-                <li>Invoice will be marked as "Refunded"</li>
+                <li>Le statut du remboursement passera à "Finalisé"</li>
+                <li>Le client recevra une notification avec un reçu</li>
+                <li>Le statut de la commande sera mis à jour à "Remboursée"</li>
+                <li>La facture sera marquée comme "Remboursée"</li>
               </ul>
             </p>
           </div>
           
           <div class="d-grid gap-2">
             <button type="submit" class="btn btn-success btn-lg">
-              <i class="fas fa-check me-2"></i>Upload & Complete Refund
+              <i class="fas fa-check me-2"></i>Télécharger et finaliser le remboursement
             </button>
             <a href="{% url 'accounts:admin_refunds_management' %}" class="btn btn-outline-secondary">
-              Cancel
+              Annuler
             </a>
           </div>
         </form>
@@ -163,7 +164,7 @@ document.querySelector('input[type="file"]').addEventListener('change', function
     
     const fileInfo = document.createElement('p');
     fileInfo.className = 'text-success mb-0 mt-2';
-    fileInfo.innerHTML = '<i class="fas fa-check-circle me-2"></i>Selected: ' + fileName;
+    fileInfo.innerHTML = '<i class="fas fa-check-circle me-2"></i>Sélectionné : ' + fileName;
     
     // Remove previous file info
     const existingInfo = uploadArea.querySelector('.text-success');
