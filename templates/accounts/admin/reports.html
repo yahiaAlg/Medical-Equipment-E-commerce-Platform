@@ -235,8 +235,7 @@
                 <tr>
                   <td><span class="badge badge-custom bg-primary">#{{ forloop.counter }}</span></td>
                   <td class="fw-medium">{{ product.product__name|truncatewords:5 }}</td>
-                  <td><small class="text-muted">{{ product.product__category__name }}</small></td>
-                  <td class="text-center"><strong>{{ product.total_quantity }}</strong></td>
+                  <td><small class="text-muted">{{ product.categories|default:"N/A" }}</small></td>                  <td class="text-center"><strong>{{ product.total_quantity }}</strong></td>
                   <td class="text-end text-success fw-bold">{{ product.total_revenue|floatformat:2 }} DZD</td>
                 </tr>
                 {% empty %}

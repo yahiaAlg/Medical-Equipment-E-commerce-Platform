@@ -1452,7 +1452,7 @@ def admin_reports(request):
             order__created_at__gte=start_date,
             order__status__in=["paid", "processing", "shipped", "delivered"],
         )
-        .values("product__name", "product__category__name")
+        .values("product__name", "product__id")
         .annotate(
             total_quantity=Sum("quantity"),
             total_revenue=Sum(F("quantity") * F("price"), output_field=DecimalField()),
@@ -1460,20 +1460,44 @@ def admin_reports(request):
         .order_by("-total_revenue")[:10]
     )
 
+    for item in top_products:
+        product = Product.objects.get(id=item["product__id"])
+        item["categories"] = ", ".join(
+            [cat.name for cat in product.categories.all()[:2]]
+        )
     # Category performance
-    category_performance = (
-        OrderItem.objects.filter(
-            order__created_at__gte=start_date,
-            order__status__in=["paid", "processing", "shipped", "delivered"],
-        )
-        .values("product__category__name")
-        .annotate(
-            total_quantity=Sum("quantity"),
-            total_revenue=Sum(F("quantity") * F("price"), output_field=DecimalField()),
-            unique_products=Count("product", distinct=True),
-        )
-        .order_by("-total_revenue")
-    )
+    category_performance = {}
+    order_items = OrderItem.objects.filter(
+        order__created_at__gte=start_date,
+        order__status__in=["paid", "processing", "shipped", "delivered"],
+    ).select_related("product")
+
+    for item in order_items:
+        for category in item.product.categories.all():
+            if category.name not in category_performance:
+                category_performance[category.name] = {
+                    "product__category__name": category.name,
+                    "total_quantity": 0,
+                    "total_revenue": Decimal("0"),
+                    "unique_products": set(),
+                }
+            category_performance[category.name]["total_quantity"] += item.quantity
+            category_performance[category.name]["total_revenue"] += (
+                item.quantity * item.price
+            )
+            category_performance[category.name]["unique_products"].add(item.product.id)
+
+    # Convert to list and add unique_products count
+    category_performance = [
+        {
+            "product__category__name": k,
+            "total_quantity": v["total_quantity"],
+            "total_revenue": v["total_revenue"],
+            "unique_products": len(v["unique_products"]),
+        }
+        for k, v in category_performance.items()
+    ]
+    category_performance.sort(key=lambda x: x["total_revenue"], reverse=True)
 
     # Specialty performance
     specialty_performance = (
@@ -1537,12 +1561,32 @@ def admin_reports(request):
 
     # ========== REVIEW ANALYTICS ==========
     # Average rating by category
-    ratings_by_category = (
-        ProductReview.objects.filter(created_at__gte=start_date)
-        .values("product__category__name")
-        .annotate(avg_rating=Avg("rating"), review_count=Count("id"))
-        .order_by("-avg_rating")
+    ratings_by_category = {}
+    reviews = ProductReview.objects.filter(created_at__gte=start_date).select_related(
+        "product"
     )
+
+    for review in reviews:
+        for category in review.product.categories.all():
+            if category.name not in ratings_by_category:
+                ratings_by_category[category.name] = {
+                    "product__category__name": category.name,
+                    "ratings": [],
+                    "review_count": 0,
+                }
+            ratings_by_category[category.name]["ratings"].append(review.rating)
+            ratings_by_category[category.name]["review_count"] += 1
+
+    # Calculate averages
+    ratings_by_category = [
+        {
+            "product__category__name": k,
+            "avg_rating": sum(v["ratings"]) / len(v["ratings"]) if v["ratings"] else 0,
+            "review_count": v["review_count"],
+        }
+        for k, v in ratings_by_category.items()
+    ]
+    ratings_by_category.sort(key=lambda x: x["avg_rating"], reverse=True)
 
     # Review volume trend
     review_trend = (
