@@ -57,8 +57,18 @@ def add_to_cart(request):
         if variant_id:
 
             variant = ProductVariant.objects.get(id=variant_id, product=product)
+        else:
+            # Auto-select cheapest variant if no variant specified
 
-            # Check variant stock
+            available_variants = ProductVariant.objects.filter(
+                product=product, is_active=True, stock_quantity__gt=0
+            )
+            if available_variants.exists():
+                # Get cheapest variant
+                variant = min(available_variants, key=lambda v: v.get_total_price())
+
+        # Check stock
+        if variant:
             if variant.stock_quantity < quantity:
                 return JsonResponse(
                     {
@@ -67,7 +77,6 @@ def add_to_cart(request):
                     }
                 )
         else:
-            # Check product stock if no variant
             if product.stock_quantity < quantity:
                 return JsonResponse(
                     {
@@ -98,10 +107,15 @@ def add_to_cart(request):
             cart_item.quantity = new_quantity
             cart_item.save()
 
+        # Build success message
+        message = "Produit ajouté au panier"
+        if variant and not variant_id:  # Auto-selected variant
+            message = f"Variante '{variant.variant_value}' ajoutée au panier"
+
         return JsonResponse(
             {
                 "success": True,
-                "message": "Produit ajouté au panier",
+                "message": message,
                 "cart_count": cart.get_total_items(),
                 "cart_total": str(cart.get_total_price()),
             }

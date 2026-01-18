@@ -177,12 +177,18 @@
               <div class="product-rating">
                   ★ ({{ product.get_average_rating|floatformat:1 }})
               </div>
-              
-              <form class="add-to-cart-form">
-                {% csrf_token %}
-                <input type="hidden" name="product_id" value="{{ product.id }}">
-                <button type="submit" class="add-to-cart">Ajouter au panier</button>
-              </form>
+              {% if product.variants.exists %}
+                <a href="{% url 'products:detail' slug=product.slug %}" class="add-to-cart text-center text-white">
+                  Voir options
+                </a>
+              {% else %}
+                <form class="add-to-cart-form">
+                  {% csrf_token %}
+                  <input type="hidden" name="product_id" value="{{ product.id }}">
+                  <button type="submit" class="add-to-cart">Ajouter au panier</button>
+                </form>
+              {% endif %}
+
             </div>
         </div>
       {% empty %}
