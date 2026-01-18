@@ -17,7 +17,7 @@ from payments.models import (
     RefundProof,
     Notification,
 )
-from products.models import Product
+from products.models import Product, ProductVariant
 from decimal import Decimal
 import random
 from datetime import datetime, timedelta
@@ -160,9 +160,17 @@ class Command(BaseCommand):
                 cart_products = random.sample(products, min(num_items, len(products)))
 
                 for product in cart_products:
+                    # Get a random variant if available
+                    variant = None
+                    if product.variants.filter(is_active=True).exists():
+                        variant = random.choice(
+                            list(product.variants.filter(is_active=True))
+                        )
+
                     CartItem.objects.get_or_create(
                         cart=cart,
                         product=product,
+                        variant=variant,
                         defaults={"quantity": random.randint(1, 3)},
                     )
 
@@ -182,19 +190,33 @@ class Command(BaseCommand):
 
                 for product in order_products:
                     quantity = random.randint(1, 3)
-                    price = (
-                        product.bulk_price
-                        if quantity >= product.bulk_quantity and product.bulk_price
-                        else product.price
-                    )
+                    variant = None
+
+                    # Get variant and price
+                    if product.variants.filter(is_active=True).exists():
+                        variant = random.choice(
+                            list(product.variants.filter(is_active=True))
+                        )
+                        price = variant.get_total_price()
+                    else:
+                        # Fallback to product price (shouldn't happen with new model)
+                        price = (
+                            product.price if product.price > 0 else Decimal("1000.00")
+                        )
+
                     item_total = price * quantity
                     subtotal += item_total
                     order_items_data.append(
-                        {"product": product, "quantity": quantity, "price": price}
+                        {
+                            "product": product,
+                            "variant": variant,
+                            "quantity": quantity,
+                            "price": price,
+                        }
                     )
 
                 # Taxe et livraison
-                tax_rate = Decimal("0.00")
+                tax_rate = Decimal("0.19")
                 tax_amount = subtotal * tax_rate
                 shipping_type = random.choice(shipping_types)
                 shipping_cost = shipping_type.cost
@@ -273,11 +295,12 @@ class Command(BaseCommand):
 
                 order.save()
 
-                # Créer les articles de commande
+                # Créer les articles de commande avec variants
                 for item_data in order_items_data:
                     OrderItem.objects.create(
                         order=order,
                         product=item_data["product"],
+                        variant=item_data["variant"],
                         quantity=item_data["quantity"],
                         price=item_data["price"],
                     )
@@ -295,7 +318,6 @@ class Command(BaseCommand):
                     ]:
                         invoice_status = "paid"
 
-                    # Utiliser get_or_create pour éviter les factures en double
                     invoice, invoice_created = Invoice.objects.get_or_create(
                         order=order,
                         defaults={
@@ -307,7 +329,6 @@ class Command(BaseCommand):
                         },
                     )
 
-                    # Mettre à jour le statut si la facture existait déjà
                     if not invoice_created:
                         invoice.status = invoice_status
                         if invoice_status == "paid" and not invoice.paid_at:
@@ -323,7 +344,6 @@ class Command(BaseCommand):
                             ["baridimob", "ccp_cheque", "bank_transfer"]
                         )
 
-                        # Vérifier si la preuve de paiement existe déjà
                         if not PaymentProof.objects.filter(invoice=invoice).exists():
                             proof = PaymentProof.objects.create(
                                 invoice=invoice,
@@ -339,7 +359,6 @@ class Command(BaseCommand):
                                 proof.verified_at = order.paid_at
                                 proof.save()
 
-                                # Créer le reçu de paiement s'il n'existe pas
                                 if not PaymentReceipt.objects.filter(
                                     invoice=invoice
                                 ).exists():

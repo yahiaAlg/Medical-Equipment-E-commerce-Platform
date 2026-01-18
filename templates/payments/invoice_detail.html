@@ -1,4 +1,4 @@
-!-- invoice_detail.html -->
+<!-- invoice_detail.html -->
 {% extends 'base.html' %}
 {% load static %}
 
@@ -58,7 +58,17 @@
         <tbody>
           {% for item in invoice.order.items.all %}
           <tr>
-            <td>{{ item.product.name }}</td>
+            <td>
+              {{ item.product.name }}
+              {% if item.variant %}
+                <br><small style="color: #666;">
+                  {{ item.variant.variant_title }}: {{ item.variant.variant_value }}
+                  {% if item.variant.purchase_type == 'bulk' %}
+                    ({{ item.variant.bulk_container_type.name }})
+                  {% endif %}
+                </small>
+              {% endif %}
+            </td>
             <td>{{ item.quantity }}</td>
             <td>{{ item.price|floatformat:2 }} DZD</td>
             <td>{{ item.get_total_price|floatformat:2 }} DZD</td>

@@ -2,6 +2,7 @@ from django.contrib import admin
 from .models import (
     Category,
     Brand,
+    BulkContainerType,
     Product,
     ProductVariant,
     ProductImage,
@@ -35,17 +36,41 @@ class BrandAdmin(admin.ModelAdmin):
     )
 
 
+@admin.register(BulkContainerType)
+class BulkContainerTypeAdmin(admin.ModelAdmin):
+    list_display = ("name", "typical_capacity", "variant_count")
+    search_fields = ("name", "description")
+
+    fieldsets = (
+        (
+            "Informations sur le conteneur",
+            {"fields": ("name", "description", "typical_capacity")},
+        ),
+    )
+
+    def variant_count(self, obj):
+        return obj.variants.count()
+
+    variant_count.short_description = "Variantes utilisant ce conteneur"
+
+
 class ProductVariantInline(admin.TabularInline):
     model = ProductVariant
     extra = 1
     fields = (
         "variant_title",
         "variant_value",
-        "additional_cost",
+        "purchase_type",
+        "retail_price",
+        "bulk_container_type",
+        "units_per_container",
+        "unit_price",
+        "wholesale_price",
         "stock_quantity",
         "is_active",
         "display_order",
     )
+    autocomplete_fields = ("bulk_container_type",)
     ordering = ("display_order", "variant_title")
 
 
@@ -77,7 +102,6 @@ class ProductAdmin(admin.ModelAdmin):
         "get_categories",
         "brand",
         "price",
-        "bulk_price",
         "stock_quantity",
         "availability_status",
         "featured",
@@ -131,11 +155,10 @@ class ProductAdmin(admin.ModelAdmin):
             {
                 "fields": (
                     "price",
-                    "bulk_price",
-                    "bulk_quantity",
                     "stock_quantity",
                     "availability_status",
-                )
+                ),
+                "description": "Le prix est défini à 0 par défaut. Les prix réels proviennent des variantes.",
             },
         ),
         ("Classification", {"fields": ("specialty", "warranty")}),
@@ -144,6 +167,14 @@ class ProductAdmin(admin.ModelAdmin):
             {"fields": ("meta_title", "meta_description"), "classes": ("collapse",)},
         ),
         ("Caractéristiques et statut", {"fields": ("featured", "trending")}),
+        (
+            "Ancien système (legacy)",
+            {
+                "fields": ("bulk_price", "bulk_quantity"),
+                "classes": ("collapse",),
+                "description": "Ces champs sont conservés pour la compatibilité. Utilisez les variantes à la place.",
+            },
+        ),
         (
             "Avis",
             {
@@ -210,26 +241,53 @@ class ProductVariantAdmin(admin.ModelAdmin):
         "product",
         "variant_title",
         "variant_value",
-        "additional_cost",
+        "purchase_type",
+        "get_price_display",
         "stock_quantity",
         "is_active",
         "display_order",
     )
-    list_filter = ("is_active", "variant_title", "product__categories")
+    list_filter = (
+        "is_active",
+        "purchase_type",
+        "variant_title",
+        "product__categories",
+        "bulk_container_type",
+    )
     search_fields = ("product__name", "variant_title", "variant_value")
     list_editable = ("is_active", "display_order", "stock_quantity")
+    autocomplete_fields = ("product", "bulk_container_type")
     ordering = ("product", "display_order", "variant_title")
 
     fieldsets = (
         (
-            "Informations sur la variante",
+            "Informations de base",
             {
                 "fields": (
                     "product",
                     "variant_title",
                     "variant_value",
-                    "additional_cost",
+                    "purchase_type",
                 )
+            },
+        ),
+        (
+            "Prix de détail",
+            {
+                "fields": ("retail_price",),
+                "description": "Pour les achats au détail, spécifiez uniquement le prix de détail.",
+            },
+        ),
+        (
+            "Prix en gros",
+            {
+                "fields": (
+                    "bulk_container_type",
+                    "units_per_container",
+                    "unit_price",
+                    "wholesale_price",
+                ),
+                "description": "Pour les achats en gros, remplissez tous ces champs.",
             },
         ),
         (
@@ -239,6 +297,21 @@ class ProductVariantAdmin(admin.ModelAdmin):
     )
 
     actions = ["activate_variants", "deactivate_variants"]
+
+    def get_price_display(self, obj):
+        if obj.purchase_type == "bulk":
+            if obj.wholesale_price and obj.units_per_container:
+                savings = obj.get_savings_percentage()
+                container_name = (
+                    obj.bulk_container_type.name
+                    if obj.bulk_container_type
+                    else "conteneur"
+                )
+                return f"{obj.wholesale_price} DA ({obj.units_per_container} unités/{container_name}, économie: {savings:.1f}%)"
+            return f"{obj.wholesale_price} DA" if obj.wholesale_price else "-"
+        return f"{obj.retail_price} DA" if obj.retail_price else "-"
+
+    get_price_display.short_description = "Prix"
 
     def activate_variants(self, request, queryset):
         updated = queryset.update(is_active=True)
@@ -256,7 +329,7 @@ class ProductVariantAdmin(admin.ModelAdmin):
         return (
             super()
             .get_queryset(request)
-            .select_related("product", "product__brand")
+            .select_related("product", "product__brand", "bulk_container_type")
             .prefetch_related("product__categories")
         )
 

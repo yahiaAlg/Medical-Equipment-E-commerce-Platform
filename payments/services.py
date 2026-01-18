@@ -16,8 +16,6 @@ class OrderService:
     @staticmethod
     def create_order_from_cart(user, cart, shipping_data, tva_rate=None):
         """Create order from cart items"""
-        # Import here to avoid circular dependency
-
         # Get TVA rate from site settings if not provided
         if tva_rate is None:
             site_info = SiteInformation.get_instance()
@@ -48,19 +46,24 @@ class OrderService:
             total_amount=total,
         )
 
-        # Create order items
+        # Create order items with variant info
         for cart_item in cart.items.all():
             OrderItem.objects.create(
                 order=order,
                 product=cart_item.product,
+                variant=cart_item.variant,  # Save variant
                 quantity=cart_item.quantity,
-                price=cart_item.product.price,
+                price=cart_item.get_unit_price(),  # Use actual cart price
             )
 
             # Reduce stock
-            product = cart_item.product
-            product.stock_quantity -= cart_item.quantity
-            product.save()
+            if cart_item.variant:
+                cart_item.variant.stock_quantity -= cart_item.quantity
+                cart_item.variant.save()
+            else:
+                product = cart_item.product
+                product.stock_quantity -= cart_item.quantity
+                product.save()
 
         # Clear cart
         cart.items.all().delete()

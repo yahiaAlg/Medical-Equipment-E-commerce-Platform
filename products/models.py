@@ -36,6 +36,27 @@ class Brand(models.Model):
         return self.name
 
 
+class BulkContainerType(models.Model):
+    """Dynamic bulk container types (cartons, tanks, packages, etc.)"""
+
+    name = models.CharField(max_length=100, unique=True, verbose_name="Nom")
+    description = models.TextField(blank=True, verbose_name="Description")
+    typical_capacity = models.CharField(
+        max_length=100,
+        blank=True,
+        verbose_name="Capacité typique",
+        help_text="Ex: 50 unités, 10L, etc.",
+    )
+
+    class Meta:
+        verbose_name = "Type de conteneur en gros"
+        verbose_name_plural = "Types de conteneurs en gros"
+        ordering = ["name"]
+
+    def __str__(self):
+        return self.name
+
+
 class Product(models.Model):
     SPECIALTIES = [
         ("dermatology", "Dermatologie"),
@@ -67,16 +88,20 @@ class Product(models.Model):
     short_description = models.CharField(
         max_length=500, verbose_name="Description courte"
     )
-    price = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="Prix")
+    # Price is now 0 by default - actual prices come from variants
+    price = models.DecimalField(
+        max_digits=10, decimal_places=2, default=0, verbose_name="Prix"
+    )
+    # Legacy bulk fields - kept for backward compatibility but variants handle this now
     bulk_price = models.DecimalField(
         max_digits=10,
         decimal_places=2,
         blank=True,
         null=True,
-        verbose_name="Prix en gros",
+        verbose_name="Prix en gros (legacy)",
     )
     bulk_quantity = models.PositiveIntegerField(
-        default=10, verbose_name="Quantité en gros"
+        default=10, verbose_name="Quantité en gros (legacy)"
     )
     sku = models.CharField(max_length=100, unique=True, verbose_name="Référence")
     stock_quantity = models.PositiveIntegerField(
@@ -134,8 +159,25 @@ class Product(models.Model):
     def get_review_count(self):
         return self.reviews.count()
 
+    def get_price_range(self):
+        """Get min and max prices from active variants"""
+        variants = self.variants.filter(is_active=True)
+        if not variants:
+            return self.price, self.price
+
+        prices = [v.get_total_price() for v in variants if v.get_total_price() > 0]
+        if not prices:
+            return self.price, self.price
+
+        return min(prices), max(prices)
+
 
 class ProductVariant(models.Model):
+    PURCHASE_TYPE_CHOICES = [
+        ("retail", "Détail"),
+        ("bulk", "En Gros"),
+    ]
+
     product = models.ForeignKey(
         Product,
         on_delete=models.CASCADE,
@@ -148,9 +190,56 @@ class ProductVariant(models.Model):
     variant_value = models.CharField(
         max_length=100, verbose_name="Valeur de la variante"
     )
-    additional_cost = models.DecimalField(
-        max_digits=10, decimal_places=2, default=0, verbose_name="Coût additionnel"
+
+    # Purchase type selection
+    purchase_type = models.CharField(
+        max_length=10,
+        choices=PURCHASE_TYPE_CHOICES,
+        default="retail",
+        verbose_name="Type d'achat",
     )
+
+    # Retail fields
+    retail_price = models.DecimalField(
+        max_digits=10,
+        decimal_places=2,
+        blank=True,
+        null=True,
+        verbose_name="Prix de détail",
+    )
+
+    # Bulk fields - dynamic container type
+    bulk_container_type = models.ForeignKey(
+        BulkContainerType,
+        on_delete=models.SET_NULL,
+        blank=True,
+        null=True,
+        related_name="variants",
+        verbose_name="Type de conteneur",
+    )
+    units_per_container = models.PositiveIntegerField(
+        blank=True,
+        null=True,
+        verbose_name="Unités par conteneur",
+        help_text="Nombre d'unités de détail dans ce conteneur",
+    )
+    unit_price = models.DecimalField(
+        max_digits=10,
+        decimal_places=2,
+        blank=True,
+        null=True,
+        verbose_name="Prix unitaire",
+        help_text="Prix d'une seule unité de détail",
+    )
+    wholesale_price = models.DecimalField(
+        max_digits=10,
+        decimal_places=2,
+        blank=True,
+        null=True,
+        verbose_name="Prix de gros",
+        help_text="Prix du conteneur complet",
+    )
+
     stock_quantity = models.PositiveIntegerField(
         default=0, verbose_name="Quantité en stock"
     )
@@ -166,10 +255,69 @@ class ProductVariant(models.Model):
         verbose_name_plural = "Variantes de produit"
 
     def __str__(self):
-        return f"{self.product.name} - {self.variant_title}: {self.variant_value}"
+        return f"{self.product.name} - {self.variant_title}: {self.variant_value} ({self.get_purchase_type_display()})"
+
+    def clean(self):
+        from django.core.exceptions import ValidationError
+
+        if self.purchase_type == "bulk":
+            if not all(
+                [
+                    self.bulk_container_type,
+                    self.units_per_container,
+                    self.unit_price,
+                    self.wholesale_price,
+                ]
+            ):
+                raise ValidationError(
+                    "Pour l'achat en gros, veuillez remplir: type de conteneur, "
+                    "unités par conteneur, prix unitaire et prix de gros."
+                )
+        elif self.purchase_type == "retail":
+            if not self.retail_price:
+                raise ValidationError(
+                    "Pour l'achat au détail, veuillez spécifier le prix de détail."
+                )
+
+    def save(self, *args, **kwargs):
+        self.full_clean()
+        super().save(*args, **kwargs)
 
     def get_total_price(self):
-        return self.product.price + self.additional_cost
+        """Get the total price based on purchase type"""
+        if self.purchase_type == "bulk" and self.wholesale_price:
+            return self.wholesale_price
+        elif self.purchase_type == "retail" and self.retail_price:
+            return self.retail_price
+        return 0
+
+    def get_unit_price(self):
+        """Get the per-unit price"""
+        if self.purchase_type == "bulk" and self.unit_price:
+            return self.unit_price
+        elif self.purchase_type == "retail" and self.retail_price:
+            return self.retail_price
+        return 0
+
+    def calculate_bulk_savings(self):
+        """Calculate savings when buying in bulk vs retail"""
+        if (
+            self.purchase_type == "bulk"
+            and self.unit_price
+            and self.units_per_container
+        ):
+            retail_equivalent = self.unit_price * self.units_per_container
+            if self.wholesale_price and retail_equivalent > self.wholesale_price:
+                return retail_equivalent - self.wholesale_price
+        return 0
+
+    def get_savings_percentage(self):
+        """Get savings percentage for bulk purchase"""
+        savings = self.calculate_bulk_savings()
+        if savings > 0 and self.unit_price and self.units_per_container:
+            retail_equivalent = self.unit_price * self.units_per_container
+            return (savings / retail_equivalent) * 100
+        return 0
 
 
 class ProductImage(models.Model):

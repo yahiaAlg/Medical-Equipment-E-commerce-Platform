@@ -1,4 +1,4 @@
-from .models import Notification
+from .models import Notification, Cart
 
 
 def notifications(request):
@@ -20,8 +20,6 @@ def cart_items_count(request):
     """Add cart items count to all templates"""
     if request.user.is_authenticated:
         try:
-            from .models import Cart
-
             cart = Cart.objects.get(user=request.user)
             return {"cart_items_count": cart.get_total_items()}
         except Cart.DoesNotExist:

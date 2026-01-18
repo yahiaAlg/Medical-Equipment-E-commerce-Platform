@@ -45,15 +45,16 @@
                 {{ item.product.short_description|truncatewords:15 }}
               </p>
             </div>
+            <!-- Replace the quantity input section (around line 48-60) -->
             <div class="item-quantity">
               <button class="qty-btn minus" onclick="updateQuantity({{ item.id }}, {{ item.quantity|add:'-1' }})"
                       {% if item.quantity <= 1 %}disabled{% endif %}>-</button>
               <input type="number" value="{{ item.quantity }}" min="1" 
-                    max="{% if item.variant %}{{ item.variant.stock_quantity }}{% else %}{{ item.product.stock_quantity }}{% endif %}" 
+                    max="{% if item.variant and item.variant.stock_quantity %}{{ item.variant.stock_quantity }}{% else %}{{ item.product.stock_quantity }}{% endif %}" 
                     class="qty-input" readonly />
               <button class="qty-btn plus" onclick="updateQuantity({{ item.id }}, {{ item.quantity|add:'1' }})"
                       {% if item.variant %}
-                        {% if item.quantity >= item.variant.stock_quantity %}disabled{% endif %}
+                        {% if item.variant.stock_quantity and item.quantity >= item.variant.stock_quantity %}disabled{% endif %}
                       {% else %}
                         {% if item.quantity >= item.product.stock_quantity %}disabled{% endif %}
                       {% endif %}>+</button>

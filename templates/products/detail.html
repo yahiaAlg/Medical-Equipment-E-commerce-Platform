@@ -54,11 +54,13 @@
       </div>
 
       <div class="price-section">
-        <span class="current-price" id="displayPrice">DZD {{ product.price }}</span>
-        {% if product.bulk_price %}
-        <span class="original-price">DZD {{ product.bulk_price }}</span>
-        <span class="discount-badge">-17%</span>
-        {% endif %}
+        {% with price_range=product.get_price_range %}
+          {% if price_range.0 == price_range.1 %}
+            <span class="current-price" id="displayPrice">DZD {{ price_range.0 }}</span>
+          {% else %}
+            <span class="current-price" id="displayPrice">DZD {{ price_range.0 }} - {{ price_range.1 }}</span>
+          {% endif %}
+        {% endwith %}
       </div>
 
       <div class="stock-status {% if product.availability_status != 'in_stock' %}out{% endif %}">
@@ -88,32 +90,45 @@
 
       <!-- Variants Section -->
       {% if variants %}
-      <div class="size-selector">
-        <h4>Options disponibles :</h4>
-        {% regroup variants by variant_title as variant_groups %}
-        {% for group in variant_groups %}
-          <div class="mb-3">
-            <label class="form-label fw-bold">{{ group.grouper }} :</label>
-            <div class="size-options">
-              {% for variant in group.list %}
-              <button class="size-btn" data-variant-id="{{ variant.id }}" data-price="{{ variant.additional_cost }}">
-                {{ variant.variant_value }}
-              </button>
-              {% endfor %}
+        <div class="size-selector">
+          <h4>Options disponibles :</h4>
+          {% regroup variants by variant_title as variant_groups %}
+          {% for group in variant_groups %}
+            <div class="mb-3">
+              <label class="form-label fw-bold">{{ group.grouper }} :</label>
+              <div class="size-options">
+                {% for variant in group.list %}
+                <button class="size-btn" 
+                        data-variant-id="{{ variant.id }}" 
+                        data-price="{{ variant.get_total_price }}"
+                        data-purchase-type="{{ variant.purchase_type }}"
+                        data-stock="{{ variant.stock_quantity }}">
+                  {{ variant.variant_value }}
+                  {% if variant.purchase_type == 'bulk' %}
+                    <small>({{ variant.bulk_container_type.name }}, {{ variant.units_per_container }} unités)</small>
+                    {% if variant.get_savings_percentage > 0 %}
+                      <span class="badge bg-success">-{{ variant.get_savings_percentage|floatformat:0 }}%</span>
+                    {% endif %}
+                  {% endif %}
+                </button>
+                {% endfor %}
+              </div>
             </div>
-          </div>
-        {% endfor %}
-      </div>
+          {% endfor %}
+        </div>
       {% endif %}
 
       <div class="quantity-cart">
         <div class="quantity-selector">
           <button class="qty-btn" onclick="changeQty(-1)">-</button>
-          <input type="number" class="qty-input" id="quantity" value="1" min="1" max="{{ product.stock_quantity }}" readonly />
+          <input type="number" class="qty-input" id="quantity" value="1" min="1" 
+                max="{% if variants %}999{% else %}{{ product.stock_quantity }}{% endif %}" 
+                readonly />
           <button class="qty-btn" onclick="changeQty(1)">+</button>
         </div>
         <button class="btn-add-cart" onclick="addToCart({{ product.id }})">🛒 Ajouter au panier</button>
       </div>
+
 
       <div class="action-buttons">
         <button class="btn-wishlist" onclick="toggleWishlist({{ product.id }}, this)">
@@ -327,11 +342,18 @@
             </h3>
             <p class="product-card-meta">{{ related.category.name }}</p>
             <div class="product-card-rating">
-              <span class="stars">★★★★☆</span>
-              <span>({{ related.get_review_count }})</span>
+              nombre des avis: <span class="rating-count">{{ related.get_review_count }}</span>
             </div>
             <div class="product-card-price">
-              <span class="price">DZD {{ related.price }}</span>
+              {% with price_range=related.get_price_range %}
+                {% if price_range.0 == price_range.1 %}
+                  <small style="color:#2b4a7a;">DZD {{ price_range.0 }}</small>
+                {% elif price_range.0 > 0 %}
+                  <small style="color:#2b4a7a;">DZD {{ price_range.0 }} - {{ price_range.1 }}</small>
+                {% else %}
+                  <small style="color:#2b4a7a;">Prix sur demande</small>
+                {% endif %}
+              {% endwith %}
             </div>
             <button class="btn-add" onclick="event.preventDefault(); quickAddToCart({{ related.id }})">+ Ajouter</button>
           </div>
@@ -345,8 +367,10 @@
 
 {% block extra_js %}
   <script>
-    const basePrice = {{ product.price }};
+    // Replace the JavaScript section at the bottom of detail.html
+    const basePrice = {% with price_range=product.get_price_range %}{% if price_range.0 == price_range.1 %}{{ price_range.0 }}{% else %}null{% endif %}{% endwith %};
     let selectedVariantId = null;
+    let selectedVariantStock = {{ product.stock_quantity }};
 
     function changeImage(src) {
       document.getElementById('mainImage').src = src;
@@ -357,59 +381,30 @@
     function changeQty(delta) {
       const input = document.getElementById('quantity');
       const newVal = parseInt(input.value) + delta;
-      if (newVal >= 1 && newVal <= parseInt(input.max)) {
+      const maxStock = parseInt(input.max);
+      if (newVal >= 1 && newVal <= maxStock) {
         input.value = newVal;
       }
     }
 
-    function openTab(evt, tabName) {
-      document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
-      document.querySelectorAll('.tab-link').forEach(t => t.classList.remove('active'));
-      document.getElementById(tabName).classList.add('active');
-      evt.currentTarget.classList.add('active');
-    }
-
-    function toggleWishlist(productId, button) {
-      {% if user.is_authenticated %}
-      fetch("{% url 'products:toggle_wishlist' %}", {
-        method: "POST",
-        headers: {"Content-Type": "application/json", "X-CSRFToken": "{{ csrf_token }}"},
-        body: JSON.stringify({product_id: productId})
-      })
-      .then(r => r.json())
-      .then(data => {
-        if(data.success) {
-          const icon = document.getElementById(`wishlist-icon-${productId}`);
-          const text = document.getElementById(`wishlist-text-${productId}`);
-
-          if(data.in_wishlist) {
-            icon.textContent = '♥';
-            if(text) text.textContent = 'Retirer de la liste';
-            button.style.color = '#dc3545';
-          } else {
-            icon.textContent = '♡';
-            if(text) text.textContent = 'Ajouter à la liste';
-            button.style.color = '#666';
-          }
-        }
-      });
-      {% else %}
-      window.location.href = "{% url 'accounts:login' %}";
-      {% endif %}
-    }
-
-    // Variant selection
+    // Variant selection - update max quantity
     document.querySelectorAll('.size-btn').forEach(btn => {
       btn.addEventListener('click', function() {
         document.querySelectorAll('.size-btn').forEach(b => b.classList.remove('active'));
         this.classList.add('active');
-
+        
         selectedVariantId = this.dataset.variantId;
-
-        // Update price display
-        const additionalCost = parseFloat(this.dataset.price);
-        const totalPrice = basePrice + additionalCost;
-        document.getElementById('displayPrice').textContent = 'DZD ' + totalPrice.toFixed(2);
+        selectedVariantStock = parseInt(this.dataset.stock);
+        const price = parseFloat(this.dataset.price);
+        
+        document.getElementById('displayPrice').textContent = 'DZD ' + price.toFixed(2);
+        
+        // Update quantity input max value
+        const qtyInput = document.getElementById('quantity');
+        qtyInput.max = selectedVariantStock;
+        if (parseInt(qtyInput.value) > selectedVariantStock) {
+          qtyInput.value = selectedVariantStock;
+        }
       });
     });
 
@@ -464,6 +459,42 @@
           alert('Ajouté au panier !');
         } else {
           alert(data.message || 'Erreur lors de l\'ajout au panier');
+        }
+      });
+      {% else %}
+      window.location.href = "{% url 'accounts:login' %}";
+      {% endif %}
+    }
+
+    function openTab(evt, tabName) {
+      document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.tab-link').forEach(t => t.classList.remove('active'));
+      document.getElementById(tabName).classList.add('active');
+      evt.currentTarget.classList.add('active');
+    }
+
+    function toggleWishlist(productId, button) {
+      {% if user.is_authenticated %}
+      fetch("{% url 'products:toggle_wishlist' %}", {
+        method: "POST",
+        headers: {"Content-Type": "application/json", "X-CSRFToken": "{{ csrf_token }}"},
+        body: JSON.stringify({product_id: productId})
+      })
+      .then(r => r.json())
+      .then(data => {
+        if(data.success) {
+          const icon = document.getElementById(`wishlist-icon-${productId}`);
+          const text = document.getElementById(`wishlist-text-${productId}`);
+
+          if(data.in_wishlist) {
+            icon.textContent = '♥';
+            if(text) text.textContent = 'Retirer de la liste';
+            button.style.color = '#dc3545';
+          } else {
+            icon.textContent = '♡';
+            if(text) text.textContent = 'Ajouter à la liste';
+            button.style.color = '#666';
+          }
         }
       });
       {% else %}

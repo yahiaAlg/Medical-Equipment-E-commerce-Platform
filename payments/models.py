@@ -42,17 +42,13 @@ class CartItem(models.Model):
         return f"{self.quantity} x {self.product.name}{variant_info}"
 
     def get_unit_price(self):
-        """Obtenir le prix unitaire incluant le coût de la variante"""
-        base_price = self.product.price
+        """Get the price per item based on variant or product"""
         if self.variant:
-            base_price += self.variant.additional_cost
-
-        if self.quantity >= self.product.bulk_quantity and self.product.bulk_price:
-            return self.product.bulk_price
-
-        return base_price
+            return self.variant.get_total_price()
+        return self.product.price
 
     def get_total_price(self):
+        """Get total price for this cart item"""
         return self.quantity * self.get_unit_price()
 
 
@@ -168,6 +164,13 @@ class OrderItem(models.Model):
     product = models.ForeignKey(
         Product, on_delete=models.CASCADE, verbose_name="Produit"
     )
+    variant = models.ForeignKey(
+        "products.ProductVariant",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        verbose_name="Variante",
+    )
     quantity = models.PositiveIntegerField(verbose_name="Quantité")
     price = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="Prix")
 
@@ -176,7 +179,8 @@ class OrderItem(models.Model):
         verbose_name_plural = "Articles de commande"
 
     def __str__(self):
-        return f"{self.quantity} x {self.product.name}"
+        variant_info = f" ({self.variant.variant_value})" if self.variant else ""
+        return f"{self.quantity} x {self.product.name}{variant_info}"
 
     def get_total_price(self):
         return self.quantity * self.price

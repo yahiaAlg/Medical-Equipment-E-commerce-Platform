@@ -3,6 +3,7 @@ from django.core.files.base import ContentFile
 from ...models import (
     Category,
     Brand,
+    BulkContainerType,
     Product,
     ProductImage,
     ProductReview,
@@ -30,7 +31,64 @@ class Command(BaseCommand):
     def handle(self, *args, **kwargs):
         self.stdout.write("Génération des produits...")
 
-        # Créer les catégories basées sur les pages HTML
+        # Créer les types de conteneurs en gros
+        container_types_data = [
+            {
+                "name": "Carton",
+                "description": "Carton standard pour produits médicaux",
+                "typical_capacity": "20-100 unités",
+            },
+            {
+                "name": "Réservoir",
+                "description": "Réservoir pour liquides en vrac",
+                "typical_capacity": "5-50 litres",
+            },
+            {
+                "name": "Colis",
+                "description": "Colis postal ou logistique",
+                "typical_capacity": "10-50 unités",
+            },
+            {
+                "name": "Boîte",
+                "description": "Boîte de rangement",
+                "typical_capacity": "5-30 unités",
+            },
+            {
+                "name": "Palette",
+                "description": "Palette de transport",
+                "typical_capacity": "100-500 unités",
+            },
+            {
+                "name": "Sac",
+                "description": "Sac en plastique ou papier",
+                "typical_capacity": "10-100 unités",
+            },
+            {
+                "name": "Fût",
+                "description": "Fût ou baril pour stockage",
+                "typical_capacity": "10-200 litres",
+            },
+            {
+                "name": "Conteneur",
+                "description": "Conteneur de grande capacité",
+                "typical_capacity": "500-5000 unités",
+            },
+        ]
+
+        container_types = {}
+        for ct_data in container_types_data:
+            ct, created = BulkContainerType.objects.get_or_create(
+                name=ct_data["name"],
+                defaults={
+                    "description": ct_data["description"],
+                    "typical_capacity": ct_data["typical_capacity"],
+                },
+            )
+            container_types[ct_data["name"]] = ct
+            if created:
+                self.stdout.write(f"Type de conteneur créé : {ct.name}")
+
+        # Créer les catégories
         categories_data = [
             {
                 "name": "Cardiologie",
@@ -111,92 +169,146 @@ class Command(BaseCommand):
             )
             brands.append(brand)
 
-        # Créer les produits basés sur les pages HTML
+        # Créer les produits avec nouvelles variantes
         products_data = [
             # Produits de cardiologie
             {
                 "name": "Électrodes ECG",
                 "categories": ["Cardiologie"],
-                "price": 2600,
                 "specialty": "cardiology",
                 "description": "Électrodes jetables pré-gélifiées pour surveillance cardiaque",
                 "variants": [
-                    {"title": "Taille du pack", "value": "Pack de 50", "cost": 0},
-                    {"title": "Taille du pack", "value": "Pack de 100", "cost": 1500},
-                    {"title": "Taille du pack", "value": "Pack de 200", "cost": 2800},
+                    {
+                        "title": "Pack standard",
+                        "value": "50 unités",
+                        "type": "retail",
+                        "price": 2600,
+                    },
+                    {
+                        "title": "Pack moyen",
+                        "value": "100 unités",
+                        "type": "retail",
+                        "price": 4100,
+                    },
+                    {
+                        "title": "Carton",
+                        "value": "200 unités",
+                        "type": "bulk",
+                        "container": "Carton",
+                        "units": 200,
+                        "unit_price": 22,
+                        "wholesale": 3800,
+                    },
                 ],
             },
             {
                 "name": "Lancettes de sang",
                 "categories": ["Cardiologie", "Laboratoire"],
-                "price": 4000,
                 "specialty": "cardiology",
                 "description": "Lancettes stériles à usage unique pour prélèvement sanguin",
                 "variants": [
-                    {"title": "Calibre", "value": "28G", "cost": 0},
-                    {"title": "Calibre", "value": "30G", "cost": 200},
-                    {"title": "Quantité", "value": "100 pcs", "cost": 0},
-                    {"title": "Quantité", "value": "200 pcs", "cost": 1800},
+                    {
+                        "title": "28G",
+                        "value": "100 pcs",
+                        "type": "retail",
+                        "price": 4000,
+                    },
+                    {
+                        "title": "30G",
+                        "value": "100 pcs",
+                        "type": "retail",
+                        "price": 4200,
+                    },
+                    {
+                        "title": "Boîte 28G",
+                        "value": "500 pcs",
+                        "type": "bulk",
+                        "container": "Boîte",
+                        "units": 500,
+                        "unit_price": 38,
+                        "wholesale": 17000,
+                    },
                 ],
             },
             {
                 "name": "CardioAspirine",
                 "categories": ["Cardiologie"],
-                "price": 200,
                 "specialty": "cardiology",
-                "description": "Aspirine à faible dose pour la protection cardiovasculaire et l'anticoagulation",
+                "description": "Aspirine à faible dose pour la protection cardiovasculaire",
                 "variants": [
-                    {"title": "Dosage", "value": "75mg", "cost": 0},
-                    {"title": "Dosage", "value": "100mg", "cost": 50},
-                    {"title": "Taille du pack", "value": "30 comprimés", "cost": 0},
-                    {"title": "Taille du pack", "value": "60 comprimés", "cost": 150},
+                    {
+                        "title": "75mg",
+                        "value": "30 comprimés",
+                        "type": "retail",
+                        "price": 200,
+                    },
+                    {
+                        "title": "100mg",
+                        "value": "30 comprimés",
+                        "type": "retail",
+                        "price": 250,
+                    },
+                    {
+                        "title": "75mg",
+                        "value": "60 comprimés",
+                        "type": "retail",
+                        "price": 350,
+                    },
                 ],
             },
             # Produits de dentisterie
             {
                 "name": "Ledermix",
                 "categories": ["Dentisterie"],
-                "price": 2000,
                 "specialty": "general",
-                "description": "Pâte dentaire sur ordonnance contenant acétonide de triamcinolone et chlortétracycline HCl",
+                "description": "Pâte dentaire sur ordonnance",
                 "variants": [
-                    {"title": "Taille", "value": "Tube de 5g", "cost": 0},
-                    {"title": "Taille", "value": "Tube de 10g", "cost": 800},
-                ],
-            },
-            {
-                "name": "Oraqix",
-                "categories": ["Dentisterie"],
-                "price": 4000,
-                "specialty": "general",
-                "description": "Gel parodontal contenant lidocaïne et prilocaïne pour anesthésie locale",
-                "variants": [
-                    {"title": "Volume", "value": "Cartouche de 1,7g", "cost": 0},
-                    {"title": "Pack", "value": "Unitaire", "cost": 0},
-                    {"title": "Pack", "value": "Boîte de 20", "cost": 15000},
+                    {
+                        "title": "Petit",
+                        "value": "Tube de 5g",
+                        "type": "retail",
+                        "price": 2000,
+                    },
+                    {
+                        "title": "Grand",
+                        "value": "Tube de 10g",
+                        "type": "retail",
+                        "price": 2800,
+                    },
+                    {
+                        "title": "Carton 5g",
+                        "value": "20 tubes",
+                        "type": "bulk",
+                        "container": "Carton",
+                        "units": 20,
+                        "unit_price": 1900,
+                        "wholesale": 35000,
+                    },
                 ],
             },
             {
                 "name": "Détartreurs dentaires",
                 "categories": ["Dentisterie", "Chirurgie"],
-                "price": 3000,
                 "specialty": "general",
-                "description": "Ensemble d'instruments dentaires pour éliminer la plaque et le tartre des dents",
+                "description": "Ensemble d'instruments dentaires pour éliminer la plaque",
                 "variants": [
                     {
-                        "title": "Type d'ensemble",
-                        "value": "Basique (3 pièces)",
-                        "cost": 0,
+                        "title": "Basique",
+                        "value": "3 pièces",
+                        "type": "retail",
+                        "price": 3000,
                     },
                     {
-                        "title": "Type d'ensemble",
-                        "value": "Professionnel (6 pièces)",
-                        "cost": 2000,
+                        "title": "Professionnel",
+                        "value": "6 pièces",
+                        "type": "retail",
+                        "price": 5000,
                     },
                     {
-                        "title": "Type d'ensemble",
-                        "value": "Complet (12 pièces)",
-                        "cost": 4500,
+                        "title": "Complet",
+                        "value": "12 pièces",
+                        "type": "retail",
+                        "price": 7500,
                     },
                 ],
             },
@@ -204,107 +316,40 @@ class Command(BaseCommand):
             {
                 "name": "Canestene DERM",
                 "categories": ["Dermatologie"],
-                "price": 1150,
                 "specialty": "dermatology",
-                "description": "Crème antifongique pour traiter les infections cutanées comme le pied d'athlète, la teigne et les irritations cutanées fongiques",
+                "description": "Crème antifongique pour traiter les infections cutanées",
                 "variants": [
-                    {"title": "Taille", "value": "15g", "cost": 0},
-                    {"title": "Taille", "value": "30g", "cost": 600},
-                    {"title": "Taille", "value": "50g", "cost": 1000},
-                ],
-            },
-            {
-                "name": "Dermo Cuivre",
-                "categories": ["Dermatologie"],
-                "price": 1400,
-                "specialty": "dermatology",
-                "description": "Pommade réparatrice pour traiter les plaies mineures, brûlures et irritations cutanées",
-                "variants": [
-                    {"title": "Volume", "value": "20ml", "cost": 0},
-                    {"title": "Volume", "value": "50ml", "cost": 800},
+                    {"title": "Petit", "value": "15g", "type": "retail", "price": 1150},
+                    {"title": "Moyen", "value": "30g", "type": "retail", "price": 1750},
+                    {"title": "Grand", "value": "50g", "type": "retail", "price": 2150},
+                    {
+                        "title": "Boîte 15g",
+                        "value": "12 tubes",
+                        "type": "bulk",
+                        "container": "Boîte",
+                        "units": 12,
+                        "unit_price": 1100,
+                        "wholesale": 12500,
+                    },
                 ],
             },
             {
                 "name": "Biafine",
                 "categories": ["Dermatologie"],
-                "price": 1700,
                 "specialty": "dermatology",
-                "description": "Crème de soins cutanés apaisante et protectrice pour peaux irritées ou abîmées",
+                "description": "Crème de soins cutanés apaisante et protectrice",
                 "variants": [
-                    {"title": "Taille", "value": "Tube de 93g", "cost": 0},
-                    {"title": "Taille", "value": "Tube de 186g", "cost": 1500},
-                ],
-            },
-            # Produits de gastro-entérologie
-            {
-                "name": "Spascol LP",
-                "categories": ["Gastro-entérologie"],
-                "price": 1150,
-                "specialty": "general",
-                "description": "Médicament myorelaxant pour traiter les spasmes musculaires et la douleur",
-                "variants": [
-                    {"title": "Taille du pack", "value": "20 comprimés", "cost": 0},
-                    {"title": "Taille du pack", "value": "40 comprimés", "cost": 900},
-                ],
-            },
-            {
-                "name": "Gastricalm",
-                "categories": ["Gastro-entérologie"],
-                "price": 850,
-                "specialty": "general",
-                "description": "Médicament pour traiter l'acidité gastrique et les brûlures d'estomac",
-                "variants": [
-                    {"title": "Forme", "value": "Comprimés", "cost": 0},
-                    {"title": "Forme", "value": "Suspension", "cost": 200},
-                ],
-            },
-            {
-                "name": "Modèle anatomique d'estomac",
-                "categories": ["Gastro-entérologie"],
-                "price": 4500,
-                "specialty": "general",
-                "description": "Modèle pédagogique de l'estomac humain",
-                "variants": [
-                    {"title": "Taille", "value": "Standard", "cost": 0},
-                    {"title": "Taille", "value": "Grand (Enseignement)", "cost": 2000},
-                ],
-            },
-            # Produits de gynécologie
-            {
-                "name": "Femaferrin",
-                "categories": ["Gynécologie"],
-                "price": 2000,
-                "specialty": "general",
-                "description": "Comprimés de supplément de fer pour traiter la carence en fer",
-                "variants": [
-                    {"title": "Pack", "value": "30 comprimés", "cost": 0},
-                    {"title": "Pack", "value": "60 comprimés", "cost": 1700},
-                    {"title": "Pack", "value": "90 comprimés", "cost": 2400},
-                ],
-            },
-            {
-                "name": "Poignée d'aspiration de qualité avec bouteille",
-                "categories": ["Gynécologie", "Chirurgie"],
-                "price": 3000,
-                "specialty": "general",
-                "description": "Dispositif d'aspiration manuel avec bouteille de collecte",
-                "variants": [
-                    {"title": "Taille de bouteille", "value": "500ml", "cost": 0},
-                    {"title": "Taille de bouteille", "value": "1000ml", "cost": 800},
-                ],
-            },
-            {
-                "name": "Modèle anatomique (Système reproducteur féminin)",
-                "categories": ["Gynécologie"],
-                "price": 4500,
-                "specialty": "general",
-                "description": "Modèle pédagogique de l'anatomie reproductive féminine",
-                "variants": [
-                    {"title": "Type", "value": "Standard", "cost": 0},
                     {
-                        "title": "Type",
-                        "value": "Détaillé (avec pathologies)",
-                        "cost": 2500,
+                        "title": "Standard",
+                        "value": "93g",
+                        "type": "retail",
+                        "price": 1700,
+                    },
+                    {
+                        "title": "Grande",
+                        "value": "186g",
+                        "type": "retail",
+                        "price": 3200,
                     },
                 ],
             },
@@ -312,278 +357,273 @@ class Command(BaseCommand):
             {
                 "name": "Tubes microcentrifuge (1,5 ml)",
                 "categories": ["Laboratoire"],
-                "price": 3000,
                 "specialty": "general",
-                "description": "Rack de 96 tubes microcentrifuge à bouchon bleu",
+                "description": "Tubes microcentrifuge à bouchon",
                 "variants": [
-                    {"title": "Quantité", "value": "96 tubes (1 rack)", "cost": 0},
-                    {"title": "Quantité", "value": "480 tubes (5 racks)", "cost": 2500},
-                    {"title": "Couleur", "value": "Bleu", "cost": 0},
-                    {"title": "Couleur", "value": "Transparent", "cost": 0},
-                    {"title": "Couleur", "value": "Assortis", "cost": 200},
-                ],
-            },
-            {
-                "name": "Ensemble de verrerie de laboratoire",
-                "categories": ["Laboratoire"],
-                "price": 2250,
-                "specialty": "general",
-                "description": "Ensemble comprenant bécher, éprouvette graduée et fiole Erlenmeyer",
-                "variants": [
-                    {"title": "Ensemble", "value": "Basique (3 pièces)", "cost": 0},
-                    {"title": "Ensemble", "value": "Standard (6 pièces)", "cost": 1500},
                     {
-                        "title": "Ensemble",
-                        "value": "Professionnel (12 pièces)",
-                        "cost": 3000,
+                        "title": "Rack bleu",
+                        "value": "96 tubes",
+                        "type": "retail",
+                        "price": 3000,
+                    },
+                    {
+                        "title": "Carton bleu",
+                        "value": "480 tubes",
+                        "type": "bulk",
+                        "container": "Carton",
+                        "units": 480,
+                        "unit_price": 30,
+                        "wholesale": 13000,
+                    },
+                    {
+                        "title": "Palette mixte",
+                        "value": "2400 tubes",
+                        "type": "bulk",
+                        "container": "Palette",
+                        "units": 2400,
+                        "unit_price": 27,
+                        "wholesale": 60000,
                     },
                 ],
             },
             {
-                "name": "Pissette (500 ml)",
-                "categories": ["Laboratoire"],
-                "price": 550,
+                "name": "Gants chirurgicaux jetables",
+                "categories": ["Chirurgie", "Laboratoire"],
                 "specialty": "general",
-                "description": "Pissette en plastique avec embout presseur",
+                "description": "Boîte de gants d'examen stériles",
                 "variants": [
-                    {"title": "Volume", "value": "250ml", "cost": -200},
-                    {"title": "Volume", "value": "500ml", "cost": 0},
-                    {"title": "Volume", "value": "1000ml", "cost": 300},
+                    {
+                        "title": "Latex M",
+                        "value": "100 pcs",
+                        "type": "retail",
+                        "price": 1750,
+                    },
+                    {
+                        "title": "Nitrile M",
+                        "value": "100 pcs",
+                        "type": "retail",
+                        "price": 2050,
+                    },
+                    {
+                        "title": "Carton Latex",
+                        "value": "1000 pcs",
+                        "type": "bulk",
+                        "container": "Carton",
+                        "units": 1000,
+                        "unit_price": 16,
+                        "wholesale": 15000,
+                    },
+                    {
+                        "title": "Carton Nitrile",
+                        "value": "1000 pcs",
+                        "type": "bulk",
+                        "container": "Carton",
+                        "units": 1000,
+                        "unit_price": 19,
+                        "wholesale": 18000,
+                    },
                 ],
             },
             # Produits de neurologie
             {
                 "name": "Marteau à réflexes",
                 "categories": ["Neurologie"],
-                "price": 2000,
                 "specialty": "neurology",
                 "description": "Outil pour tester les réflexes du patient",
                 "variants": [
-                    {"title": "Type", "value": "Taylor", "cost": 0},
-                    {"title": "Type", "value": "Buck", "cost": 300},
-                    {"title": "Type", "value": "Babinski", "cost": 500},
-                ],
-            },
-            {
-                "name": "Plateau de ponction lombaire",
-                "categories": ["Neurologie", "Chirurgie"],
-                "price": 20000,
-                "specialty": "neurology",
-                "description": "Kit stérile pour effectuer des ponctions rachidiennes et analyses du liquide céphalorachidien",
-                "variants": [
-                    {"title": "Taille d'aiguille", "value": "20G", "cost": 0},
-                    {"title": "Taille d'aiguille", "value": "22G", "cost": 500},
-                    {"title": "Taille d'aiguille", "value": "25G", "cost": 1000},
+                    {
+                        "title": "Taylor",
+                        "value": "Standard",
+                        "type": "retail",
+                        "price": 2000,
+                    },
+                    {
+                        "title": "Buck",
+                        "value": "Standard",
+                        "type": "retail",
+                        "price": 2300,
+                    },
+                    {
+                        "title": "Babinski",
+                        "value": "Standard",
+                        "type": "retail",
+                        "price": 2500,
+                    },
                 ],
             },
             {
                 "name": "Neurobion Forte",
                 "categories": ["Neurologie"],
-                "price": 1500,
                 "specialty": "neurology",
-                "description": "Supplément de complexe vitaminique B qui aide à soulager les picotements, engourdissements et faiblesses",
+                "description": "Supplément de complexe vitaminique B",
                 "variants": [
-                    {"title": "Pack", "value": "30 comprimés", "cost": 0},
-                    {"title": "Pack", "value": "60 comprimés", "cost": 1300},
+                    {
+                        "title": "Standard",
+                        "value": "30 comprimés",
+                        "type": "retail",
+                        "price": 1500,
+                    },
+                    {
+                        "title": "Double",
+                        "value": "60 comprimés",
+                        "type": "retail",
+                        "price": 2800,
+                    },
+                    {
+                        "title": "Carton",
+                        "value": "10 boîtes x 30",
+                        "type": "bulk",
+                        "container": "Carton",
+                        "units": 10,
+                        "unit_price": 1450,
+                        "wholesale": 13500,
+                    },
                 ],
             },
             # Produits d'ophtalmologie
             {
                 "name": "Vibac",
                 "categories": ["Ophtalmologie", "Chirurgie"],
-                "price": 750,
                 "specialty": "ophthalmology",
                 "description": "Solution antiseptique pour désinfection cutanée",
                 "variants": [
-                    {"title": "Volume", "value": "100ml", "cost": 0},
-                    {"title": "Volume", "value": "250ml", "cost": 500},
-                    {"title": "Volume", "value": "500ml", "cost": 900},
-                ],
-            },
-            {
-                "name": "Vabysmo",
-                "categories": ["Ophtalmologie"],
-                "price": 20000,
-                "specialty": "ophthalmology",
-                "description": "Solution injectable contenant 120 mg de principe actif",
-                "variants": [
-                    {"title": "Pack", "value": "Flacon unique", "cost": 0},
-                    {"title": "Pack", "value": "Pack de 3", "cost": 5000},
-                ],
-            },
-            {
-                "name": "Ophthavet",
-                "categories": ["Ophtalmologie"],
-                "price": 2250,
-                "specialty": "ophthalmology",
-                "description": "Solution ophtalmique pour soins oculaires",
-                "variants": [
-                    {"title": "Volume", "value": "5ml", "cost": 0},
-                    {"title": "Volume", "value": "10ml", "cost": 1000},
+                    {
+                        "title": "Petit",
+                        "value": "100ml",
+                        "type": "retail",
+                        "price": 750,
+                    },
+                    {
+                        "title": "Moyen",
+                        "value": "250ml",
+                        "type": "retail",
+                        "price": 1250,
+                    },
+                    {
+                        "title": "Grand",
+                        "value": "500ml",
+                        "type": "retail",
+                        "price": 1650,
+                    },
+                    {
+                        "title": "Carton 250ml",
+                        "value": "12 flacons",
+                        "type": "bulk",
+                        "container": "Carton",
+                        "units": 12,
+                        "unit_price": 1200,
+                        "wholesale": 13500,
+                    },
                 ],
             },
             # Produits d'orthopédie
             {
                 "name": "Alvityl Chondroflex",
                 "categories": ["Orthopédie"],
-                "price": 3250,
                 "specialty": "orthopedics",
-                "description": "Supplément pour la santé articulaire avec chondroïtine et glucosamine pour maintenir le cartilage et la fonction articulaire",
+                "description": "Supplément pour la santé articulaire",
                 "variants": [
-                    {"title": "Pack", "value": "30 comprimés", "cost": 0},
-                    {"title": "Pack", "value": "60 comprimés", "cost": 2800},
-                    {"title": "Pack", "value": "90 comprimés", "cost": 4200},
-                ],
-            },
-            {
-                "name": "Structoflex",
-                "categories": ["Orthopédie"],
-                "price": 4000,
-                "specialty": "orthopedics",
-                "description": "Supplément articulaire contenant du sulfate de chondroïtine pour soutenir la mobilité articulaire et la santé du cartilage",
-                "variants": [
-                    {"title": "Forme", "value": "Comprimés", "cost": 0},
-                    {"title": "Forme", "value": "Capsules", "cost": 300},
-                    {"title": "Pack", "value": "30 unités", "cost": 0},
-                    {"title": "Pack", "value": "60 unités", "cost": 3500},
-                ],
-            },
-            {
-                "name": "Salusan Ortho",
-                "categories": ["Orthopédie"],
-                "price": 2750,
-                "specialty": "orthopedics",
-                "description": "Supplément pour la santé orthopédique avec collagène et vitamines pour soutenir les os et les articulations",
-                "variants": [
-                    {"title": "Pack", "value": "30 sachets", "cost": 0},
-                    {"title": "Pack", "value": "60 sachets", "cost": 2400},
+                    {
+                        "title": "30 jours",
+                        "value": "30 comprimés",
+                        "type": "retail",
+                        "price": 3250,
+                    },
+                    {
+                        "title": "60 jours",
+                        "value": "60 comprimés",
+                        "type": "retail",
+                        "price": 6050,
+                    },
+                    {
+                        "title": "90 jours",
+                        "value": "90 comprimés",
+                        "type": "retail",
+                        "price": 7450,
+                    },
                 ],
             },
             # Produits de pédiatrie
             {
-                "name": "EfferalganMed Pédiatrique (Paracétamol 30 mg/ml)",
+                "name": "EfferalganMed Pédiatrique",
                 "categories": ["Pédiatrie"],
-                "price": 550,
                 "specialty": "pediatrics",
-                "description": "Solution pédiatrique de paracétamol pour soulager la douleur et la fièvre chez les enfants de 4 à 32 kg",
+                "description": "Solution pédiatrique de paracétamol",
                 "variants": [
-                    {"title": "Volume", "value": "Flacon de 90ml", "cost": 0},
-                    {"title": "Volume", "value": "Flacon de 150ml", "cost": 400},
+                    {
+                        "title": "Standard",
+                        "value": "90ml",
+                        "type": "retail",
+                        "price": 550,
+                    },
+                    {
+                        "title": "Grand",
+                        "value": "150ml",
+                        "type": "retail",
+                        "price": 950,
+                    },
+                    {
+                        "title": "Carton 90ml",
+                        "value": "12 flacons",
+                        "type": "bulk",
+                        "container": "Carton",
+                        "units": 12,
+                        "unit_price": 520,
+                        "wholesale": 5900,
+                    },
                 ],
             },
             {
-                "name": "Melilax",
+                "name": "Doliprane",
                 "categories": ["Pédiatrie"],
-                "price": 1600,
                 "specialty": "pediatrics",
-                "description": "Supplément laxatif à base de plantes pour un soulagement doux de la constipation occasionnelle",
+                "description": "Analgésique et antipyrétique",
                 "variants": [
                     {
-                        "title": "Forme",
-                        "value": "Microlavements pédiatriques (6x5g)",
-                        "cost": 0,
+                        "title": "100mg",
+                        "value": "10 suppositoires",
+                        "type": "retail",
+                        "price": 1000,
                     },
                     {
-                        "title": "Forme",
-                        "value": "Microlavements adultes (6x10g)",
-                        "cost": 500,
+                        "title": "200mg",
+                        "value": "10 suppositoires",
+                        "type": "retail",
+                        "price": 1200,
                     },
-                ],
-            },
-            {
-                "name": "Doliprane (Paracétamol)",
-                "categories": ["Pédiatrie"],
-                "price": 1000,
-                "specialty": "pediatrics",
-                "description": "Analgésique et antipyrétique contenant du paracétamol (acétaminophène)",
-                "variants": [
-                    {"title": "Dosage", "value": "Suppositoires 100mg", "cost": 0},
-                    {"title": "Dosage", "value": "Suppositoires 200mg", "cost": 200},
-                    {"title": "Dosage", "value": "Suppositoires 300mg", "cost": 300},
+                    {
+                        "title": "300mg",
+                        "value": "10 suppositoires",
+                        "type": "retail",
+                        "price": 1300,
+                    },
                 ],
             },
             # Produits de pneumologie
             {
-                "name": "Deslor (Desloratadine 5 mg)",
-                "categories": ["Pneumologie"],
-                "price": 1500,
-                "specialty": "general",
-                "description": "Comprimés antihistaminiques pour le soulagement des allergies",
-                "variants": [
-                    {"title": "Pack", "value": "10 comprimés", "cost": 0},
-                    {"title": "Pack", "value": "20 comprimés", "cost": 1300},
-                    {"title": "Pack", "value": "30 comprimés", "cost": 1800},
-                ],
-            },
-            {
-                "name": "Débitmètre de pointe",
-                "categories": ["Pneumologie"],
-                "price": 2250,
-                "specialty": "general",
-                "description": "Appareil pour mesurer le débit respiratoire",
-                "variants": [
-                    {"title": "Type", "value": "Standard", "cost": 0},
-                    {"title": "Type", "value": "Numérique", "cost": 1500},
-                ],
-            },
-            {
                 "name": "Nébuliseur",
                 "categories": ["Pneumologie", "Pédiatrie"],
-                "price": 4500,
                 "specialty": "general",
-                "description": "Appareil électronique pour administrer des médicaments sous forme de brouillard",
-                "variants": [
-                    {"title": "Type", "value": "Compresseur", "cost": 0},
-                    {"title": "Type", "value": "Ultrasonique", "cost": 2000},
-                    {"title": "Type", "value": "Maille", "cost": 3500},
-                ],
-            },
-            # Produits de chirurgie
-            {
-                "name": "Ensemble d'instruments chirurgicaux",
-                "categories": ["Chirurgie"],
-                "price": 7500,
-                "specialty": "general",
-                "description": "Ensemble de base d'instruments chirurgicaux comprenant pinces, ciseaux et manches de scalpel",
+                "description": "Appareil électronique pour administrer des médicaments",
                 "variants": [
                     {
-                        "title": "Ensemble",
-                        "value": "Chirurgie mineure (10 pcs)",
-                        "cost": 0,
+                        "title": "Compresseur",
+                        "value": "Standard",
+                        "type": "retail",
+                        "price": 4500,
                     },
                     {
-                        "title": "Ensemble",
-                        "value": "Chirurgie générale (25 pcs)",
-                        "cost": 5000,
+                        "title": "Ultrasonique",
+                        "value": "Standard",
+                        "type": "retail",
+                        "price": 6500,
                     },
-                    {"title": "Ensemble", "value": "Complet (50 pcs)", "cost": 12000},
-                ],
-            },
-            {
-                "name": "Gants chirurgicaux jetables",
-                "categories": ["Chirurgie", "Laboratoire"],
-                "price": 1750,
-                "specialty": "general",
-                "description": "Boîte de gants d'examen stériles en latex ou nitrile",
-                "variants": [
-                    {"title": "Matériau", "value": "Latex", "cost": 0},
-                    {"title": "Matériau", "value": "Nitrile", "cost": 300},
-                    {"title": "Taille", "value": "Petit", "cost": 0},
-                    {"title": "Taille", "value": "Moyen", "cost": 0},
-                    {"title": "Taille", "value": "Grand", "cost": 0},
-                    {"title": "Taille", "value": "Très grand", "cost": 0},
-                ],
-            },
-            {
-                "name": "Ruban médical",
-                "categories": ["Chirurgie"],
-                "price": 350,
-                "specialty": "general",
-                "description": "Rouleau de ruban médical hypoallergénique",
-                "variants": [
-                    {"title": "Largeur", "value": "1,25cm x 5m", "cost": 0},
-                    {"title": "Largeur", "value": "2,5cm x 5m", "cost": 100},
-                    {"title": "Largeur", "value": "5cm x 5m", "cost": 250},
+                    {
+                        "title": "Maille",
+                        "value": "Portable",
+                        "type": "retail",
+                        "price": 8000,
+                    },
                 ],
             },
         ]
@@ -593,16 +633,14 @@ class Command(BaseCommand):
                 name=prod_data["name"],
                 defaults={
                     "brand": random.choice(brands),
-                    "price": Decimal(str(prod_data["price"])),
-                    "bulk_price": Decimal(str(prod_data["price"] * 0.85)),
-                    "bulk_quantity": 10,
+                    "price": Decimal("0"),  # Price is 0, comes from variants
                     "sku": f"FEN-{1000 + idx}",
                     "stock_quantity": random.randint(10, 150),
                     "specialty": prod_data["specialty"],
                     "availability_status": "in_stock",
                     "short_description": prod_data["description"],
-                    "description": f'{prod_data["description"]}. Qualité professionnelle pour usage médical. Conforme à toutes les normes et réglementations médicales.',
-                    "specifications": "Qualité médicale professionnelle\nGarantie : 1-2 ans\nCertifications : Conforme aux normes médicales",
+                    "description": f'{prod_data["description"]}. Qualité professionnelle pour usage médical.',
+                    "specifications": "Qualité médicale professionnelle\nGarantie : 1-2 ans",
                     "warranty": "Garantie constructeur standard",
                     "featured": random.choice([True, False]),
                     "trending": random.choice([True, False]),
@@ -612,17 +650,13 @@ class Command(BaseCommand):
             if created:
                 self.stdout.write(f"Produit créé : {product.name}")
 
-                # Ajouter les catégories (relation M2M)
+                # Ajouter les catégories
                 for cat_name in prod_data["categories"]:
                     product.categories.add(categories[cat_name])
-                self.stdout.write(
-                    f"  Catégories ajoutées : {', '.join(prod_data['categories'])}"
-                )
 
-                # Ajouter des images de placeholder
+                # Ajouter des images
                 for img_num in range(3):
                     image_url = f"https://source.unsplash.com/800x600/?medical,{prod_data['categories'][0].lower()}&sig={idx}{img_num}"
-
                     image_content = self.download_image(image_url)
                     if image_content:
                         ProductImage.objects.create(
@@ -635,23 +669,41 @@ class Command(BaseCommand):
                             is_primary=(img_num == 0),
                         )
 
-                # Ajouter les variantes de produits
+                # Ajouter les variantes
                 if "variants" in prod_data:
-                    for order, variant_data in enumerate(prod_data["variants"]):
-                        ProductVariant.objects.create(
-                            product=product,
-                            variant_title=variant_data["title"],
-                            variant_value=variant_data["value"],
-                            additional_cost=Decimal(str(variant_data["cost"])),
-                            stock_quantity=random.randint(5, 100),
-                            is_active=True,
-                            display_order=order,
-                        )
+                    for order, v_data in enumerate(prod_data["variants"]):
+                        if v_data["type"] == "retail":
+                            ProductVariant.objects.create(
+                                product=product,
+                                variant_title=v_data["title"],
+                                variant_value=v_data["value"],
+                                purchase_type="retail",
+                                retail_price=Decimal(str(v_data["price"])),
+                                stock_quantity=random.randint(5, 100),
+                                is_active=True,
+                                display_order=order,
+                            )
+                        else:  # bulk
+                            ProductVariant.objects.create(
+                                product=product,
+                                variant_title=v_data["title"],
+                                variant_value=v_data["value"],
+                                purchase_type="bulk",
+                                bulk_container_type=container_types[
+                                    v_data["container"]
+                                ],
+                                units_per_container=v_data["units"],
+                                unit_price=Decimal(str(v_data["unit_price"])),
+                                wholesale_price=Decimal(str(v_data["wholesale"])),
+                                stock_quantity=random.randint(5, 50),
+                                is_active=True,
+                                display_order=order,
+                            )
                     self.stdout.write(
-                        f"  {len(prod_data['variants'])} variantes ajoutées pour {product.name}"
+                        f"  {len(prod_data['variants'])} variantes ajoutées"
                     )
 
-        # Créer des avis d'exemple
+        # Créer des avis
         users = User.objects.all()
         if users.exists():
             products = Product.objects.all()[:15]
@@ -660,9 +712,7 @@ class Command(BaseCommand):
                 "Très bon produit",
                 "Hautement recommandé",
                 "Parfait pour notre clinique",
-                "Équipement de qualité professionnelle",
                 "Très satisfait",
-                "Bon rapport qualité-prix",
             ]
 
             for product in products:
@@ -678,6 +728,4 @@ class Command(BaseCommand):
                     },
                 )
 
-        self.stdout.write(
-            self.style.SUCCESS("Produits avec variantes générés avec succès !")
-        )
+        self.stdout.write(self.style.SUCCESS("Produits générés avec succès !"))

@@ -114,41 +114,50 @@
         <tr>
           <th>Produit</th>
           <th>Quantité</th>
-          <th>Prix</th>
+          <th>Prix unitaire</th>
           <th>Total</th>
         </tr>
       </thead>
       <tbody>
         {% for item in items %}
         <tr>
-          <td>{{ item.product.name }}</td>
+          <td>
+            {{ item.product.name }}
+            {% if item.variant %}
+              <br><small class="text-muted">
+                {{ item.variant.variant_title }}: {{ item.variant.variant_value }}
+                {% if item.variant.purchase_type == 'bulk' %}
+                  ({{ item.variant.bulk_container_type.name }})
+                {% endif %}
+              </small>
+            {% endif %}
+          </td>
           <td>{{ item.quantity }}</td>
-          <td>{{ item.price }} DZD</td>
-          <td><strong>{{ item.get_total_price }} DZD</strong></td>
+          <td>{{ item.price|floatformat:2 }} DZD</td>
+          <td><strong>{{ item.get_total_price|floatformat:2 }} DZD</strong></td>
         </tr>
         {% endfor %}
       </tbody>
       <tfoot>
         <tr>
           <td colspan="3"><strong>Sous-total</strong></td>
-          <td><strong>{{ order.subtotal }} DZD</strong></td>
+          <td><strong>{{ order.subtotal|floatformat:2 }} DZD</strong></td>
         </tr>
         <tr>
           <td colspan="3">Taxe ({% widthratio tva_rate 1 100 as tax_percentage %}{{ tax_percentage|floatformat:0 }}%)</td>
-          <td>{{ order.tax_amount }} DZD</td>
+          <td>{{ order.tax_amount|floatformat:2 }} DZD</td>
         </tr>
         <tr>
           <td colspan="3">Livraison</td>
-          <td>{{ order.shipping_cost }} DZD</td>
+          <td>{{ order.shipping_cost|floatformat:2 }} DZD</td>
         </tr>
         <tr class="table-primary">
           <td colspan="3"><strong>Total</strong></td>
-          <td><strong>{{ order.total_amount }} DZD</strong></td>
+          <td><strong>{{ order.total_amount|floatformat:2 }} DZD</strong></td>
         </tr>
       </tfoot>
     </table>
   </div>
-
   <!-- Customer Notes & Attachments -->
   {% if order_note %}
   <div class="detail-card">

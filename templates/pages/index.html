@@ -65,13 +65,15 @@
         {% endif %}
       </div>
       <h3>{{ product.short_description|truncatechars:80 }}</h3>
-      <p class="product-price">
-        {% if product.bulk_price %}
-          {{ product.bulk_price }} - {{ product.price }} DZD
+      {% with price_range=product.get_price_range %}
+        {% if price_range.0 == price_range.1 %}
+          <p class="product-price">DZD {{ price_range.0 }}</p>
+        {% elif price_range.0 > 0 %}
+          <p class="product-price">DZD {{ price_range.0 }} - {{ price_range.1 }}</p>
         {% else %}
-          {{ product.price }} DZD
+          <p class="product-price">Prix sur demande</p>
         {% endif %}
-      </p>
+      {% endwith %}
       <a href="{{ product.get_absolute_url }}" class="btn btn-view-details">Voir les Détails</a>
     </div>
     {% endfor %}
@@ -139,7 +141,15 @@
         {% endif %}
       </div>
       <h3>{{ product.short_description|truncatechars:80 }}</h3>
-      <p class="product-price">{{ product.price }} DZD</p>
+      {% with price_range=product.get_price_range %}
+        {% if price_range.0 == price_range.1 %}
+          <p class="current-price">DZD {{ price_range.0 }}</p>
+        {% elif price_range.0 > 0 %}
+          <p class="current-price">DZD {{ price_range.0 }} - {{ price_range.1 }}</p>
+        {% else %}
+          <p class="current-price">Prix sur demande</p>
+        {% endif %}
+      {% endwith %}
       <a href="{{ product.get_absolute_url }}" class="btn btn-view-details">Voir les Détails</a>
     </div>
     {% endfor %}

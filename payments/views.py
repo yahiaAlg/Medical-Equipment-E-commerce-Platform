@@ -8,8 +8,7 @@ import json
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.http import JsonResponse
-
-from products.models import Product
+from products.models import Product, ProductVariant
 from .models import *
 from .forms import *
 from .services import *
@@ -54,10 +53,28 @@ def add_to_cart(request):
         product = Product.objects.get(id=product_id)
         variant = None
 
+        # Get variant if specified
         if variant_id:
-            from products.models import ProductVariant
 
             variant = ProductVariant.objects.get(id=variant_id, product=product)
+
+            # Check variant stock
+            if variant.stock_quantity < quantity:
+                return JsonResponse(
+                    {
+                        "success": False,
+                        "message": f"Stock insuffisant. Seulement {variant.stock_quantity} disponible(s)",
+                    }
+                )
+        else:
+            # Check product stock if no variant
+            if product.stock_quantity < quantity:
+                return JsonResponse(
+                    {
+                        "success": False,
+                        "message": f"Stock insuffisant. Seulement {product.stock_quantity} disponible(s)",
+                    }
+                )
 
         cart, created = Cart.objects.get_or_create(user=request.user)
 
@@ -66,20 +83,32 @@ def add_to_cart(request):
         )
 
         if not created:
-            cart_item.quantity += quantity
+            new_quantity = cart_item.quantity + quantity
+
+            # Check stock for updated quantity
+            max_stock = variant.stock_quantity if variant else product.stock_quantity
+            if new_quantity > max_stock:
+                return JsonResponse(
+                    {
+                        "success": False,
+                        "message": f"Impossible d'ajouter {quantity}. Stock maximum: {max_stock}",
+                    }
+                )
+
+            cart_item.quantity = new_quantity
             cart_item.save()
 
         return JsonResponse(
             {
                 "success": True,
-                "message": "Product added to cart",
+                "message": "Produit ajouté au panier",
                 "cart_count": cart.get_total_items(),
                 "cart_total": str(cart.get_total_price()),
             }
         )
 
     except Product.DoesNotExist:
-        return JsonResponse({"success": False, "message": "Product not found"})
+        return JsonResponse({"success": False, "message": "Produit non trouvé"})
     except Exception as e:
         return JsonResponse({"success": False, "message": str(e)})
 

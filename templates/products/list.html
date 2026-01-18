@@ -165,7 +165,15 @@
                 {% endfor %}
               </div>
               
-              <p class="product-price">DZD {{ product.price }}</p>
+              {% with price_range=product.get_price_range %}
+                {% if price_range.0 == price_range.1 %}
+                  <p class="product-price">DZD {{ price_range.0 }}</p>
+                {% elif price_range.0 > 0 %}
+                  <p class="product-price">DZD {{ price_range.0 }} - {{ price_range.1 }}</p>
+                {% else %}
+                  <p class="product-price">Prix sur demande</p>
+                {% endif %}
+              {% endwith %}
               <div class="product-rating">
                   ★ ({{ product.get_average_rating|floatformat:1 }})
               </div>

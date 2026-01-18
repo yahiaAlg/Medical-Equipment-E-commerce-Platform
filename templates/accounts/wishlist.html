@@ -100,10 +100,15 @@
                         </div>
                         
                         <div class="wishlist-item-price">
-                            <span class="current-price">{{ product.price }} DZD</span>
-                            {% if product.bulk_price and product.price > product.bulk_price %}
-                                <span class="original-price">{{ product.bulk_price }} DZD</span>
-                            {% endif %}
+                            {% with price_range=product.get_price_range %}
+                                {% if price_range.0 == price_range.1 %}
+                                <p class="product-price">DZD {{ price_range.0 }}</p>
+                                {% elif price_range.0 > 0 %}
+                                <p class="product-price">DZD {{ price_range.0 }} - {{ price_range.1 }}</p>
+                                {% else %}
+                                <p class="product-price">Prix sur demande</p>
+                                {% endif %}
+                            {% endwith %}
                         </div>
                         
                         <div class="wishlist-item-actions">
@@ -172,10 +177,15 @@
                         </div>
                         
                         <div class="wishlist-item-price">
-                            <span class="current-price">{{ product.price }} DZD</span>
-                            {% if product.bulk_price and product.price > product.bulk_price %}
-                                <span class="original-price">{{ product.bulk_price }} DZD</span>
+                        {% with price_range=product.get_price_range %}
+                            {% if price_range.0 == price_range.1 %}
+                            <p class="current-price">DZD {{ price_range.0 }}</p>
+                            {% elif price_range.0 > 0 %}
+                            <p class="current-price">DZD {{ price_range.0 }} - {{ price_range.1 }}</p>
+                            {% else %}
+                            <p class="current-price">Prix sur demande</p>
                             {% endif %}
+                        {% endwith %}
                         </div>
                         
                         <div class="wishlist-item-actions">
